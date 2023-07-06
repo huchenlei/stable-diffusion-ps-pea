@@ -37,6 +37,8 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install
+      - name: Install npm-run-all
+        run: npm install -g npm-run-all
       - name: Build
         run: npm run build
       - name: Setup Pages
