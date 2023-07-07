@@ -1,6 +1,31 @@
 # stable-diffusion-ps-pea
 Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
 
+## Development plan
+
+1. Basic UI setting for image generation
+   - We should not distinguish txt2img and img2img. (Maybe txt2img in some advanced settings?). Fill on an empty selection should trigger txt2img, otherwise img2img.
+   - Prompt input, various configuration input UI.
+   - Get input from current photopea selection (Capture the selected content)
+   - Sending inputs to A1111 API
+   - Render the returned image on photopea canvas
+   - Ckpt selection, VAE selection.
+1. Prompt textbox
+   - Auto complete (Self prompt use history and prompt use DB)
+   - Templates (Default quality prompt, negative embeddings, etc)
+   - Prompt token estimation (75/150/225)
+   - LoRA selection (LoRA should be selected instead of being put into prompt ideally)
+     - Automatically detect LoRA trigger words
+1. ControlNet support
+   - Select a layer, choose a preprocessor can convert it to ControlNet layer.
+   - ControlNet layer will be used as ControlNet input
+   - Black background of the preprocessor result will be replaced by transparent background
+   - White lines, shapes will be inverted
+1. Inpaint
+   - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
+(512x512?).
+   - Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
