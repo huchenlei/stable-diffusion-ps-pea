@@ -1,6 +1,10 @@
 # stable-diffusion-ps-pea
 Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
 
+## Setup
+Add `--cors-allow-origins http://localhost:5173` to WebUI command line args for local development.
+Add `--cors-allow-origins https://huchenlei.github.io/stable-diffusion-ps-pea/` for production useage.
+
 ## Development plan
 
 1. Basic UI setting for image generation
