@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
+import { A1111Context, ISampler } from '../Automatic1111';
+import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
 interface ICommonPayload {
   // Basic generation params.
@@ -116,6 +118,16 @@ class CommonPayload implements ICommonPayload {
 };
 
 const payload = ref(new CommonPayload());
+const context: A1111Context = useA1111ContextStore().a1111Context;
+
+function samplerOptions(samplers: ISampler[]) {
+  return samplers.map(sampler => {
+    return {
+      value: sampler.name,
+      label: sampler.name,
+    };
+  });
+}
 
 function onSubmit(e: Event) {
   e.preventDefault();
@@ -125,6 +137,10 @@ function onSubmit(e: Event) {
 
 <template>
   <a-form :model="payload" @submit="onSubmit">
+    <a-form-item label="sampler" name="sampler">
+      <a-select ref="select" v-model="payload.sampler_name" :options="samplerOptions(context.samplers)"></a-select>
+    </a-form-item>
+
     <a-form-item label="Batch Size" name="batch_size">
       <a-input-number v-model="payload.batch_size" />
     </a-form-item>
