@@ -106,6 +106,14 @@ class A1111Context {
     get apiURL(): string {
         return `${this.baseURL}/sdapi/v1`;
     }
+
+    get txt2imgURL(): string {
+        return `${this.apiURL}/txt2img`;
+    }
+
+    get img2imgURL(): string {
+        return `${this.apiURL}/img2img`;
+    }
 };
 
 interface ICommonPayload {

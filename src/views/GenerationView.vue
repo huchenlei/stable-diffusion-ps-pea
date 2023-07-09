@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { A1111Context, type ISampler, CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
 const payload = new CommonPayload();
 const context: A1111Context = useA1111ContextStore().a1111Context;
+const imgSrc = ref('');
 
 function samplerOptions(samplers: ISampler[]) {
   return samplers.map(sampler => {
@@ -14,16 +16,24 @@ function samplerOptions(samplers: ISampler[]) {
   });
 }
 
-function generate() {
-  
+async function generate() {
+  const response = await fetch(context.txt2imgURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
 }
 </script>
 
 <template>
   <a-form :model="payload">
     <a-form-item label="Prompt">
-      <a-textarea v-model:value="payload.prompt" placeholder="Enter prompt here"
-        :autoSize="{ minRows: 2, maxRows: 6 }" />
+      <a-textarea v-model:value="payload.prompt" placeholder="Enter prompt here" :autoSize="{ minRows: 2, maxRows: 6 }" />
     </a-form-item>
 
     <a-form-item label="Negative Prompt">
@@ -54,5 +64,7 @@ function generate() {
     <a-form-item>
       <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
     </a-form-item>
+
+    <a-image v-model:src="imgSrc" />
   </a-form>
 </template>
