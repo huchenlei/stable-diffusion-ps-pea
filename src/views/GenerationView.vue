@@ -2,7 +2,7 @@
 import { ref, reactive } from 'vue';
 import { A1111Context, type ISampler, CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { executeInPhotopea, pasteImageAsNewLayer } from '../Photopea';
+import { photopeaContext } from '../Photopea';
 
 const payload = reactive(new CommonPayload());
 const context: A1111Context = useA1111ContextStore().a1111Context;
@@ -30,11 +30,17 @@ async function generate() {
   imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
 
   try {
-    await executeInPhotopea(pasteImageAsNewLayer, imgSrc.value);
+    await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value);
   } catch (e) {
     console.error(e);
   }
 }
+
+async function captureMask() {
+  const base64image = await photopeaContext.invoke('exportMaskFromSelection');
+  imgSrc.value = `data:image/png;base64,${base64image}`;
+}
+
 </script>
 
 <template>
@@ -70,6 +76,10 @@ async function generate() {
 
     <a-form-item>
       <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
+    </a-form-item>
+
+    <a-form-item>
+      <a-button type="primary" @click="captureMask">capture mask</a-button>
     </a-form-item>
 
     <a-image v-model:src="imgSrc" />
