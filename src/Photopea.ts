@@ -1,113 +1,53 @@
-// Posts a message and receives back a promise that will eventually return a 2-element array. One of
-// them will be Photopea's "done" message, and the other the actual payload.
-
-const photopeaWindow = window.parent;
 const MESSAGE_END_ACK = "done";
+class PhotopeaContext {
+    photopeaWindow: Window;
+    // The content is a JS file that defines many useful photopea operations.
+    context: string;
 
-function postMessageToPhotopea(message: string) {
-    if (window === window.top) {
-        throw Error("Not running in Photopea environment!");
+    constructor() {
+        this.photopeaWindow = window.parent;
+        this.context = '';
     }
 
-    return new Promise(function (resolve) {
-        const responseDataPieces: any[] = [];
-        function photopeaMessageHandle(event: MessageEvent) {
-            if (event.data == MESSAGE_END_ACK) {
-                window.removeEventListener("message", photopeaMessageHandle);
-                resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
-            } else {
-                responseDataPieces.push(event.data);
-            }
-        };
+    async initialize() {
+        const response = await fetch("/js/photopea.js");
+        this.context = await response.text();
+    }
 
-        window.addEventListener("message", photopeaMessageHandle);
-        photopeaWindow.postMessage(message, "*");
-    });
-}
-
-function getPhotopeaScriptString(func: Function, ...args: any[]) {
-    return func.toString() + `${func.name}(${args.map(arg => JSON.stringify(arg)).join(',')});`
-}
-
-function executeInPhotopea(func: Function, ...args: any[]) {
-    // Replace window.app with app, as in Photopea app is a global variable that 
-    // is not bound to the `window` object.
-    const message = getPhotopeaScriptString(func, ...args).replace('window.app', 'app');
-    console.debug(`ps-pea: sending to photopea\n` + message);
-    return postMessageToPhotopea(message);
-}
-
-interface PhotopeaLayer {
-    typename: string;
-    visible: boolean;
-};
-
-interface PhotopeaDocument {
-    typename: string;
-    layers: (PhotopeaLayer | PhotopeaDocument)[];
-    activeLayer: (PhotopeaLayer | PhotopeaDocument);
-    saveToOE: (format: string) => void;
-};
-
-interface PhotopeaApp {
-    activeDocument: PhotopeaDocument;
-    open: (url: string, as: string | null, asSmart: boolean) => void;
-};
-
-// Hides all layers except the current one, outputs the whole image, then restores the previous
-// layers state.
-// This function is expected to execute in Photopea.
-function exportSelectedLayerOnly(format: string) {
-    // Gets all layers recursively, including the ones inside folders.
-    function getAllArtLayers(document: PhotopeaDocument) {
-        const allArtLayers: PhotopeaLayer[] = [];
-
-        for (var i = 0; i < document.layers.length; i++) {
-            var currentLayer = document.layers[i];
-            if (currentLayer.typename === "ArtLayer") {
-                allArtLayers.push(currentLayer as PhotopeaLayer);
-            } else {
-                allArtLayers.push(...getAllArtLayers(currentLayer as PhotopeaDocument));
-            }
+    // Post a message to photopea and receive the result.
+    private postMessageToPhotopea(message: string) {
+        if (window === window.top) {
+            throw Error("Not running in Photopea environment!");
         }
-        return allArtLayers;
+
+        return new Promise((resolve) => {
+            const responseDataPieces: any[] = [];
+            function photopeaMessageHandle(event: MessageEvent) {
+                if (event.data == MESSAGE_END_ACK) {
+                    window.removeEventListener("message", photopeaMessageHandle);
+                    resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
+                } else {
+                    responseDataPieces.push(event.data);
+                }
+            };
+
+            window.addEventListener("message", photopeaMessageHandle);
+            this.photopeaWindow.postMessage(message, "*");
+        });
     }
-    const app = (window as any)["app"] as PhotopeaApp;
 
-    const allLayers = getAllArtLayers(app.activeDocument);
-    // Make all layers except the currently selected one invisible, and store
-    // their initial state.
-    const layerStates = allLayers.map(layer => layer.visible);
-    allLayers.forEach(layer => layer.visible = layer === app.activeDocument.activeLayer);
+    public async invoke(funcName: string, ...args: any[]) {
+        if (!this.context) {
+            await this.initialize();
+        }
+        const funcCall = `${funcName}(${args.map(arg => JSON.stringify(arg)).join(',')});`;
+        const message = (this.context + funcCall);
+        console.debug(message);
+        return this.postMessageToPhotopea(message);
+    }
+};
 
-    app.activeDocument.saveToOE(format);
-
-    layerStates.forEach((visible, i) => {
-        allLayers[i].visible = visible;
-    });
-}
-
-/**
- * This function is expected to execute in Photopea.
- * @param format image format string. e.g. "PNG".
- */
-function exportAllLayers(format: string) {
-    ((window as any)["app"] as PhotopeaApp).activeDocument.saveToOE(format);
-}
-
-/**
- * This function is expected to execute in Photopea.
- * @param base64image base64 string representing an image.
- */
-function pasteImageAsNewLayer(base64image: string) {
-    ((window as any)["app"] as PhotopeaApp).open(base64image, null, /* asSmart */ true);
-}
-
+const photopeaContext = new PhotopeaContext();
 export {
-    executeInPhotopea,
-    getPhotopeaScriptString,
-    postMessageToPhotopea,
-    exportSelectedLayerOnly,
-    exportAllLayers,
-    pasteImageAsNewLayer,
+    photopeaContext
 };
