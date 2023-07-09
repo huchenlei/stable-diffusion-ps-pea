@@ -18,6 +18,6 @@ const initializeContext = async () => {
   <div>
     <a-input addonBefore="A1111 URL:" :value="a1111URL" @input="(value: string) => a1111URL = value">
     </a-input>
-    <a-button @click="initializeContext">Connect</a-button>
+    <a-button @click="initializeContext">{{ $t('connect') }}</a-button>
   </div>
 </template>

@@ -1,0 +1,13 @@
+import { createI18n } from 'vue-i18n'
+
+const messages = {
+    en: {
+        connect: 'Connect',
+    },
+};
+
+export default createI18n({
+    locale: navigator.language.split('-')[0] || 'en',
+    fallbackLocale: 'en',
+    messages,
+});
