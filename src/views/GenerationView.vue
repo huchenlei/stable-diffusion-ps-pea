@@ -37,7 +37,7 @@ async function generate() {
 }
 
 async function captureMask() {
-  const base64image = await photopeaContext.invoke('exportMaskFromSelection');
+  const base64image = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG');
   imgSrc.value = `data:image/png;base64,${base64image}`;
 }
 
