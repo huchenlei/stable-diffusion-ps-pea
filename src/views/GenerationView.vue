@@ -2,6 +2,7 @@
 import { ref, reactive } from 'vue';
 import { A1111Context, type ISampler, CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+import { executeInPhotopea, pasteImageAsNewLayer } from '../Photopea';
 
 const payload = reactive(new CommonPayload());
 const context: A1111Context = useA1111ContextStore().a1111Context;
@@ -27,6 +28,12 @@ async function generate() {
 
   const data = await response.json();
   imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
+
+  try {
+    await executeInPhotopea(pasteImageAsNewLayer, data);
+  } catch (e) {
+    console.error(e);
+  }
 }
 </script>
 
