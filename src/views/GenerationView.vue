@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { A1111Context, type ISampler, CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
-const payload = new CommonPayload();
+const payload = reactive(new CommonPayload());
 const context: A1111Context = useA1111ContextStore().a1111Context;
 const imgSrc = ref('');
 
