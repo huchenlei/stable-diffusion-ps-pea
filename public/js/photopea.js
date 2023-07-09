@@ -1,16 +1,18 @@
+// Note: Many ES6+ features are not available in photopea environment. 
+
 // Hides all layers except the current one, outputs the whole image, then restores the previous
 // layers state.
 function exportSelectedLayerOnly(format) {
     // Gets all layers recursively, including the ones inside folders.
     function getAllArtLayers(document) {
-        const allArtLayers = [];
+        let allArtLayers = [];
 
-        for (var i = 0; i < document.layers.length; i++) {
-            var currentLayer = document.layers[i];
+        for (let i = 0; i < document.layers.length; i++) {
+            const currentLayer = document.layers[i];
             if (currentLayer.typename === "ArtLayer") {
                 allArtLayers.push(currentLayer);
             } else {
-                allArtLayers.push(...getAllArtLayers(currentLayer));
+                allArtLayers = allArtLayers.concat(getAllArtLayers(currentLayer));
             }
         }
         return allArtLayers;
@@ -19,14 +21,20 @@ function exportSelectedLayerOnly(format) {
     const allLayers = getAllArtLayers(app.activeDocument);
     // Make all layers except the currently selected one invisible, and store
     // their initial state.
-    const layerStates = allLayers.map(layer => layer.visible);
-    allLayers.forEach(layer => layer.visible = layer === app.activeDocument.activeLayer);
+    const layerStates = [];
+    for (let i = 0; i < allLayers.length; i++) {
+        const layer = allLayers[i];
+
+        layerStates.push(layer.visible);
+        layer.visible = layer === app.activeDocument.activeLayer;
+    }
 
     app.activeDocument.saveToOE(format);
 
-    layerStates.forEach((visible, i) => {
-        allLayers[i].visible = visible;
-    });
+    for (let i = 0; i < allLayers.length; i++) {
+        const layer = allLayers[i];
+        layer.visible = layerStates[i];
+    }
 }
 
 /**
