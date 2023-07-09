@@ -128,23 +128,15 @@ async function captureMask() {
         </a-form-item>
 
         <a-form-item label="sampler" name="sampler">
-          <a-select ref="select" v-model="payload.sampler_name" :options="samplerOptions(context.samplers)"></a-select>
+          <a-select ref="select" v-model:value="payload.sampler_name" :options="samplerOptions(context.samplers)"></a-select>
         </a-form-item>
 
         <a-form-item label="Batch Size" name="batch_size">
-          <a-input-number v-model:value="payload.batch_size" />
+          <a-input-number v-model:value="payload.batch_size" :min="1" :max="64" />
         </a-form-item>
 
         <a-form-item label="CFG Scale" name="cfg_scale">
-          <a-input-number v-model:value="payload.cfg_scale" />
-        </a-form-item>
-
-        <a-form-item label="Height" name="height">
-          <a-input-number v-model:value="payload.height" />
-        </a-form-item>
-
-        <a-form-item label="Width" name="width">
-          <a-input-number v-model:value="payload.width" />
+          <a-input-number v-model:value="payload.cfg_scale" :min="1" :max="30" />
         </a-form-item>
 
         <a-form-item>
