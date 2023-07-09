@@ -1,16 +1,32 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterLink, RouterView, useRoute } from 'vue-router';
+const route = useRoute();
 </script>
 
 <template>
   <header>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/generation">Generation</RouterLink>
-      </nav>
+    <a-menu class="navigation" mode="horizontal" :selectedKeys="[route.path]">
+      <a-menu-item key="/">
+        <RouterLink to="/">{{ $t('nav.connection') }}</RouterLink>
+      </a-menu-item>
+      <a-menu-item key="/about">
+        <RouterLink to="/about">{{ $t('nav.about') }}</RouterLink>
+      </a-menu-item>
+      <a-menu-item key="/generation">
+        <RouterLink to="/generation">{{ $t('nav.generation') }}</RouterLink>
+      </a-menu-item>
+    </a-menu>
   </header>
-
   <RouterView />
 </template>
 
+<style scoped>
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  /* ensure it's on top of other elements */
+}
+</style>
