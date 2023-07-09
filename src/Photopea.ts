@@ -30,7 +30,9 @@ function getPhotopeaScriptString(func: Function, ...args: any[]) {
 }
 
 function executeInPhotopea(func: Function, ...args: any[]) {
-    const message = getPhotopeaScriptString(func, ...args)
+    // Replace window.app with app, as in Photopea app is a global variable that 
+    // is not bound to the `window` object.
+    const message = getPhotopeaScriptString(func, ...args).replace('window.app', 'app');
     console.debug(`ps-pea: sending to photopea\n` + message);
     return postMessageToPhotopea(message);
 }

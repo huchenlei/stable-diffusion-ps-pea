@@ -30,7 +30,7 @@ async function generate() {
   imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
 
   try {
-    await executeInPhotopea(pasteImageAsNewLayer, data['images'][0]);
+    await executeInPhotopea(pasteImageAsNewLayer, imgSrc.value);
   } catch (e) {
     console.error(e);
   }
