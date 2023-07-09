@@ -26,7 +26,9 @@ function exportSelectedLayerOnly(format) {
         const layer = allLayers[i];
 
         layerStates.push(layer.visible);
-        layer.visible = layer === app.activeDocument.activeLayer;
+        // Don't use `===` here as the compare is for the value of the layer,
+        // not address.
+        layer.visible = layer == app.activeDocument.activeLayer;
     }
 
     app.activeDocument.saveToOE(format);
