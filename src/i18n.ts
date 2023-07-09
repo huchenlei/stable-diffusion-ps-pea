@@ -4,6 +4,7 @@ const messages = {
     en: {
         connect: 'Connect',
         a1111URL: 'A1111 URL:',
+        generate: 'Generate',
     },
 };
 
