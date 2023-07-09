@@ -10,7 +10,7 @@ class PhotopeaContext {
     }
 
     async initialize() {
-        const response = await fetch("/js/photopea.js");
+        const response = await fetch(`${import.meta.env.BASE_URL}/js/photopea.js`);
         this.context = await response.text();
     }
 
