@@ -30,7 +30,9 @@ function getPhotopeaScriptString(func: Function, ...args: any[]) {
 }
 
 function executeInPhotopea(func: Function, ...args: any[]) {
-    return postMessageToPhotopea(getPhotopeaScriptString(func, ...args));
+    const message = getPhotopeaScriptString(func, ...args)
+    console.debug(`ps-pea: sending to photopea\n` + message);
+    return postMessageToPhotopea(message);
 }
 
 interface PhotopeaLayer {
