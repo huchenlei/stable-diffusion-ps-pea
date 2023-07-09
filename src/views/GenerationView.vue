@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, inject } from 'vue';
-import { A1111Context, ISampler } from '../Automatic1111';
+import { ref } from 'vue';
+import { A1111Context, type ISampler } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
 interface ICommonPayload {
