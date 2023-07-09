@@ -3,6 +3,7 @@ import { createI18n } from 'vue-i18n'
 const messages = {
     en: {
         connect: 'Connect',
+        a1111URL: 'A1111 URL:',
     },
 };
 
