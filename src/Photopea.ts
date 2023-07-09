@@ -52,8 +52,6 @@ interface PhotopeaApp {
     open: (url: string, as: string | null, asSmart: boolean) => void;
 };
 
-const app = {} as PhotopeaApp;
-
 // Hides all layers except the current one, outputs the whole image, then restores the previous
 // layers state.
 // This function is expected to execute in Photopea.
@@ -72,6 +70,7 @@ function exportSelectedLayerOnly(format: string) {
         }
         return allArtLayers;
     }
+    const app = (window as any)["app"] as PhotopeaApp;
 
     const allLayers = getAllArtLayers(app.activeDocument);
     // Make all layers except the currently selected one invisible, and store
@@ -91,7 +90,7 @@ function exportSelectedLayerOnly(format: string) {
  * @param format image format string. e.g. "PNG".
  */
 function exportAllLayers(format: string) {
-    app.activeDocument.saveToOE(format);
+    ((window as any)["app"] as PhotopeaApp).activeDocument.saveToOE(format);
 }
 
 /**
@@ -99,7 +98,7 @@ function exportAllLayers(format: string) {
  * @param base64image base64 string representing an image.
  */
 function pasteImageAsNewLayer(base64image: string) {
-    app.open(base64image, null, /* asSmart */ true);
+    ((window as any)["app"] as PhotopeaApp).open(base64image, null, /* asSmart */ true);
 }
 
 export {
