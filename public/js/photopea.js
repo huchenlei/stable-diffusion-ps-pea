@@ -59,7 +59,7 @@ function pasteImageAsNewLayer(base64image) {
 function exportMaskFromSelection(format) {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
-    if (app.activeDocument.selection.bounds === null) {
+    if (!app.activeDocument.selection.bounds) {
         alert("No selection!");
         app.echoToOE("");
         return;
@@ -95,7 +95,7 @@ function getSelectionBound() {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
     const bounds = app.activeDocument.selection.bounds;
-    if (bounds === null) {
+    if (!bounds) {
         app.echoToOE("");
     } else {
         app.echoToOE(JSON.stringify(bounds));
