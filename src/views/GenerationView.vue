@@ -109,6 +109,8 @@ async function generate() {
 
 async function captureMask() {
   const arrayBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string);
+  console.log(maskBound);
   imgSrc.value = `data:image/png;base64,${base64ArrayBuffer(arrayBuffer)}`;
 }
 

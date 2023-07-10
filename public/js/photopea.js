@@ -61,6 +61,7 @@ function exportMaskFromSelection(format) {
     // to see if the selection is actually there.
     if (app.activeDocument.selection.bounds === null) {
         alert("No selection!");
+        app.echoToOE("");
         return;
     }
 
@@ -88,4 +89,15 @@ function exportMaskFromSelection(format) {
 
     // Remove the temp layer.
     app.activeDocument.activeLayer.remove();
+}
+
+function getSelectionBound() {
+    // Note: app.activeDocument.selection seems always exists. Checking bounds
+    // to see if the selection is actually there.
+    const bounds = app.activeDocument.selection.bounds;
+    if (bounds === null) {
+        app.echoToOE("");
+    } else {
+        app.echoToOE(JSON.stringify(bounds));
+    }
 }

@@ -20,18 +20,22 @@ class PhotopeaContext {
             throw Error("Not running in Photopea environment!");
         }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const responseDataPieces: any[] = [];
             function photopeaMessageHandle(event: MessageEvent) {
                 if (event.data == MESSAGE_END_ACK) {
                     window.removeEventListener("message", photopeaMessageHandle);
                     resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
+                } else if (!event.data) {
+                    reject('Photopea Error.');
                 } else {
                     responseDataPieces.push(event.data);
                 }
             };
 
             window.addEventListener("message", photopeaMessageHandle);
+            // Timeout after 5s.
+            setTimeout(() => reject("Photopea message timeout"), 5 * 1000);
             this.photopeaWindow.postMessage(message, "*");
         });
     }
