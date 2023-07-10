@@ -2,7 +2,8 @@
 import { ref, reactive } from 'vue';
 import { A1111Context, type ISampler, CommonPayload, type IStableDiffusionModel } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { photopeaContext } from '../Photopea';
+import { photopeaContext, type PhotopeaBound } from '../Photopea';
+import { applyMask } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 
 /*
@@ -108,10 +109,10 @@ async function generate() {
 }
 
 async function captureMask() {
-  const arrayBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string);
-  console.log(maskBound);
-  imgSrc.value = `data:image/png;base64,${base64ArrayBuffer(arrayBuffer)}`;
+  const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+  const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+  imgSrc.value = await applyMask(imageBuffer, maskBuffer, maskBound);
 }
 
 </script>

@@ -51,7 +51,14 @@ class PhotopeaContext {
     }
 };
 
+interface PhotopeaBoundItem {
+    0: string;
+    b: number;
+};
+type PhotopeaBound = [PhotopeaBoundItem, PhotopeaBoundItem, PhotopeaBoundItem, PhotopeaBoundItem];
+
 const photopeaContext = new PhotopeaContext();
 export {
+    type PhotopeaBound,
     photopeaContext
 };
