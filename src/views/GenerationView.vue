@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue';
 import { A1111Context, type ISampler, CommonPayload, type IStableDiffusionModel } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
-import { applyMask } from '../ImageUtil';
+import { applyMask, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 
 /*
@@ -110,9 +110,14 @@ async function generate() {
 
 async function captureMask() {
   const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+  imgSrc.value = await cropImage(maskBuffer, maskBound);
+}
+
+async function captureImage() {
   const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
   const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-  imgSrc.value = await applyMask(imageBuffer, maskBuffer, maskBound);
+  imgSrc.value = await cropImage(imageBuffer, maskBound);
 }
 
 </script>
@@ -152,6 +157,10 @@ async function captureMask() {
 
       <a-form-item>
         <a-button type="primary" @click="captureMask">capture mask</a-button>
+      </a-form-item>
+
+      <a-form-item>
+        <a-button type="primary" @click="captureImage">capture image</a-button>
       </a-form-item>
 
       <a-image v-model:src="imgSrc" />
