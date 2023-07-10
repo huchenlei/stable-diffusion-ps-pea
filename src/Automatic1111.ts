@@ -50,6 +50,158 @@ interface IHypernetwork {
     path: string;
 };
 
+interface IOptions {
+    samples_save: boolean;
+    samples_format: string;
+    samples_filename_pattern: string;
+    save_images_add_number: boolean;
+    grid_save: boolean;
+    grid_format: string;
+    grid_extended_filename: boolean;
+    grid_only_if_multiple: boolean;
+    grid_prevent_empty_spots: boolean;
+    grid_zip_filename_pattern: string;
+    n_rows: number;
+    enable_pnginfo: boolean;
+    save_txt: boolean;
+    save_images_before_face_restoration: boolean;
+    save_images_before_highres_fix: boolean;
+    save_images_before_color_correction: boolean;
+    save_mask: boolean;
+    save_mask_composite: boolean;
+    jpeg_quality: number;
+    webp_lossless: boolean;
+    export_for_4chan: boolean;
+    img_downscale_threshold: number;
+    target_side_length: number;
+    img_max_size_mp: number;
+    use_original_name_batch: boolean;
+    use_upscaler_name_as_suffix: boolean;
+    save_selected_only: boolean;
+    save_init_img: boolean;
+    temp_dir: string;
+    clean_temp_dir_at_start: boolean;
+    outdir_samples: string;
+    outdir_txt2img_samples: string;
+    outdir_img2img_samples: string;
+    outdir_extras_samples: string;
+    outdir_grids: string;
+    outdir_txt2img_grids: string;
+    outdir_img2img_grids: string;
+    outdir_save: string;
+    outdir_init_images: string;
+    save_to_dirs: boolean;
+    grid_save_to_dirs: boolean;
+    use_save_to_dirs_for_ui: boolean;
+    directories_filename_pattern: string;
+    directories_max_prompt_words: number;
+    ESRGAN_tile: number;
+    ESRGAN_tile_overlap: number;
+    realesrgan_enabled_models: string[];
+    upscaler_for_img2img: any;
+    face_restoration_model: string;
+    code_former_weight: number;
+    face_restoration_unload: boolean;
+    show_warnings: boolean;
+    memmon_poll_rate: number;
+    samples_log_stdout: boolean;
+    multiple_tqdm: boolean;
+    print_hypernet_extra: boolean;
+    list_hidden_files: boolean;
+    unload_models_when_training: boolean;
+    pin_memory: boolean;
+    save_optimizer_state: boolean;
+    save_training_settings_to_txt: boolean;
+    dataset_filename_word_regex: string;
+    dataset_filename_join_string: string;
+    training_image_repeats_per_epoch: number;
+    training_write_csv_every: number;
+    training_xattention_optimizations: boolean;
+    training_enable_tensorboard: boolean;
+    training_tensorboard_save_images: boolean;
+    training_tensorboard_flush_every: number;
+    sd_model_checkpoint: string;
+    sd_checkpoint_cache: number;
+    sd_vae_checkpoint_cache: number;
+    sd_vae: string;
+    sd_vae_as_default: boolean;
+    sd_unet: string;
+    inpainting_mask_weight: number;
+    initial_noise_multiplier: number;
+    img2img_color_correction: boolean;
+    img2img_fix_steps: boolean;
+    img2img_background_color: string;
+    enable_quantization: boolean;
+    enable_emphasis: boolean;
+    enable_batch_seeds: boolean;
+    comma_padding_backtrack: number;
+    CLIP_stop_at_last_layers: number;
+    upcast_attn: boolean;
+    randn_source: string;
+    cross_attention_optimization: string;
+    s_min_uncond: number;
+    token_merging_ratio: number;
+    token_merging_ratio_img2img: number;
+    token_merging_ratio_hr: number;
+    pad_cond_uncond: boolean;
+    experimental_persistent_cond_cache: boolean;
+    use_old_emphasis_implementation: boolean;
+    use_old_karras_scheduler_sigmas: boolean;
+    no_dpmpp_sde_batch_determinism: boolean;
+    use_old_hires_fix_width_height: boolean;
+    dont_fix_second_order_samplers_schedule: boolean;
+    hires_fix_use_firstpass_conds: boolean;
+    interrogate_keep_models_in_memory: boolean;
+    interrogate_return_ranks: boolean;
+    interrogate_clip_num_beams: number;
+    interrogate_clip_min_length: number;
+    interrogate_clip_max_length: number;
+    interrogate_clip_dict_limit: number;
+    interrogate_clip_skip_categories: any[];
+    interrogate_deepbooru_score_threshold: number;
+    deepbooru_sort_alpha: boolean;
+    deepbooru_use_spaces: boolean;
+    deepbooru_escape: boolean;
+    deepbooru_filter_tags: string;
+    extra_networks_show_hidden_directories: boolean;
+    extra_networks_hidden_models: string;
+    extra_networks_default_view: string;
+    extra_networks_default_multiplier: number;
+    extra_networks_card_width: number;
+    extra_networks_card_height: number;
+    extra_networks_add_text_separator: string;
+    ui_extra_networks_tab_reorder: string;
+    sd_hypernetwork: string;
+    localization: string;
+    gradio_theme: string;
+    img2img_editor_height: number;
+    return_grid: boolean;
+    return_mask: boolean;
+    return_mask_composite: boolean;
+    do_not_show_images: boolean;
+    send_seed: boolean;
+    send_size: boolean;
+    font: string;
+    js_modal_lightbox: boolean;
+    js_modal_lightbox_initially_zoomed: boolean;
+    js_modal_lightbox_gamepad: boolean;
+    js_modal_lightbox_gamepad_repeat: number;
+    show_progress_in_title: boolean;
+    samplers_in_dropdown: boolean;
+    dimensions_and_batch_together: boolean;
+    keyedit_precision_attention: number;
+    keyedit_precision_extra: number;
+    keyedit_delimiters: string;
+    quicksettings_list: string[];
+    ui_tab_order: any[];
+    hidden_tabs: any[];
+    ui_reorder_list: string[];
+    hires_fix_show_sampler: boolean;
+    hires_fix_show_prompts: boolean;
+    disable_token_counters: boolean;
+    add_model_hash_to_info: boolean;
+}
+
 async function fetchJSON(url: string): Promise<any> {
     const response = await fetch(url);
     return await response.json();
@@ -60,11 +212,12 @@ class A1111Context {
 
     samplers: ISampler[] = [];
     upscalers: IUpscaler[] = [];
-    embeddings: IEmbeddings | undefined;
+    embeddings: IEmbeddings = {} as IEmbeddings;
     hypernetworks: IHypernetwork[] = [];
     sdModels: IStableDiffusionModel[] = [];
     sdVAEs: IStableDiffusionVAE[] = [];
     loras: ILoRA[] = [];
+    options: IOptions = {} as IOptions;
 
     public async initialize(baseURL: string): Promise<boolean> {
         this.baseURL = baseURL;
@@ -75,7 +228,8 @@ class A1111Context {
             fetchJSON(`${this.apiURL}/upscalers`),
             fetchJSON(`${this.apiURL}/sd-vae`),
             fetchJSON(`${this.apiURL}/embeddings`),
-            fetchJSON(`${this.apiURL}/hypernetworks`)
+            fetchJSON(`${this.apiURL}/hypernetworks`),
+            fetchJSON(`${this.apiURL}/options`),
         ];
 
         try {
@@ -86,7 +240,8 @@ class A1111Context {
                 upscalers,
                 sdVAEs,
                 embeddings,
-                hypernetworks
+                hypernetworks,
+                options,
             ] = await Promise.all(fetchPromises);
 
             this.samplers = samplers as ISampler[];
@@ -96,6 +251,7 @@ class A1111Context {
             this.sdVAEs = sdVAEs as IStableDiffusionVAE[];
             this.embeddings = embeddings as IEmbeddings;
             this.hypernetworks = hypernetworks as IHypernetwork[];
+            this.options = options as IOptions;
             return true;
         } catch (e) {
             console.error(e);
@@ -234,4 +390,5 @@ export {
     A1111Context,
     CommonPayload,
     type ISampler,
+    type IStableDiffusionModel,
 };

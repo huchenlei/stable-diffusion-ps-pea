@@ -19,7 +19,7 @@ const route = useRoute();
         </a-menu-item>
       </a-menu>
     </header>
-    <RouterView />
+    <RouterView class="view"/>
   </div>
 </template>
 
@@ -32,4 +32,8 @@ const route = useRoute();
   z-index: 1000;
   /* ensure it's on top of other elements */
 }
+.view {
+  margin-top: 50px;
+}
+
 </style>

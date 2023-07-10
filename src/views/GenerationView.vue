@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { A1111Context, type ISampler, CommonPayload } from '../Automatic1111';
+import { A1111Context, type ISampler, CommonPayload, type IStableDiffusionModel } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext } from '../Photopea';
+import SDModelSelection from '@/components/SDModelSelection.vue';
 
 /*
 MIT LICENSE
@@ -74,8 +75,8 @@ function base64ArrayBuffer(arrayBuffer: ArrayBuffer) {
   return base64
 }
 
+const context = useA1111ContextStore().a1111Context;
 const payload = reactive(new CommonPayload());
-const context: A1111Context = useA1111ContextStore().a1111Context;
 const imgSrc = ref('');
 
 function samplerOptions(samplers: ISampler[]) {
@@ -112,43 +113,45 @@ async function captureMask() {
 }
 
 </script>
-
 <template>
-  <a-row>
-    <a-col span="24">
-      <a-form :model="payload" class="payload">
-        <a-form-item>
-          <a-textarea v-model:value="payload.prompt" placeholder="Enter prompt here"
-            :autoSize="{ minRows: 2, maxRows: 6 }" />
-        </a-form-item>
+  <a-space direction="vertical">
+    <SDModelSelection :models="context.sdModels" :activeModelName="context.options.sd_model_checkpoint"
+      @change="(value: string) => context.options.sd_model_checkpoint = value">
+    </SDModelSelection>
 
-        <a-form-item>
-          <a-textarea v-model:value="payload.negative_prompt" placeholder="Enter negative prompt here"
-            :autoSize="{ minRows: 2, maxRows: 6 }" />
-        </a-form-item>
+    <a-form :model="payload" class="payload">
+      <a-form-item>
+        <a-textarea v-model:value="payload.prompt" placeholder="Enter prompt here"
+          :autoSize="{ minRows: 2, maxRows: 6 }" />
+      </a-form-item>
 
-        <a-form-item label="sampler" name="sampler">
-          <a-select ref="select" v-model:value="payload.sampler_name" :options="samplerOptions(context.samplers)"></a-select>
-        </a-form-item>
+      <a-form-item>
+        <a-textarea v-model:value="payload.negative_prompt" placeholder="Enter negative prompt here"
+          :autoSize="{ minRows: 2, maxRows: 6 }" />
+      </a-form-item>
 
-        <a-form-item label="Batch Size" name="batch_size">
-          <a-input-number v-model:value="payload.batch_size" :min="1" :max="64" />
-        </a-form-item>
+      <a-form-item label="sampler" name="sampler">
+        <a-select ref="select" v-model:value="payload.sampler_name"
+          :options="samplerOptions(context.samplers)"></a-select>
+      </a-form-item>
 
-        <a-form-item label="CFG Scale" name="cfg_scale">
-          <a-input-number v-model:value="payload.cfg_scale" :min="1" :max="30" />
-        </a-form-item>
+      <a-form-item label="Batch Size" name="batch_size">
+        <a-input-number v-model:value="payload.batch_size" :min="1" :max="64" />
+      </a-form-item>
 
-        <a-form-item>
-          <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
-        </a-form-item>
+      <a-form-item label="CFG Scale" name="cfg_scale">
+        <a-input-number v-model:value="payload.cfg_scale" :min="1" :max="30" />
+      </a-form-item>
 
-        <a-form-item>
-          <a-button type="primary" @click="captureMask">capture mask</a-button>
-        </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
+      </a-form-item>
 
-        <a-image v-model:src="imgSrc" />
-      </a-form>
-    </a-col>
-  </a-row>
+      <a-form-item>
+        <a-button type="primary" @click="captureMask">capture mask</a-button>
+      </a-form-item>
+
+      <a-image v-model:src="imgSrc" />
+    </a-form>
+  </a-space>
 </template>
