@@ -15,11 +15,20 @@ export default {
       required: true,
     },
   },
-  methods: {
-    async onModelChange(value: string) {
+  emits: ['change'],
+  setup(props, { emit }) {
+    const options = props.models.map(model => {
+      return {
+        value: model.title,
+        label: model.model_name,
+      };
+    });
+
+    const loading = ref(false);
+    async function onModelChange(value: string) {
       const context = useA1111ContextStore().a1111Context;
 
-      this.loading = true;
+      loading.value = true;
       // Update checkpoint.
       const response = await fetch(`${context.apiURL}/options`, {
         method: "POST",
@@ -32,23 +41,14 @@ export default {
       });
 
       console.debug(await response.json());
-
-      this.$emit('change', value);
-      this.loading = false;
+      emit('change', value);
+      loading.value = false;
     }
-  },
-  setup(props) {
-    const options = props.models.map(model => {
-      return {
-        value: model.title,
-        label: model.model_name,
-      };
-    });
 
-    const loading = ref(false);
     return {
       options,
       loading,
+      onModelChange,
     };
   },
 };
