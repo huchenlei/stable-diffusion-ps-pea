@@ -11,7 +11,8 @@ class PhotopeaContext {
 
     async initialize() {
         const response = await fetch(`${import.meta.env.BASE_URL}/js/photopea.js`);
-        this.context = await response.text();
+        // Stripe out all line comments.
+        this.context = (await response.text()).replace(/\/\/.*/g, '');
     }
 
     // Post a message to photopea and receive the result.

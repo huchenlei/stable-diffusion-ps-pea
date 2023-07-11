@@ -61,15 +61,21 @@ function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
     if (hasSelection()) {
         app.activeDocument.selection.deselect();
     }
-
+    const layerNumBeforePaste = app.activeDocument.layers.length;
     app.open(base64image, null, /* asSmart */ true);
-    const layer = app.activeDocument.activeLayer;
-    layer.translate(
-        leftOffset - layer.bounds[0].value,
-        topOffset - layer.bounds[1].value
-    );
+    let checkLayers = setInterval(() => {
+        if (app.activeDocument.layers.length > layerNumBeforePaste) {
+            clearInterval(checkLayers);
+            // Continue your code here, the image is loaded and a new layer has been created
+            const layer = app.activeDocument.activeLayer;
+            layer.translate(
+                leftOffset - layer.bounds[0].value,
+                topOffset - layer.bounds[1].value
+            );
 
-    app.echoToOE('success');
+            app.echoToOE('success');
+        }
+    }, 200 /* ms */);
 }
 
 // Creates a black and white mask based on the current selection in the active document.
