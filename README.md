@@ -8,12 +8,13 @@ Add `--cors-allow-origins https://huchenlei.github.io/stable-diffusion-ps-pea/` 
 ## Development plan
 
 1. Basic UI setting for image generation
-   - We should not distinguish txt2img and img2img. (Maybe txt2img in some advanced settings?). Fill on an empty selection should trigger txt2img, otherwise img2img.
-   - Prompt input, various configuration input UI.
-   - Get input from current photopea selection (Capture the selected content)
-   - Sending inputs to A1111 API
-   - Render the returned image on photopea canvas
-   - Ckpt selection, VAE selection.
+   - [*DONE*] We should not distinguish txt2img and img2img. (Maybe txt2img in some advanced settings?). Fill on an empty selection should trigger txt2img, otherwise img2img.
+   - [*DONE*] Prompt input, various configuration input UI.
+   - [*DONE*] Get input from current photopea selection (Capture the selected content)
+   - [*DONE*] Sending inputs to A1111 API
+   - [*DONE*] Render the returned image on photopea canvas
+   - [*DONE*]Ckpt selection
+   - VAE selection.
 1. Prompt textbox
    - Auto complete (Self prompt use history and prompt use DB)
    - Templates (Default quality prompt, negative embeddings, etc)
