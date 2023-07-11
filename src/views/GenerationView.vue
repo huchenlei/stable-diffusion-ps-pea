@@ -84,8 +84,6 @@ async function captureImage() {
     </SDModelSelection>
 
     <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
-    <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
-    </Img2ImgPayloadDisplay>
 
     <a-form :model="commonPayload" class="payload">
       <a-form-item>
@@ -125,5 +123,18 @@ async function captureImage() {
 
       <a-image v-model:src="imgSrc" />
     </a-form>
+
+    <a-collapse :bordered="false">
+      <a-collapse-panel header="Advanced settings">
+        <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
+        </Img2ImgPayloadDisplay>
+      </a-collapse-panel>
+    </a-collapse>
   </a-space>
 </template>
+
+<style scoped>
+textarea {
+  width: 85vw;
+}
+</style>
