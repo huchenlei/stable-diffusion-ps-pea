@@ -8,7 +8,7 @@ import {
 import PayloadRadio from '@/components/PayloadRadio.vue';
 
 export default {
-    name: 'payloadDisplay',
+    name: 'Img2ImgPayloadDisplay',
     props: {
         payload: {
             type: Img2ImgPayload,

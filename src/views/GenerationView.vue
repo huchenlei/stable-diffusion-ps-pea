@@ -9,10 +9,11 @@ import {
 } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
-import { applyMask, cropImage } from '../ImageUtil';
+import { cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
+import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 
 const generationMode = reactive(ref(GenerationMode.Img2Img));
 
@@ -128,6 +129,8 @@ async function captureImage() {
       <a-collapse-panel header="Advanced settings">
         <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
         </Img2ImgPayloadDisplay>
+        <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
+        </Txt2ImgPayloadDisplay>
       </a-collapse-panel>
     </a-collapse>
   </a-space>

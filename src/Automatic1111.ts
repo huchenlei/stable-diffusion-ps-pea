@@ -251,7 +251,7 @@ class A1111Context {
             this.sdVAEs = sdVAEs as IStableDiffusionVAE[];
             this.embeddings = embeddings as IEmbeddings;
             this.hypernetworks = hypernetworks as IHypernetwork[];
-            this.options = options as IOptions;
+            this.options = options as IOptions;            
             return true;
         } catch (e) {
             console.error(e);
@@ -318,6 +318,7 @@ interface ITxt2ImgPayload {
     hr_scale: number;
     hr_second_pass_steps: number;
     hr_upscaler: string;
+    denoising_strength: number;
     tiling: boolean;
 };
 
@@ -411,6 +412,7 @@ class Txt2ImgPayload implements ITxt2ImgPayload {
     hr_scale: number = 2.0;
     hr_second_pass_steps: number = 0;
     hr_upscaler: string = "Latent";
+    denoising_strength: number = 0.75;
     tiling: boolean = false;
 };
 
