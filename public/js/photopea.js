@@ -65,9 +65,11 @@ function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
     app.open(base64image, null, /* asSmart */ true);
     const layer = app.activeDocument.activeLayer;
     layer.translate(
-        leftOffset - layer.bounds[0].b,
-        topOffset - layer.bounds[1].b
+        leftOffset - layer.bounds[0].value,
+        topOffset - layer.bounds[1].value
     );
+
+    app.echoToOE('success');
 }
 
 // Creates a black and white mask based on the current selection in the active document.
