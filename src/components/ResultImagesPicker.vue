@@ -35,8 +35,7 @@ export default {
                 }, 200);
             });
         }
-        pasteImageOnPhotopea(props.imageUrls[selectedIndex.value]);
-
+        props.imageUrls.forEach(url => pasteImageOnPhotopea(url));
         return {
             selectedIndex,
             async selectResultImage(imageURL: string, index: number) {

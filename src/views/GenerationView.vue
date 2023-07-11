@@ -76,6 +76,8 @@ async function generate() {
     // Clear array content.
     resultImages.length = 0;
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
+    left.value = image.left;
+    top.value = image.top;
   } catch (e) {
     console.error(e);
     return;
