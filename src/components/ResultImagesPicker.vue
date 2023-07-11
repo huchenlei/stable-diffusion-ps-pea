@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { photopeaContext } from '../Photopea';
 
 export default {
@@ -35,7 +35,11 @@ export default {
                 }, 200);
             });
         }
-        props.imageUrls.forEach(url => pasteImageOnPhotopea(url));
+
+        watch(props.imageUrls, (newValue: string[], _) => {
+            newValue.forEach(url => pasteImageOnPhotopea(url));
+        });
+
         return {
             selectedIndex,
             async selectResultImage(imageURL: string, index: number) {
