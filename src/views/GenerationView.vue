@@ -14,16 +14,20 @@ import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
+import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
+const left = ref(0);
+const top = ref(0);
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
 
-const imgSrc = ref('');
+// Image URLs of generated images.
+const resultImages: string[] = reactive([]);
 
 function samplerOptions(samplers: ISampler[]) {
   return samplers.map(sampler => {
@@ -68,14 +72,10 @@ async function generate() {
       }),
     });
     const data = await response.json();
-    imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
 
-    const layerCount = await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value) as number;
-    const waitTranslate = setInterval(async () => {
-      const status = await photopeaContext.invoke('translateIfNewLayerAdded', layerCount, image.left, image.top);
-      if (status === 'success')
-        clearInterval(waitTranslate);
-    }, 200);
+    // Clear array content.
+    resultImages.length = 0;
+    resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
   } catch (e) {
     console.error(e);
     return;
@@ -118,7 +118,7 @@ async function generate() {
       <a-form-item>
         <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
       </a-form-item>
-      <a-image v-model:src="imgSrc" />
+      <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
     </a-form>
 
     <a-collapse :bordered="false">
