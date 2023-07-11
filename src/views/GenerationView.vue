@@ -9,12 +9,15 @@ import {
   InpaintArea,
   InpaintFill,
   MaskMode,
+  GenerationMode,
 } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { applyMask, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
+
+const generationMode = reactive(ref(GenerationMode.Img2Img));
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
@@ -82,6 +85,8 @@ async function captureImage() {
     <SDModelSelection :models="context.sdModels" :activeModelName="context.options.sd_model_checkpoint"
       @change="(value: string) => context.options.sd_model_checkpoint = value">
     </SDModelSelection>
+
+    <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
 
     <PayloadRadio v-model:value="img2imgPayload.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
     <PayloadRadio v-model:value="img2imgPayload.inpaint_full_res" :enum-type="InpaintArea"></PayloadRadio>

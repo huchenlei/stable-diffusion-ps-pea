@@ -414,6 +414,11 @@ class Txt2ImgPayload implements ITxt2ImgPayload {
     tiling: boolean = false;
 };
 
+enum GenerationMode {
+    Txt2Img,
+    Img2Img,
+};
+
 export {
     A1111Context,
     CommonPayload,
@@ -423,6 +428,7 @@ export {
     InpaintFill,
     MaskMode,
     ResizeMode,
+    GenerationMode,
     type ISampler,
     type IStableDiffusionModel,
 };

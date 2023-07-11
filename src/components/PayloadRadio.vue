@@ -24,7 +24,7 @@ export default {
 </script>
 
 <template>
-    <a-radio-group :value="$props.value" @change="onRadioChange">
+    <a-radio-group :value="$props.value" @change="onRadioChange" size="small">
         <a-radio-button v-for="key in Object.values($props.enumType).filter(value => isNaN(Number(value)))" :key="key"
             :value="$props.enumType[key]">
             {{ key }}
