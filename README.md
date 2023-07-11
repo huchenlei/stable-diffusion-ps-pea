@@ -15,18 +15,21 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Render the returned image on photopea canvas
    - [*DONE*]Ckpt selection
    - VAE selection.
-1. Prompt textbox
+1. Universal extension support
+   - Raw text input for extension's script args.
+1. Savable run configuration
+3. Prompt textbox
    - Auto complete (Self prompt use history and prompt use DB)
    - Templates (Default quality prompt, negative embeddings, etc)
    - Prompt token estimation (75/150/225)
    - LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
-1. ControlNet support
+4. ControlNet support
    - Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - ControlNet layer will be used as ControlNet input
    - Black background of the preprocessor result will be replaced by transparent background
    - White lines, shapes will be inverted
-1. Inpaint
+5. Inpaint
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
 (512x512?).
    - Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
