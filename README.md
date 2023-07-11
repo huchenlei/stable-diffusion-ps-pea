@@ -15,6 +15,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Render the returned image on photopea canvas
    - [*DONE*]Ckpt selection
    - VAE selection.
+   - Generation progress bar.
 1. Universal extension support
    - Raw text input for extension's script args.
 1. Savable run configuration
