@@ -98,7 +98,8 @@ async function captureImage() {
     </SDModelSelection>
 
     <a-space>
-      <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
+      <PayloadRadio :value="generationMode" @update:value="mode => generationMode = mode" :enum-type="GenerationMode">
+      </PayloadRadio>
       <a-checkbox v-model:value="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
     </a-space>
 
