@@ -31,14 +31,22 @@ export default {
 </script>
 
 <template>
-    <a-space direction="vertical">
+    <a-form :labelWrap="true">
         <a-checkbox v-model:checked="payload.restore_faces">Restore faces</a-checkbox>
         <a-checkbox v-model:checked="payload.tiling">Tiling</a-checkbox>
         <a-checkbox v-model:checked="payload.enable_hr">Hires. fix</a-checkbox>
-        <a-space v-if="payload.enable_hr" direction="vertical">
-            <a-select ref="select" v-model:value="payload.hr_upscaler" :options="upscalerOptions"></a-select>
+        <a-space v-if="payload.enable_hr" direction="vertical" size="small">
+            <a-form-item label="Upscaler" class="form-item">
+                <a-select ref="select" v-model:value="payload.hr_upscaler" :options="upscalerOptions"></a-select>
+            </a-form-item>
             <a-input-number addonBefore="Upscale by" v-model:value="payload.hr_scale" :min="1" :max="4" />
             <a-input-number addonBefore="Denosing strength" v-model:value="payload.denoising_strength" :min="0" :max="1" />
         </a-space>
-    </a-space>
+    </a-form>
 </template>
+
+<style scoped>
+.form-item {
+    margin-bottom: 0;
+}
+</style>
