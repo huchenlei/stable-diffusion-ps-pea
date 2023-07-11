@@ -69,7 +69,13 @@ async function generate() {
     });
     const data = await response.json();
     imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
-    await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value, image.left, image.top);
+
+    const layerCount = await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value) as number;
+    const waitTranslate = setInterval(async () => {
+      const status = await photopeaContext.invoke('translateIfNewLayerAdded', layerCount, image.left, image.top);
+      if (status === 'success')
+        clearInterval(waitTranslate);
+    }, 200);
   } catch (e) {
     console.error(e);
     return;

@@ -55,27 +55,30 @@ function hasSelection() {
  * Paste the given image to Photopea as a new Image layer.
  * @param base64image base64 string representing an image.
  */
-function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
+function pasteImageAsNewLayer(base64image) {
+    const layerNumBeforePaste = app.activeDocument.layers.length;
+    app.open(base64image, null, /* asSmart */ true);
+    app.echoToOE(layerNumBeforePaste.toString());
+}
+
+// Translate the newly added layer if the new layer has been added.
+function translateIfNewLayerAdded(layerCount, leftOffset, topOffset) {
+    if (app.activeDocument.layers.length === layerCount) {
+        app.echoToOE("fail");
+        return;
+    }
+
     // Deselect first, otherwise we are going to translate the selected area,
     // intead of the whole layer.
     if (hasSelection()) {
         app.activeDocument.selection.deselect();
     }
-    const layerNumBeforePaste = app.activeDocument.layers.length;
-    app.open(base64image, null, /* asSmart */ true);
-    let checkLayers = setInterval(() => {
-        if (app.activeDocument.layers.length > layerNumBeforePaste) {
-            clearInterval(checkLayers);
-            // Continue your code here, the image is loaded and a new layer has been created
-            const layer = app.activeDocument.activeLayer;
-            layer.translate(
-                leftOffset - layer.bounds[0].value,
-                topOffset - layer.bounds[1].value
-            );
-
-            app.echoToOE('success');
-        }
-    }, 200 /* ms */);
+    const layer = app.activeDocument.activeLayer;
+    layer.translate(
+        leftOffset - layer.bounds[0].value,
+        topOffset - layer.bounds[1].value
+    );
+    app.echoToOE("success");
 }
 
 // Creates a black and white mask based on the current selection in the active document.
