@@ -35,7 +35,7 @@ export default {
                 }, 200);
             });
         }
-        pasteImageOnPhotopea(props.imageURLs[selectedIndex.value]);
+        pasteImageOnPhotopea(props.imageUrls[selectedIndex.value]);
 
         return {
             selectedIndex,
@@ -50,7 +50,7 @@ export default {
 
 <template>
     <div class="image-grid">
-        <div :class="{ 'grid-item': true, 'selected': index === selectedIndex }" v-for="(image, index) in imageURLs"
+        <div :class="{ 'grid-item': true, 'selected': index === selectedIndex }" v-for="(image, index) in imageUrls"
             :key="index" @click="selectResultImage(image, index)">
             <a-image :src="image" :preview="false" />
         </div>
