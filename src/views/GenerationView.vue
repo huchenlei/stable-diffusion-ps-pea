@@ -86,25 +86,26 @@ async function captureImage() {
 
     <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
 
-    <a-form :model="commonPayload" class="payload">
+    <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
       <a-form-item>
         <a-textarea v-model:value="commonPayload.prompt" placeholder="Enter prompt here"
-          :autoSize="{ minRows: 2, maxRows: 6 }" />
+          :autoSize="{ minRows: 2, maxRows: 6 }" class="prompt-box" />
       </a-form-item>
 
       <a-form-item>
         <a-textarea v-model:value="commonPayload.negative_prompt" placeholder="Enter negative prompt here"
-          :autoSize="{ minRows: 2, maxRows: 6 }" />
+          :autoSize="{ minRows: 2, maxRows: 6 }" class="prompt-box" />
       </a-form-item>
-
-      <a-form-item label="Batch Size" name="batch_size">
-        <a-input-number v-model:value="commonPayload.batch_size" :min="1" :max="64" />
+      <a-form-item label="Sampler">
+        <a-select ref="select" v-model:value="commonPayload.sampler_name"
+          :options="samplerOptions(context.samplers)"></a-select>
       </a-form-item>
-
-      <a-form-item label="CFG Scale" name="cfg_scale">
-        <a-input-number v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
+      <a-form-item>
+        <a-input-number addonBefore="Batch Size" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
       </a-form-item>
-
+      <a-form-item>
+        <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
+      </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
       </a-form-item>
@@ -122,10 +123,6 @@ async function captureImage() {
 
     <a-collapse :bordered="false">
       <a-collapse-panel header="Advanced settings">
-        <a-form-item label="sampler" name="sampler">
-          <a-select ref="select" v-model:value="commonPayload.sampler_name"
-            :options="samplerOptions(context.samplers)"></a-select>
-        </a-form-item>
         <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
         </Img2ImgPayloadDisplay>
         <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
@@ -136,7 +133,7 @@ async function captureImage() {
 </template>
 
 <style scoped>
-textarea {
+.prompt-box {
   width: 85vw;
 }
 </style>
