@@ -251,7 +251,7 @@ class A1111Context {
             this.sdVAEs = sdVAEs as IStableDiffusionVAE[];
             this.embeddings = embeddings as IEmbeddings;
             this.hypernetworks = hypernetworks as IHypernetwork[];
-            this.options = options as IOptions;            
+            this.options = options as IOptions;
             return true;
         } catch (e) {
             console.error(e);
@@ -348,6 +348,7 @@ enum InpaintArea {
 // Payload params specific to img2img.
 interface IImg2ImgPayload {
     init_images: string[];
+    mask: string | undefined;
     denoising_strength: number;
     initial_noise_multiplier: number;
     inpaint_full_res: InpaintArea;
@@ -391,6 +392,7 @@ class CommonPayload implements ICommonPayload {
 
 class Img2ImgPayload implements IImg2ImgPayload {
     init_images: string[] = [];
+    mask: string | undefined = undefined;
     denoising_strength: number = 0.75;
     initial_noise_multiplier: number = 1.0;
     inpaint_full_res: InpaintArea = InpaintArea.OnlyMasked;

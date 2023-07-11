@@ -51,10 +51,8 @@ async function generate() {
     const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
     const extraPayload = isImg2Img ? img2imgPayload : txt2imgPayload;
     if (isImg2Img) {
-      img2imgPayload.init_images = [
-        image.dataURL,
-        mask.dataURL,
-      ];
+      img2imgPayload.init_images = [image.dataURL];
+      img2imgPayload.mask = mask.dataURL;
     }
     commonPayload.width = image.width;
     commonPayload.height = image.height;
