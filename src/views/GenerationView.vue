@@ -97,11 +97,6 @@ async function captureImage() {
           :autoSize="{ minRows: 2, maxRows: 6 }" />
       </a-form-item>
 
-      <a-form-item label="sampler" name="sampler">
-        <a-select ref="select" v-model:value="commonPayload.sampler_name"
-          :options="samplerOptions(context.samplers)"></a-select>
-      </a-form-item>
-
       <a-form-item label="Batch Size" name="batch_size">
         <a-input-number v-model:value="commonPayload.batch_size" :min="1" :max="64" />
       </a-form-item>
@@ -127,6 +122,10 @@ async function captureImage() {
 
     <a-collapse :bordered="false">
       <a-collapse-panel header="Advanced settings">
+        <a-form-item label="sampler" name="sampler">
+          <a-select ref="select" v-model:value="commonPayload.sampler_name"
+            :options="samplerOptions(context.samplers)"></a-select>
+        </a-form-item>
         <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
         </Img2ImgPayloadDisplay>
         <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
