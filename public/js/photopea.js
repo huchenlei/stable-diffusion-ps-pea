@@ -47,11 +47,21 @@ function exportAllLayers(format) {
     app.activeDocument.saveToOE(format);
 }
 
+function hasSelection() {
+    return !!app.activeDocument.selection.bounds;
+}
+
 /**
  * Paste the given image to Photopea as a new Image layer.
  * @param base64image base64 string representing an image.
  */
 function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
+    // Deselect first, otherwise we are going to translate the selected area,
+    // intead of the whole layer.
+    if (hasSelection()) {
+        app.activeDocument.selection.deselect();
+    }
+
     app.open(base64image, null, /* asSmart */ true);
     const layer = app.activeDocument.activeLayer;
     layer.translate(
@@ -64,7 +74,7 @@ function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
 function exportMaskFromSelection(format) {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
-    if (!app.activeDocument.selection.bounds) {
+    if (!hasSelection()) {
         alert("No selection!");
         app.echoToOE("");
         return;
@@ -100,7 +110,7 @@ function getSelectionBound() {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
     const bounds = app.activeDocument.selection.bounds;
-    if (!bounds) {
+    if (!hasSelection()) {
         app.echoToOE("");
     } else {
         app.echoToOE(JSON.stringify(bounds));
