@@ -56,7 +56,7 @@ function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
     const layer = app.activeDocument.activeLayer;
     layer.translate(
         leftOffset - layer.bounds[0].b,
-        topOffset - layer.bounds[1].b,
+        topOffset - layer.bounds[1].b
     );
 }
 
