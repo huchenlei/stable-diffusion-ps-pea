@@ -92,7 +92,7 @@ async function generate() {
     <a-space>
       <PayloadRadio :value="generationMode" @update:value="mode => generationMode = mode" :enum-type="GenerationMode">
       </PayloadRadio>
-      <a-checkbox v-model:value="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
+      <a-checkbox v-model:checked="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
     </a-space>
 
     <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
