@@ -15,13 +15,13 @@ import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 
-const generationMode = reactive(ref(GenerationMode.Img2Img));
+const generationMode = ref(GenerationMode.Img2Img);
+const autoGenerationMode = ref(true);
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
-const autoGenerationMode = reactive(ref(true));
 
 const imgSrc = ref('');
 
