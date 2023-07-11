@@ -15,7 +15,7 @@ class PhotopeaContext {
     }
 
     // Post a message to photopea and receive the result.
-    private postMessageToPhotopea(message: string) {
+    private postMessageToPhotopea(message: string): Promise<any> {
         if (window === window.top) {
             throw Error("Not running in Photopea environment!");
         }
@@ -40,7 +40,7 @@ class PhotopeaContext {
         });
     }
 
-    public async invoke(funcName: string, ...args: any[]) {
+    public async invoke(funcName: string, ...args: any[]): Promise<any> {
         if (!this.context) {
             await this.initialize();
         }

@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { A1111Context, type ISampler, CommonPayload, type IStableDiffusionModel } from '../Automatic1111';
+import {
+  type ISampler,
+  CommonPayload,
+  ResizeMode,
+  Img2ImgPayload,
+  Txt2ImgPayload,
+  InpaintArea,
+  InpaintFill,
+  MaskMode,
+} from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { applyMask, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
+import PayloadRadio from '@/components/PayloadRadio.vue';
 
 const context = useA1111ContextStore().a1111Context;
-const payload = reactive(new CommonPayload());
+const commonPayload = reactive(new CommonPayload());
+const img2imgPayload = reactive(new Img2ImgPayload());
+const txt2imgPayload = reactive(new Txt2ImgPayload());
+
 const imgSrc = ref('');
 
 function samplerOptions(samplers: ISampler[]) {
@@ -20,14 +33,27 @@ function samplerOptions(samplers: ISampler[]) {
 }
 
 async function generate() {
-  const response = await fetch(context.txt2imgURL, {
+  try {
+    const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+    const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+    const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+
+    const [image, mask] = await Promise.all([cropImage(imageBuffer, maskBound), cropImage(maskBuffer, maskBound)]);
+    const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
+    const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
+
+
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(commonPayload),
   });
-
   const data = await response.json();
   imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
 
@@ -41,13 +67,13 @@ async function generate() {
 async function captureMask() {
   const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
   const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-  imgSrc.value = await cropImage(maskBuffer, maskBound);
+  imgSrc.value = (await cropImage(maskBuffer, maskBound)).dataURL;
 }
 
 async function captureImage() {
   const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
   const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-  imgSrc.value = await cropImage(imageBuffer, maskBound);
+  imgSrc.value = (await cropImage(imageBuffer, maskBound)).dataURL;
 }
 
 </script>
@@ -57,28 +83,33 @@ async function captureImage() {
       @change="(value: string) => context.options.sd_model_checkpoint = value">
     </SDModelSelection>
 
-    <a-form :model="payload" class="payload">
+    <PayloadRadio v-model:value="img2imgPayload.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
+    <PayloadRadio v-model:value="img2imgPayload.inpaint_full_res" :enum-type="InpaintArea"></PayloadRadio>
+    <PayloadRadio v-model:value="img2imgPayload.inpainting_fill" :enum-type="InpaintFill"></PayloadRadio>
+    <PayloadRadio v-model:value="img2imgPayload.inpainting_mask_invert" :enum-type="MaskMode"></PayloadRadio>
+
+    <a-form :model="commonPayload" class="payload">
       <a-form-item>
-        <a-textarea v-model:value="payload.prompt" placeholder="Enter prompt here"
+        <a-textarea v-model:value="commonPayload.prompt" placeholder="Enter prompt here"
           :autoSize="{ minRows: 2, maxRows: 6 }" />
       </a-form-item>
 
       <a-form-item>
-        <a-textarea v-model:value="payload.negative_prompt" placeholder="Enter negative prompt here"
+        <a-textarea v-model:value="commonPayload.negative_prompt" placeholder="Enter negative prompt here"
           :autoSize="{ minRows: 2, maxRows: 6 }" />
       </a-form-item>
 
       <a-form-item label="sampler" name="sampler">
-        <a-select ref="select" v-model:value="payload.sampler_name"
+        <a-select ref="select" v-model:value="commonPayload.sampler_name"
           :options="samplerOptions(context.samplers)"></a-select>
       </a-form-item>
 
       <a-form-item label="Batch Size" name="batch_size">
-        <a-input-number v-model:value="payload.batch_size" :min="1" :max="64" />
+        <a-input-number v-model:value="commonPayload.batch_size" :min="1" :max="64" />
       </a-form-item>
 
       <a-form-item label="CFG Scale" name="cfg_scale">
-        <a-input-number v-model:value="payload.cfg_scale" :min="1" :max="30" />
+        <a-input-number v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
       </a-form-item>
 
       <a-form-item>

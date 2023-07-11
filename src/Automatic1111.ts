@@ -307,7 +307,8 @@ interface ICommonPayload {
     subseed_strength: number;
 };
 
-interface ITxt2ImgPayload extends ICommonPayload {
+// Payload params specific to txt2img.
+interface ITxt2ImgPayload {
     restore_faces: boolean;
     enable_hr: boolean;
     hr_negative_prompt: string;
@@ -343,7 +344,8 @@ enum InpaintArea {
     OnlyMasked,
 };
 
-interface IImg2ImgPayload extends ICommonPayload {
+// Payload params specific to img2img.
+interface IImg2ImgPayload {
     init_images: string[];
     denoising_strength: number;
     initial_noise_multiplier: number;
@@ -386,9 +388,41 @@ class CommonPayload implements ICommonPayload {
     styles: string[] = [];
 };
 
+class Img2ImgPayload implements IImg2ImgPayload {
+    init_images: string[] = [];
+    denoising_strength: number = 0.75;
+    initial_noise_multiplier: number = 1.0;
+    inpaint_full_res: InpaintArea = InpaintArea.OnlyMasked;
+    inpaint_full_res_padding: number = 32;
+    inpainting_fill: InpaintFill = InpaintFill.Original;
+    inpainting_mask_invert: MaskMode = MaskMode.InpaintMasked;
+    mask_blur_x: number = 4;
+    mask_blur_y: number = 4;
+    resize_mode: ResizeMode = ResizeMode.Resize;
+};
+
+class Txt2ImgPayload implements ITxt2ImgPayload {
+    restore_faces: boolean = false;
+    enable_hr: boolean = false;
+    hr_negative_prompt: string = "";
+    hr_prompt: string = "";
+    hr_resize_x: number = 0;
+    hr_resize_y: number = 0;
+    hr_scale: number = 2.0;
+    hr_second_pass_steps: number = 0;
+    hr_upscaler: string = "Latent";
+    tiling: boolean = false;
+};
+
 export {
     A1111Context,
     CommonPayload,
+    Img2ImgPayload,
+    Txt2ImgPayload,
+    InpaintArea,
+    InpaintFill,
+    MaskMode,
+    ResizeMode,
     type ISampler,
     type IStableDiffusionModel,
 };
