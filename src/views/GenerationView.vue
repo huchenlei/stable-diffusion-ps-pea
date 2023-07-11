@@ -82,18 +82,6 @@ async function generate() {
   }
 }
 
-async function captureMask() {
-  const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-  imgSrc.value = (await cropImage(maskBuffer, maskBound)).dataURL;
-}
-
-async function captureImage() {
-  const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-  const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-  imgSrc.value = (await cropImage(imageBuffer, maskBound)).dataURL;
-}
-
 </script>
 <template>
   <a-space direction="vertical">
@@ -130,15 +118,6 @@ async function captureImage() {
       <a-form-item>
         <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
       </a-form-item>
-
-      <a-form-item>
-        <a-button type="primary" @click="captureMask">capture mask</a-button>
-      </a-form-item>
-
-      <a-form-item>
-        <a-button type="primary" @click="captureImage">capture image</a-button>
-      </a-form-item>
-
       <a-image v-model:src="imgSrc" />
     </a-form>
 
