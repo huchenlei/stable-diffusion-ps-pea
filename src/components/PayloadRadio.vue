@@ -11,7 +11,7 @@ export default {
             required: true,
         },
     },
-    emits: ['update:value', 'input'],
+    emits: ['update:value'],
     setup(props, { emit }) {
         return {
             onRadioChange(e: Event) {

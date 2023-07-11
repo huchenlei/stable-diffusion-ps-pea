@@ -3,12 +3,8 @@ import { ref, reactive } from 'vue';
 import {
   type ISampler,
   CommonPayload,
-  ResizeMode,
   Img2ImgPayload,
   Txt2ImgPayload,
-  InpaintArea,
-  InpaintFill,
-  MaskMode,
   GenerationMode,
 } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
@@ -16,6 +12,7 @@ import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { applyMask, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
+import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 
 const generationMode = reactive(ref(GenerationMode.Img2Img));
 
@@ -87,11 +84,8 @@ async function captureImage() {
     </SDModelSelection>
 
     <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
-
-    <PayloadRadio v-model:value="img2imgPayload.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
-    <PayloadRadio v-model:value="img2imgPayload.inpaint_full_res" :enum-type="InpaintArea"></PayloadRadio>
-    <PayloadRadio v-model:value="img2imgPayload.inpainting_fill" :enum-type="InpaintFill"></PayloadRadio>
-    <PayloadRadio v-model:value="img2imgPayload.inpainting_mask_invert" :enum-type="MaskMode"></PayloadRadio>
+    <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
+    </Img2ImgPayloadDisplay>
 
     <a-form :model="commonPayload" class="payload">
       <a-form-item>
