@@ -36,6 +36,8 @@ export default {
 
 <template>
     <a-form :labelWrap="true">
+        <a-image v-for="init_image in payload.init_images" :src="init_image"></a-image>
+        
         <a-form-item label="Resize Mode" class="form-item">
             <PayloadRadio v-model:value="payload.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
         </a-form-item>

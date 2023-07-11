@@ -7,6 +7,12 @@ const messages = {
             about: 'About',
             generation: 'Generation',
         },
+        gen: {
+            autoGenerationModeHint: 'Automatically select generation mode based on selected area.',
+        },
+        width: 'Width',
+        height: 'Height',
+        
         connect: 'Connect',
         a1111URL: 'A1111 URL:',
         generate: 'Generate',

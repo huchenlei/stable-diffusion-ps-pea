@@ -51,8 +51,13 @@ function exportAllLayers(format) {
  * Paste the given image to Photopea as a new Image layer.
  * @param base64image base64 string representing an image.
  */
-function pasteImageAsNewLayer(base64image) {
+function pasteImageAsNewLayer(base64image, leftOffset, topOffset) {
     app.open(base64image, null, /* asSmart */ true);
+    const layer = app.activeDocument.activeLayer;
+    layer.translate(
+        leftOffset - layer.bounds[0].b,
+        topOffset - layer.bounds[1].b,
+    );
 }
 
 // Creates a black and white mask based on the current selection in the active document.

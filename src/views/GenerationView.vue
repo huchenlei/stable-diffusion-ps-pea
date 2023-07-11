@@ -21,6 +21,7 @@ const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
+const autoGenerationMode = reactive(ref(true));
 
 const imgSrc = ref('');
 
@@ -40,28 +41,40 @@ async function generate() {
     const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
 
     const [image, mask] = await Promise.all([cropImage(imageBuffer, maskBound), cropImage(maskBuffer, maskBound)]);
-    const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
+
+    if (autoGenerationMode.value) {
+      const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
+      generationMode.value = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
+    }
+
+    const isImg2Img = generationMode.value === GenerationMode.Img2Img;
     const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
+    const extraPayload = isImg2Img ? img2imgPayload : txt2imgPayload;
+    if (isImg2Img) {
+      img2imgPayload.init_images = [
+        image.dataURL,
+        mask.dataURL,
+      ];
+    }
+    commonPayload.width = image.width;
+    commonPayload.height = image.height;
 
-
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...commonPayload,
+        ...extraPayload,
+      }),
+    });
+    const data = await response.json();
+    imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
+    await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value, image.left, image.top);
   } catch (e) {
     console.error(e);
     return;
-  }
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(commonPayload),
-  });
-  const data = await response.json();
-  imgSrc.value = `data:image/png;base64,${data['images'][0] as string}`;
-
-  try {
-    await photopeaContext.invoke('pasteImageAsNewLayer', imgSrc.value);
-  } catch (e) {
-    console.error(e);
   }
 }
 
@@ -84,7 +97,10 @@ async function captureImage() {
       @change="(value: string) => context.options.sd_model_checkpoint = value">
     </SDModelSelection>
 
-    <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
+    <a-space>
+      <PayloadRadio v-model:value="generationMode" :enum-type="GenerationMode"></PayloadRadio>
+      <a-checkbox v-model:value="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
+    </a-space>
 
     <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
       <a-form-item>
@@ -123,10 +139,17 @@ async function captureImage() {
 
     <a-collapse :bordered="false">
       <a-collapse-panel header="Advanced settings">
-        <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
-        </Img2ImgPayloadDisplay>
-        <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
-        </Txt2ImgPayloadDisplay>
+        <a-space direction="vertical">
+          <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
+            :max="2048" />
+          <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
+            :max="2048" />
+
+          <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
+          </Img2ImgPayloadDisplay>
+          <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
+          </Txt2ImgPayloadDisplay>
+        </a-space>
       </a-collapse-panel>
     </a-collapse>
   </a-space>
