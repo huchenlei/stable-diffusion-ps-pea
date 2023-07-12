@@ -32,7 +32,7 @@ export default {
                         clearInterval(waitTranslate);
                         resolve(true);
                     }
-                }, 200);
+                }, 50);
             });
         }
 
