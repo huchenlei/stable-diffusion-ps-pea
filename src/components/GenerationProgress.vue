@@ -31,8 +31,6 @@ export default {
                         const response = await fetch(`${context.apiURL}/progress`);
                         const p = await response.json() as IProgress;
 
-                        console.debug(p);
-
                         if (!started && p.progress === 0)
                             return;
 
