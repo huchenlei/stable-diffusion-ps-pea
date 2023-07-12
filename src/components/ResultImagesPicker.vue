@@ -36,8 +36,10 @@ export default {
             });
         }
 
-        watch(props.imageUrls, (newValue: string[], _) => {
-            newValue.forEach(url => pasteImageOnPhotopea(url));
+        watch(props.imageUrls, async (newValue: string[], _) => {
+            for (const url of newValue) {
+                await pasteImageOnPhotopea(url);
+            }
         });
 
         return {
