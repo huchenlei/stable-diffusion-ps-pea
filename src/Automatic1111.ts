@@ -202,6 +202,25 @@ interface IOptions {
     add_model_hash_to_info: boolean;
 }
 
+interface IGenerationJob {
+    skipped: boolean;
+    interrupted: boolean;
+    job: string;
+    job_count: number;
+    job_timestamp: string;
+    job_no: number;
+    sampling_step: number;
+    sampling_steps: number;
+};
+
+interface IProgress {
+    progress: number;
+    eta_relative: number;
+    job: IGenerationJob;
+    current_image: string | null;
+    textinfo: string | null;
+};
+
 async function fetchJSON(url: string): Promise<any> {
     const response = await fetch(url);
     return await response.json();
@@ -435,4 +454,5 @@ export {
     GenerationMode,
     type ISampler,
     type IStableDiffusionModel,
+    type IProgress,
 };

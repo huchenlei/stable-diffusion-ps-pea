@@ -15,9 +15,11 @@ import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
+import GenerationProgress from '@/components/GenerationProgress.vue'; 
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
+const generationActive = ref(false);
 const left = ref(0);
 const top = ref(0);
 
@@ -86,6 +88,9 @@ async function generate() {
 
 </script>
 <template>
+  <GenerationProgress v-model:active="generationActive"></GenerationProgress>
+  <a-button @click="generationActive = true">click</a-button>
+
   <a-space direction="vertical">
     <SDModelSelection :models="context.sdModels" :activeModelName="context.options.sd_model_checkpoint"
       @change="(value: string) => context.options.sd_model_checkpoint = value">
