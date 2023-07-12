@@ -9,10 +9,12 @@ const messages = {
         },
         gen: {
             autoGenerationModeHint: 'Automatically select generation mode based on selected area.',
+            skip: 'Skip',
+            interrupt: 'Interrupt',
         },
         width: 'Width',
         height: 'Height',
-        
+
         connect: 'Connect',
         a1111URL: 'A1111 URL:',
         generate: 'Generate',

@@ -63,20 +63,39 @@ export default {
             }
         });
 
+        async function interrupt() {
+            const response = await fetch(`${context.apiURL}/interrupt`, { method: 'POST' });
+            const r = await response.json();
+            console.debug(`Interrupt done: ${JSON.stringify(r)}`);
+            emit('update:active', false);
+        }
+
+        async function skip() {
+            const response = await fetch(`${context.apiURL}/skip`, { method: 'POST' });
+            const r = await response.json();
+            console.debug(`Skip done: ${JSON.stringify(r)}`);
+        }
+
         return {
             progress,
             eta,
+            skip,
+            interrupt,
         };
     },
 };
 </script>
 
 <template>
-    <a-space class="modal-container" v-if="true">
+    <a-space class="modal-container" v-if="active">
         <a-progress type="circle" :percent="(progress * 100).toFixed(0)"></a-progress>
         <a-button :ghost="true">
             {{ (Math.abs(eta)).toFixed(0) }} seconds
         </a-button>
+        <a-space>
+            <a-button :danger="true" :ghost="true" @click="skip">{{ $t('gen.skip') }}</a-button>
+            <a-button :danger="true" :ghost="true" @click="interrupt">{{ $t('gen.interrupt') }}</a-button>
+        </a-space>
     </a-space>
 </template>
 
