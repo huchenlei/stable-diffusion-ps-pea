@@ -11,8 +11,9 @@ class PhotopeaContext {
 
     async initialize() {
         const response = await fetch(`${import.meta.env.BASE_URL}/js/photopea.js`);
-        // Stripe out all line comments.
-        this.context = (await response.text()).replace(/\/\/.*/g, '');
+        this.context = (await response.text())
+            .replace(/\/\/.*/g, '') // Stripe out all line comments.
+            .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1'); // Stripe out all block comments.
     }
 
     // Post a message to photopea and receive the result.
