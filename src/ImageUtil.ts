@@ -45,10 +45,10 @@ function applyMaskInternal(imageObj: fabric.Image, maskObj: fabric.Image, boundi
 
     // Create clipping rectangle
     const clippingRect = new fabric.Rect({
-        left: boundingBox[0].b,
-        top: boundingBox[1].b,
-        width: boundingBox[2].b - boundingBox[0].b,
-        height: boundingBox[3].b - boundingBox[1].b,
+        left: boundingBox[0],
+        top: boundingBox[1],
+        width: boundingBox[2] - boundingBox[0],
+        height: boundingBox[3] - boundingBox[1],
         absolutePositioned: true // This option will make sure the rect stays at its absolute position.
     });
 
@@ -92,10 +92,10 @@ async function applyMask(imageBuffer: ArrayBuffer, maskBuffer: ArrayBuffer, boun
 async function cropImage(imageBuffer: ArrayBuffer, boundingBox: PhotopeaBound): Promise<PayloadImage> {
     // Create clipping rectangle
     const clippingRect = {
-        left: boundingBox[0].b,
-        top: boundingBox[1].b,
-        width: boundingBox[2].b - boundingBox[0].b,
-        height: boundingBox[3].b - boundingBox[1].b,
+        left: boundingBox[0],
+        top: boundingBox[1],
+        width: boundingBox[2] - boundingBox[0],
+        height: boundingBox[3] - boundingBox[1],
     };
 
     // Create a new fabric canvas

@@ -124,6 +124,11 @@ function getSelectionBound() {
     if (!hasSelection()) {
         app.echoToOE("");
     } else {
-        app.echoToOE(JSON.stringify(bounds));
+        app.echoToOE(JSON.stringify([
+            bounds[0].value,
+            bounds[1].value,
+            bounds[2].value,
+            bounds[3].value,
+        ]));
     }
 }
