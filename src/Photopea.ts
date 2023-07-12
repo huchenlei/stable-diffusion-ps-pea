@@ -13,7 +13,8 @@ class PhotopeaContext {
         const response = await fetch(`${import.meta.env.BASE_URL}/js/photopea.js`);
         this.context = (await response.text())
             .replace(/\/\/.*/g, '') // Stripe out all line comments.
-            .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1'); // Stripe out all block comments.
+            .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1') // Stripe out all block comments.
+            .replace(/^\s*[\r\n]/gm, ''); // Remove empty new lines.
     }
 
     // Post a message to photopea and receive the result.
