@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch, toRef } from 'vue';
 import {
   type ISampler,
   CommonPayload,
@@ -25,6 +25,7 @@ const top = ref(0);
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
+commonPayload.sampler_name = context.samplers[0].name;
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
 
