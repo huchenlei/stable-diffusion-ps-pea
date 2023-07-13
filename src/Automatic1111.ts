@@ -238,6 +238,8 @@ class A1111Context {
     loras: ILoRA[] = [];
     options: IOptions = {} as IOptions;
 
+    initialized: boolean = false;
+
     public async initialize(baseURL: string): Promise<boolean> {
         this.baseURL = baseURL;
         const fetchPromises = [
@@ -271,6 +273,8 @@ class A1111Context {
             this.embeddings = embeddings as IEmbeddings;
             this.hypernetworks = hypernetworks as IHypernetwork[];
             this.options = options as IOptions;
+
+            this.initialized = true;
             return true;
         } catch (e) {
             console.error(e);
