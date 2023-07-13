@@ -11,11 +11,11 @@ const route = useRoute();
         <a-menu-item key="/">
           <RouterLink to="/">{{ $t('nav.connection') }}</RouterLink>
         </a-menu-item>
-        <a-menu-item key="/about">
-          <RouterLink to="/about">{{ $t('nav.about') }}</RouterLink>
-        </a-menu-item>
         <a-menu-item key="/generation">
           <RouterLink to="/generation">{{ $t('nav.generation') }}</RouterLink>
+        </a-menu-item>
+        <a-menu-item key="/about">
+          <RouterLink to="/about">{{ $t('nav.about') }}</RouterLink>
         </a-menu-item>
       </a-menu>
     </header>
