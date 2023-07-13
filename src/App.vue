@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router';
+import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+const context = useA1111ContextStore().a1111Context;
 const route = useRoute();
 </script>
 
@@ -12,7 +14,7 @@ const route = useRoute();
           <a-menu-item key="/">
             <RouterLink to="/">{{ $t('nav.connection') }}</RouterLink>
           </a-menu-item>
-          <a-menu-item key="/generation">
+          <a-menu-item key="/generation" :disabled="!context.initialized">
             <RouterLink to="/generation">{{ $t('nav.generation') }}</RouterLink>
           </a-menu-item>
           <a-menu-item key="/about">
