@@ -45,7 +45,7 @@ export default {
 
 <style scoped>
 .selected {
-    border: 2px solid #88a950 !important;
+    border: 4px solid #88a950 !important;
 }
 
 .modal {
