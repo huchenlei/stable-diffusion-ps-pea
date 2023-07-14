@@ -73,3 +73,9 @@ export default {
     </template>
   </a-select>
 </template>
+
+<style scoped>
+.select {
+  width: 100%;
+}
+</style>

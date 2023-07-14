@@ -93,60 +93,68 @@ async function generate() {
 
 </script>
 <template>
-  <GenerationProgress v-model:active="generationActive"></GenerationProgress>
+  <div>
+    <GenerationProgress v-model:active="generationActive"></GenerationProgress>
 
-  <a-space direction="vertical">
-    <SDModelSelection :models="context.sdModels" :activeModelName="context.options.sd_model_checkpoint"
-      @change="(value: string) => context.options.sd_model_checkpoint = value">
-    </SDModelSelection>
+    <a-space direction="vertical" class="root">
+      <SDModelSelection :models="context.sdModels" :activeModelName="context.options.sd_model_checkpoint"
+        @change="(value: string) => context.options.sd_model_checkpoint = value">
+      </SDModelSelection>
 
-    <a-space>
-      <PayloadRadio :value="generationMode" @update:value="mode => generationMode = mode" :enum-type="GenerationMode">
-      </PayloadRadio>
-      <a-checkbox v-model:checked="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
+      <a-space>
+        <PayloadRadio :value="generationMode" @update:value="mode => generationMode = mode" :enum-type="GenerationMode">
+        </PayloadRadio>
+        <a-checkbox v-model:checked="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
+      </a-space>
+
+      <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
+        <a-form-item>
+          <PromptInput v-model:prompt-value="commonPayload.prompt" :placeholder="$t('gen.enterPrompt') + '...'">
+          </PromptInput>
+        </a-form-item>
+
+        <a-form-item>
+          <PromptInput v-model:prompt-value="commonPayload.negative_prompt" :lora-selection="false"
+            :placeholder="$t('gen.enterNegativePrompt') + '...'">
+          </PromptInput>
+        </a-form-item>
+
+        <a-form-item label="Sampler">
+          <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-input-number addonBefore="Batch Size" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
+        </a-form-item>
+        <a-form-item>
+          <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
+        </a-form-item>
+        <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
+      </a-form>
+
+      <a-collapse :bordered="false">
+        <a-collapse-panel header="Advanced settings">
+          <a-space direction="vertical">
+            <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
+              :max="2048" />
+            <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
+              :max="2048" />
+
+            <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
+            </Img2ImgPayloadDisplay>
+            <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
+            </Txt2ImgPayloadDisplay>
+          </a-space>
+        </a-collapse-panel>
+      </a-collapse>
     </a-space>
-
-    <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
-      <a-form-item>
-        <PromptInput v-model:prompt-value="commonPayload.prompt" :placeholder="$t('gen.enterPrompt') + '...'">
-        </PromptInput>
-      </a-form-item>
-
-      <a-form-item>
-        <PromptInput v-model:prompt-value="commonPayload.negative_prompt" :lora-selection="false"
-          :placeholder="$t('gen.enterNegativePrompt') + '...'">
-        </PromptInput>
-      </a-form-item>
-
-      <a-form-item label="Sampler">
-        <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
-      </a-form-item>
-      <a-form-item>
-        <a-input-number addonBefore="Batch Size" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
-      </a-form-item>
-      <a-form-item>
-        <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
-      </a-form-item>
-      <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
-    </a-form>
-
-    <a-collapse :bordered="false">
-      <a-collapse-panel header="Advanced settings">
-        <a-space direction="vertical">
-          <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
-            :max="2048" />
-          <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
-            :max="2048" />
-
-          <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
-          </Img2ImgPayloadDisplay>
-          <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
-          </Txt2ImgPayloadDisplay>
-        </a-space>
-      </a-collapse-panel>
-    </a-collapse>
-  </a-space>
+  </div>
 </template>
+
+<style scoped>
+.root {
+  width: 100%;
+}
+</style>

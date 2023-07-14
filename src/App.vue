@@ -26,3 +26,9 @@ const route = useRoute();
     <RouterView class="view" />
   </div>
 </template>
+
+<style scoped>
+.class {
+  width: 100%;
+}
+</style>
