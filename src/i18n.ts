@@ -12,6 +12,8 @@ const messages = {
             skip: 'Skip',
             interrupt: 'Interrupt',
             addLoRA: 'Add LoRA',
+            enterPrompt: 'Enter prompt',
+            enterNegativePrompt: 'Enter negative prompt',
         },
         width: 'Width',
         height: 'Height',

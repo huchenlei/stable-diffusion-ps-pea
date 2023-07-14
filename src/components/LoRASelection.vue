@@ -10,7 +10,7 @@ interface LoRAItem {
 };
 
 export default {
-    name: 'SDModelSelection',
+    name: 'LoRASelection',
     props: {
         models: {
             type: Array<ILoRA>,
