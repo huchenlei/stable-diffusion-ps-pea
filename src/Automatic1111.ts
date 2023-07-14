@@ -293,6 +293,14 @@ class A1111Context {
     get img2imgURL(): string {
         return `${this.apiURL}/img2img`;
     }
+
+    get thumbnailURL(): string {
+        return `${this.baseURL}/sd_extra_networks/thumb`
+    }
+
+    checkpointPreviewURL(model_name: string): string {
+        return `${this.thumbnailURL}?filename=models/Stable-diffusion/${model_name}.preview.png`;
+    }
 };
 
 interface ICommonPayload {
