@@ -2,9 +2,10 @@
 import { computed, ref } from 'vue';
 import { type IStableDiffusionModel } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+import ImagePicker from './ImagePicker.vue';
 
 interface sdModelItem {
-  previewURL: string;
+  imageURL: string;
   name: string;
 };
 
@@ -20,17 +21,13 @@ export default {
       required: true,
     },
   },
+  components: {
+    ImagePicker,
+  },
   emits: ['change'],
   setup(props, { emit }) {
-    const options = computed(() => props.models.map(model => {
-      return {
-        value: model.title,
-        label: model.model_name,
-      };
-    }));
-
     const loading = ref(false);
-    async function onModelChange(value: string) {
+    async function onModelChange(item: sdModelItem) {
       const context = useA1111ContextStore().a1111Context;
 
       loading.value = true;
@@ -41,150 +38,38 @@ export default {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          sd_model_checkpoint: value
+          sd_model_checkpoint: item.name
         })
       });
 
-      console.debug(await response.json());
-      emit('change', value);
+      console.debug('Checkpoint updated: ' + JSON.stringify(await response.json()));
+      emit('change', item.name);
       loading.value = false;
     }
 
-    const imageUrls = computed(() => {
+    const images = computed(() => {
       const context = useA1111ContextStore().a1111Context;
       return props.models.map(model => {
         return {
-          previewURL: context.checkpointPreviewURL(model.model_name),
+          imageURL: context.checkpointPreviewURL(model.model_name),
           name: model.model_name,
         } as sdModelItem;
       });
     });
 
-    const selectedIndex = ref(0);
-    function selectModel(image: string, index: number) {
-      console.log(index);
-    }
-
     return {
-      options,
       loading,
       onModelChange,
-
-      selectedIndex,
-      selectModel,
-      imageUrls,
-
+      images,
     };
   },
 };
 </script>
 
 <template>
-  <a-select ref="select" :value="$props.activeModelName" :options="options" class="select"
-    :loading="loading">
+  <a-select ref="select" :value="$props.activeModelName" class="select" :loading="loading">
     <template #dropdownRender="{ menuNode, props }">
-      <div class="modal">
-        <div class="image-grid modal-content">
-          <div :class="{ 'card': true, 'selected': index === selectedIndex }" v-for="(item, index) in imageUrls"
-            :key="index" @click="onModelChange(item.name)">
-            <a-image :src="item.previewURL" fallback="image_alt.png" :preview="false" />
-            <div class="actions">
-              <span class="name">{{ item.name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ImagePicker :images="images" @item-clicked="onModelChange"></ImagePicker>
     </template>
   </a-select>
 </template>
-
-<style scoped>
-.modal {
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-.modal-content {
-  position: relative;
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  margin: 5vh auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 90%; 
-}
-
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  grid-gap: 8px;
-  overflow: unset;
-}
-
-.card {
-  overflow: hidden;
-  background-size: cover;
-  width: 100%;
-  height: 0;
-  padding-bottom: 100%;
-  position: relative;
-
-  border: 1px solid rgb(45, 45, 45);
-  border-radius: 3px;
-  outline: none;
-  transition: box-shadow 200ms cubic-bezier(0.215, 0.61, 0.355, 1) 0s, scale 400ms cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
-  margin: 0px;
-}
-
-.card:hover {
-  border-color: rgb(238, 238, 238);
-  border-width: 1px;
-  box-shadow: rgb(238, 238, 238) 0px 0px 0px 1px;
-}
-
-.card img {
-  position: absolute;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-.actions {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.5em;
-  background: rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 0.25em 0.25em rgba(0, 0, 0, 0.5);
-  text-shadow: 0 0 0.2em black;
-}
-
-.actions * {
-  color: white;
-}
-
-.actions .name {
-  font-weight: bold;
-  line-break: anywhere;
-  overflow: hidden;
-  display: block;
-  text-overflow: ellipsis;
-  text-shadow: rgba(0, 0, 0, 0.9) 0px 1px 1px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), transparent);
-  white-space: nowrap;
-}
-
-.card:hover .actions .name {
-  overflow: visible;
-  text-overflow: unset;
-  white-space: normal;
-}
-</style>
