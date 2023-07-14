@@ -68,10 +68,18 @@ export default {
 </script>
 
 <template>
-    <a-textarea v-model:value="promptBody" :placeholder="$props.placeholder" :autoSize="{ minRows: 1, maxRows: 6 }"
-        @change="updatePromptBody" />
+    <a-space direction="vertical" class="input-container">
+        <a-textarea v-model:value="promptBody" :placeholder="$props.placeholder" :autoSize="{ minRows: 1, maxRows: 6 }"
+            @change="updatePromptBody" />
 
-    <LoRASelection v-if="$props.loraSelection" :models="loras" :activeLoRAs="activeLoRAs" @add:activeLoRAs="addLoRA"
-        @remove:activeLoRAs="removeLoRA">
-    </LoRASelection>
+        <LoRASelection v-if="$props.loraSelection" :models="loras" :activeLoRAs="activeLoRAs" @add:activeLoRAs="addLoRA"
+            @remove:activeLoRAs="removeLoRA">
+        </LoRASelection>
+    </a-space>
 </template>
+
+<style scoped>
+.input-container {
+    width: 100%;
+}
+</style>
