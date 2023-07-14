@@ -23,8 +23,9 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - Auto complete (Self prompt use history and prompt use DB)
    - Templates (Default quality prompt, negative embeddings, etc)
    - Prompt token estimation (75/150/225)
-   - LoRA selection (LoRA should be selected instead of being put into prompt ideally)
+   - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
+     - Search bar on LoRA selection
 4. ControlNet support
    - Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - ControlNet layer will be used as ControlNet input
@@ -34,7 +35,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
 (512x512?).
    - Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
-
+ 
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
