@@ -1,5 +1,4 @@
 <script lang="ts">
-import { computed } from 'vue';
 
 interface ImageItem {
     imageURL: string;
