@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import {
   type ISampler,
   CommonPayload,
@@ -33,14 +33,14 @@ const txt2imgPayload = reactive(new Txt2ImgPayload());
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
 
-function samplerOptions(samplers: ISampler[]) {
-  return samplers.map(sampler => {
+const samplerOptions = computed(() => {
+  return context.samplers.map(sampler => {
     return {
       value: sampler.name,
       label: sampler.name,
     };
   });
-}
+});
 
 async function generate() {
   try {
@@ -119,8 +119,7 @@ async function generate() {
       </a-form-item>
 
       <a-form-item label="Sampler">
-        <a-select ref="select" v-model:value="commonPayload.sampler_name"
-          :options="samplerOptions(context.samplers)"></a-select>
+        <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
       </a-form-item>
       <a-form-item>
         <a-input-number addonBefore="Batch Size" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
