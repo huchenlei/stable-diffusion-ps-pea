@@ -22,12 +22,12 @@ export default {
   },
   emits: ['change'],
   setup(props, { emit }) {
-    const options = props.models.map(model => {
+    const options = computed(() => props.models.map(model => {
       return {
         value: model.title,
         label: model.model_name,
       };
-    });
+    }));
 
     const loading = ref(false);
     async function onModelChange(value: string) {
@@ -80,22 +80,45 @@ export default {
 </script>
 
 <template>
-  <a-select ref="select" :value="$props.activeModelName" :options="options" class="select" @change="onModelChange"
-    :loading="loading"></a-select>
-
-  <div class="image-grid">
-    <div :class="{ 'card': true, 'selected': index === selectedIndex }" v-for="(item, index) in imageUrls" :key="index">
-      <a-image :src="item.previewURL" fallback="image_alt.png" :preview="false" />
-      <div class="actions">
-        <span class="name">{{ item.name }}</span>
+  <a-select ref="select" :value="$props.activeModelName" :options="options" class="select"
+    :loading="loading">
+    <template #dropdownRender="{ menuNode, props }">
+      <div class="modal">
+        <div class="image-grid modal-content">
+          <div :class="{ 'card': true, 'selected': index === selectedIndex }" v-for="(item, index) in imageUrls"
+            :key="index" @click="onModelChange(item.name)">
+            <a-image :src="item.previewURL" fallback="image_alt.png" :preview="false" />
+            <div class="actions">
+              <span class="name">{{ item.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </a-select>
 </template>
 
 <style scoped>
-.select {
-  min-width: 100px;
+.modal {
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  position: relative;
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  margin: 5vh auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 90%; 
 }
 
 .image-grid {
