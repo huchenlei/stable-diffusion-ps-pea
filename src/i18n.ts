@@ -11,6 +11,7 @@ const messages = {
             autoGenerationModeHint: 'Automatically select generation mode based on selected area.',
             skip: 'Skip',
             interrupt: 'Interrupt',
+            addLoRA: 'Add LoRA',
         },
         width: 'Width',
         height: 'Height',

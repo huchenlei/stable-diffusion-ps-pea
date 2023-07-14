@@ -1,9 +1,9 @@
 <script lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 interface ImageItem {
     imageURL: string;
-    name: string | undefined;
+    name: string;
 };
 
 export default {
@@ -12,17 +12,19 @@ export default {
         images: {
             type: Array<ImageItem>,
             default: [],
-        }
+        },
+        selectedImages: {
+            type: Array<string>,
+            default: [],
+        },
     },
     emits: ['item-clicked'],
     setup(props, { emit }) {
-        const selectedIndex = ref(0);
         return {
-            selectedIndex,
-            onItemClicked(item: ImageItem, index: number) {
-                selectedIndex.value = index;
-                emit('item-clicked', item);
-            }
+            onItemClicked(item: ImageItem) {
+                if (!props.selectedImages.includes(item.name))
+                    emit('item-clicked', item);
+            },
         };
     },
 };
@@ -31,8 +33,8 @@ export default {
 <template>
     <div class="modal">
         <div class="image-grid modal-content">
-            <div :class="{ 'grid-item': true, 'selected': index === selectedIndex }" v-for="(item, index) in $props.images"
-                :key="index" @click="onItemClicked(item, index)">
+            <div :class="{ 'grid-item': true, 'selected': $props.selectedImages!.includes(item.name) }"
+                v-for="(item, index) in $props.images" :key="index" @click="onItemClicked(item)">
                 <a-image :src="item.imageURL" fallback="image_alt.png" :preview="false" />
                 <div class="actions">
                     <span class="name">{{ item.name }}</span>
@@ -44,7 +46,7 @@ export default {
 
 <style scoped>
 .selected {
-    border: 2px solid #88a950;
+    border: 2px solid #88a950 !important;
 }
 
 .modal {

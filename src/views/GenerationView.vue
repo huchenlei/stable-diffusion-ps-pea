@@ -6,6 +6,7 @@ import {
   Img2ImgPayload,
   Txt2ImgPayload,
   GenerationMode,
+  type ILoRA,
 } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
@@ -16,6 +17,7 @@ import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
+import LoRASelection from '@/components/LoRASelection.vue';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
@@ -28,6 +30,7 @@ const commonPayload = reactive(new CommonPayload());
 commonPayload.sampler_name = context.samplers[0].name;
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
+const activeLoRAs: string[] = reactive([]);
 
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
@@ -39,6 +42,15 @@ function samplerOptions(samplers: ISampler[]) {
       label: sampler.name,
     };
   });
+}
+
+function addLoRA(item: ILoRA) {
+  activeLoRAs.push(item.name);
+}
+
+function removeLoRA(item: ILoRA) {
+  const indexToRemove = activeLoRAs.indexOf(item.name);
+  activeLoRAs.splice(indexToRemove, 1);
 }
 
 async function generate() {
@@ -115,6 +127,9 @@ async function generate() {
         <a-textarea v-model:value="commonPayload.negative_prompt" placeholder="Enter negative prompt here"
           :autoSize="{ minRows: 2, maxRows: 6 }" class="prompt-box" />
       </a-form-item>
+
+      <LoRASelection :models="context.loras" :activeLoRAs="activeLoRAs" @add:activeLoRAs="addLoRA"
+        @remove:activeLoRAs="removeLoRA"></LoRASelection>
       <a-form-item label="Sampler">
         <a-select ref="select" v-model:value="commonPayload.sampler_name"
           :options="samplerOptions(context.samplers)"></a-select>

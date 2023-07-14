@@ -12,9 +12,68 @@ interface IStableDiffusionModel {
     title: string;
 };
 
+interface ILoRAMetadata {
+    ss_sd_model_name: string;
+    ss_clip_skip: string;
+    ss_num_train_images: string;
+    ss_tag_frequency: {
+        dataset: {
+            [key: string]: number;
+        };
+    };
+    ss_cache_latents: string;
+    ss_caption_dropout_every_n_epochs: string;
+    ss_caption_dropout_rate: string;
+    ss_caption_tag_dropout_rate: string;
+    ss_dataset_dirs: {
+        dataset: {
+            n_repeats: number;
+            img_count: number;
+        };
+    };
+    ss_datasets: string;
+    ss_epoch: string;
+    ss_face_crop_aug_range: string;
+    ss_full_fp16: string;
+    ss_gradient_accumulation_steps: string;
+    ss_gradient_checkpointing: string;
+    ss_learning_rate: string;
+    ss_lowram: string;
+    ss_lr_scheduler: string;
+    ss_lr_warmup_steps: string;
+    ss_max_grad_norm: string;
+    ss_max_token_length: string;
+    ss_max_train_steps: string;
+    ss_min_snr_gamma: string;
+    ss_mixed_precision: string;
+    ss_network_alpha: string;
+    ss_network_dim: string;
+    ss_network_module: string;
+    ss_new_sd_model_hash: string;
+    ss_noise_offset: string;
+    ss_num_batches_per_epoch: string;
+    ss_num_epochs: string;
+    ss_num_reg_images: string;
+    ss_optimizer: string;
+    ss_output_name: string;
+    ss_prior_loss_weight: string;
+    ss_sd_model_hash: string;
+    ss_sd_scripts_commit_hash: string;
+    ss_seed: string;
+    ss_session_id: string;
+    ss_text_encoder_lr: string;
+    ss_training_comment: string;
+    ss_training_finished_at: string;
+    ss_training_started_at: string;
+    ss_unet_lr: string;
+    ss_v2: string;
+    sshs_legacy_hash: string;
+    sshs_model_hash: string;
+};
+
 interface ILoRA {
     alias: string;
-    metadata: Record<string, any>;
+    metadata: ILoRAMetadata | {};
     name: string;
     path: string;
 };
@@ -301,6 +360,11 @@ class A1111Context {
     checkpointPreviewURL(model_name: string): string {
         return `${this.thumbnailURL}?filename=models/Stable-diffusion/${model_name}.preview.png`;
     }
+
+    loraPreviewURL(model_name: string): string {
+        // model_name e.g. VsingerTianyi_tianyi
+        return `${this.thumbnailURL}?filename=models/Lora/${model_name}.preview.png`
+    }
 };
 
 interface ICommonPayload {
@@ -464,6 +528,7 @@ export {
     MaskMode,
     ResizeMode,
     GenerationMode,
+    type ILoRA,
     type ISampler,
     type IStableDiffusionModel,
     type IProgress,
