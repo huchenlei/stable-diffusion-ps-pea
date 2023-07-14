@@ -39,19 +39,26 @@ export default {
             emit('update:promptValue', promptBody.value + activeLoRAs.map(formatLoRA).join(','));
         }
 
+        function addLoRA(item: ILoRA) {
+            if (activeLoRAs.includes(item.name)) {
+                removeLoRA(item);
+                return;
+            }
+            activeLoRAs.push(item.name);
+            updatePrompt();
+        }
+        function removeLoRA(item: ILoRA) {
+            const indexToRemove = activeLoRAs.indexOf(item.name);
+            activeLoRAs.splice(indexToRemove, 1);
+            updatePrompt();
+        }
+        function updatePromptBody(e: InputEvent) {
+            updatePrompt();
+        }
         return {
-            addLoRA(item: ILoRA) {
-                activeLoRAs.push(item.name);
-                updatePrompt();
-            },
-            removeLoRA(item: ILoRA) {
-                const indexToRemove = activeLoRAs.indexOf(item.name);
-                activeLoRAs.splice(indexToRemove, 1);
-                updatePrompt();
-            },
-            updatePromptBody(e: InputEvent) {
-                updatePrompt();
-            },
+            addLoRA,
+            removeLoRA,
+            updatePromptBody,
             activeLoRAs,
             loras,
             promptBody,

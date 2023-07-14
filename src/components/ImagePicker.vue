@@ -21,8 +21,7 @@ export default {
     setup(props, { emit }) {
         return {
             onItemClicked(item: ImageItem) {
-                if (!props.selectedImages.includes(item.name))
-                    emit('item-clicked', item);
+                emit('item-clicked', item);
             },
         };
     },
@@ -30,14 +29,12 @@ export default {
 </script>
 
 <template>
-    <div class="modal">
-        <div class="image-grid modal-content">
-            <div :class="{ 'grid-item': true, 'selected': $props.selectedImages!.includes(item.name) }"
-                v-for="(item, index) in $props.images" :key="index" @click="onItemClicked(item)">
-                <a-image :src="item.imageURL" fallback="image_alt.png" :preview="false" />
-                <div class="actions">
-                    <span class="name">{{ item.name }}</span>
-                </div>
+    <div class="image-grid">
+        <div :class="{ 'grid-item': true, 'selected': $props.selectedImages!.includes(item.name) }"
+            v-for="(item, index) in $props.images" :key="index" @click="onItemClicked(item)">
+            <a-image :src="item.imageURL" fallback="image_alt.png" :preview="false" />
+            <div class="actions">
+                <span class="name">{{ item.name }}</span>
             </div>
         </div>
     </div>
@@ -46,37 +43,6 @@ export default {
 <style scoped>
 .selected {
     border: 4px solid #88a950 !important;
-}
-
-.modal {
-    position: fixed;
-    /* Stay in place */
-    z-index: 1;
-    /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    /* Full width */
-    height: 100%;
-    /* Full height */
-    overflow: auto;
-    /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0);
-    /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4);
-    /* Black w/ opacity */
-}
-
-.modal-content {
-    position: relative;
-    background-color: rgb(0, 0, 0);
-    /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4);
-    /* Black w/ opacity */
-    margin: 5vh auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 90%;
 }
 
 .image-grid {
