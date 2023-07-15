@@ -16,6 +16,7 @@ const messages = {
             enterNegativePrompt: 'Enter negative prompt',
             extraNetworks: 'Extra networks',
             clearPrompt: 'Clear current prompt',
+            samplingSteps: 'Sampling steps',
         },
         width: 'Width',
         height: 'Height',

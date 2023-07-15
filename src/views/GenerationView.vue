@@ -123,7 +123,10 @@ async function generate() {
         <a-form-item>
           <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
         </a-form-item>
-
+        <a-form-item>
+          <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
+            :max="150" />
+        </a-form-item>
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
       </a-form>
 
