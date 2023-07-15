@@ -114,14 +114,14 @@ async function generate() {
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
         </a-form-item>
-        <a-form-item label="Sampler">
+        <a-form-item :label="$t('sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
         <a-form-item>
-          <a-input-number addonBefore="Batch Size" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
+          <a-input-number :addonBefore="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
         </a-form-item>
         <a-form-item>
-          <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
+          <a-input-number :addonBefore="$t('gen.cfg')" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
         </a-form-item>
         <a-form-item>
           <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
@@ -131,7 +131,7 @@ async function generate() {
       </a-form>
 
       <a-collapse :bordered="false">
-        <a-collapse-panel header="Advanced settings">
+        <a-collapse-panel :header="$t('gen.advancedSettings')">
           <a-space direction="vertical">
             <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
               :max="2048" />
