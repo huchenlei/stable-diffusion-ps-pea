@@ -111,6 +111,9 @@ async function generate() {
         <a-form-item>
           <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
+        <a-form-item>
+          <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
+        </a-form-item>
         <a-form-item label="Sampler">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
@@ -120,9 +123,7 @@ async function generate() {
         <a-form-item>
           <a-input-number addonBefore="CFG Scale" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
         </a-form-item>
-        <a-form-item>
-          <a-button type="primary" @click="generate">{{ $t('generate') }}</a-button>
-        </a-form-item>
+
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
       </a-form>
 
@@ -146,7 +147,8 @@ async function generate() {
 </template>
 
 <style scoped>
-.root {
+.root,
+.generate {
   width: 100%;
 }
 </style>
