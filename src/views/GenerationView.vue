@@ -118,7 +118,8 @@ async function generate() {
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
         <a-form-item>
-          <a-input-number :addonBefore="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64" />
+          <a-input-number :addonBefore="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1"
+            :max="64" />
         </a-form-item>
         <a-form-item>
           <a-input-number :addonBefore="$t('gen.cfg')" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
@@ -138,10 +139,14 @@ async function generate() {
             <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
               :max="2048" />
 
-            <Img2ImgPayloadDisplay v-if="generationMode === GenerationMode.Img2Img" :payload="img2imgPayload">
-            </Img2ImgPayloadDisplay>
-            <Txt2ImgPayloadDisplay v-if="generationMode === GenerationMode.Txt2Img" :payload="txt2imgPayload">
-            </Txt2ImgPayloadDisplay>
+            <div :hidden="generationMode !== GenerationMode.Img2Img">
+              <Img2ImgPayloadDisplay :payload="img2imgPayload">
+              </Img2ImgPayloadDisplay>
+            </div>
+            <div :hidden="generationMode !== GenerationMode.Txt2Img">
+              <Txt2ImgPayloadDisplay :payload="txt2imgPayload">
+              </Txt2ImgPayloadDisplay>
+            </div>
           </a-space>
         </a-collapse-panel>
       </a-collapse>
