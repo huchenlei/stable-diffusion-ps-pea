@@ -85,7 +85,7 @@ export default {
 </script>
 
 <template>
-    <a-button type="primary" @click="showDrawer" title="Extra Networks">
+    <a-button type="primary" @click="showDrawer" :title="$t('gen.extraNetworks')">
         <DeploymentUnitOutlined />
     </a-button>
 

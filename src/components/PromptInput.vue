@@ -2,6 +2,7 @@
 import { computed, } from 'vue';
 import { CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+import { DeleteOutlined } from '@ant-design/icons-vue';
 import ExtraNetworks from './ExtraNetworks.vue';
 
 export default {
@@ -13,7 +14,8 @@ export default {
         },
     },
     components: {
-        ExtraNetworks
+        ExtraNetworks,
+        DeleteOutlined,
     },
     emits: ['update:promptValue'],
     setup(props, { emit }) {
@@ -26,10 +28,16 @@ export default {
             props.payload.prompt += prompt;
         }
 
+        function clearPrompt() {
+            props.payload.prompt = '';
+            props.payload.negative_prompt = '';
+        }
+
         return {
             loras,
             embeddings,
             addPrompt,
+            clearPrompt,
         };
     },
 };
@@ -42,7 +50,12 @@ export default {
         <a-textarea v-model:value="payload.negative_prompt" :placeholder="$t('gen.enterNegativePrompt') + '...'"
             :autoSize="{ minRows: 1, maxRows: 6 }" />
 
-        <ExtraNetworks :loras="loras" :embeddings="embeddings" @add:prompt="addPrompt"></ExtraNetworks>
+        <a-space>
+            <ExtraNetworks :loras="loras" :embeddings="embeddings" @add:prompt="addPrompt"></ExtraNetworks>
+            <a-button @click="clearPrompt" :danger="true" type="primary" :title="$t('gen.clearPrompt')">
+                <DeleteOutlined></DeleteOutlined>
+            </a-button>
+        </a-space>
     </a-space>
 </template>
 

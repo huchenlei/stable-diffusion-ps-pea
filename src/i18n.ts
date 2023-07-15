@@ -14,6 +14,8 @@ const messages = {
             addLoRA: 'Add LoRA',
             enterPrompt: 'Enter prompt',
             enterNegativePrompt: 'Enter negative prompt',
+            extraNetworks: 'Extra networks',
+            clearPrompt: 'Clear current prompt',
         },
         width: 'Width',
         height: 'Height',
