@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, ref } from 'vue';
-import { type ILoRA } from '../Automatic1111';
+import { type ILoRA, type IEmbedding } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { DeploymentUnitOutlined } from '@ant-design/icons-vue';
 import ImagePicker from './ImagePicker.vue';
@@ -23,7 +23,11 @@ export default {
         loras: {
             type: Array<ILoRA>,
             required: true,
-        }
+        },
+        embeddings: {
+            type: Array<[string, IEmbedding]>,
+            required: true,
+        },
     },
     components: {
         ImagePicker,
@@ -41,9 +45,21 @@ export default {
             });
         });
 
+        const embeddingImages = computed(() => {
+            const context = useA1111ContextStore().a1111Context;
+            return props.embeddings.map(entry => {
+                const [name, _] = entry;
+                return { imageURL: context.embeddingPreviewURL(name), name };
+            });
+        });
+
         const onAddLoRA = (item: ImageItem) => {
             emit('add:prompt', `<lora:${item.name}:1.0>`);
         };
+
+        const onAddRawPrompt = (item: ImageItem) => {
+            emit('add:prompt', `(${item.name}:1.0)`);
+        }
 
         const afterVisibleChange = (bool: boolean) => {
             console.log('visible', bool);
@@ -60,7 +76,9 @@ export default {
             afterVisibleChange,
             showDrawer,
             loraImages,
+            embeddingImages,
             onAddLoRA,
+            onAddRawPrompt,
         };
     },
 };
@@ -79,6 +97,10 @@ export default {
         </a-radio-group>
 
         <ImagePicker :hidden="currentNetworkType !== NetworkType.LoRA" :images="loraImages" @item-clicked="onAddLoRA">
+        </ImagePicker>
+
+        <ImagePicker :hidden="currentNetworkType !== NetworkType.Embedding" :images="embeddingImages"
+            @item-clicked="onAddRawPrompt">
         </ImagePicker>
     </a-drawer>
 </template>

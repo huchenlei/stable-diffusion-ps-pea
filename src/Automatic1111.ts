@@ -365,6 +365,10 @@ class A1111Context {
         // model_name e.g. VsingerTianyi_tianyi
         return `${this.thumbnailURL}?filename=models/Lora/${model_name}.preview.png`
     }
+
+    embeddingPreviewURL(model_name: string): string {
+        return `${this.thumbnailURL}?filename=embeddings/${model_name}.preview.png`
+    }
 };
 
 interface ICommonPayload {
@@ -529,6 +533,7 @@ export {
     ResizeMode,
     GenerationMode,
     type ILoRA,
+    type IEmbedding,
     type ISampler,
     type IStableDiffusionModel,
     type IProgress,
