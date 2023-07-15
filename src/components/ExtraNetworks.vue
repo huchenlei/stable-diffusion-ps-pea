@@ -92,7 +92,7 @@ export default {
     <a-drawer v-model:visible="visible" title="Extra Networks" placement="right" @after-visible-change="afterVisibleChange">
         <a-radio-group v-model:value="currentNetworkType" button-style="solid">
             <a-radio-button
-                v-for="network in [NetworkType.LoRA, NetworkType.Embedding, NetworkType.Hypernetwork, NetworkType.LyCORIS]"
+                v-for="network in [NetworkType.LoRA, NetworkType.Embedding]"
                 :value="network">{{ network }}</a-radio-button>
         </a-radio-group>
 
