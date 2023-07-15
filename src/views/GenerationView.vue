@@ -109,16 +109,8 @@ async function generate() {
 
       <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
         <a-form-item>
-          <PromptInput v-model:prompt-value="commonPayload.prompt" :placeholder="$t('gen.enterPrompt') + '...'">
-          </PromptInput>
+          <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
-
-        <a-form-item>
-          <PromptInput v-model:prompt-value="commonPayload.negative_prompt" :lora-selection="false"
-            :placeholder="$t('gen.enterNegativePrompt') + '...'">
-          </PromptInput>
-        </a-form-item>
-
         <a-form-item label="Sampler">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
