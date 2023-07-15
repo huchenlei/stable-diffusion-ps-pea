@@ -53,10 +53,7 @@ export default {
             visible.value = true;
         };
 
-        const current = ref<string[]>(['mail']);
-
         return {
-            current,
             visible,
             NetworkType,
             currentNetworkType,
