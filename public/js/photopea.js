@@ -239,7 +239,7 @@ function controlNetDetectedMapPostProcess(layerName) {
     layer.name = layerName;
     const folder = createControlNetFolderIfNotExist();
     layer.move(folder, ElementPlacement.INSIDE);
-    layer.opacity = 50;
+    layer.opacity = 100;
     layer.blendMode = BlendMode.DIFFERENCE;
     app.echoToOE("success");
 }
