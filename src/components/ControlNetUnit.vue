@@ -16,6 +16,11 @@ interface ModuleOption {
 
 type SliderAttr = 'processor_res' | 'threshold_a' | 'threshold_b';
 
+interface ControlNetError {
+    detail: string;
+    error: string;
+}
+
 export default {
     name: 'ControlNetUnit',
     props: {
@@ -126,6 +131,10 @@ export default {
                     }),
                 });
                 const data = await response.json();
+                // There can be various reasons why ControlNet rejects the payload.
+                if (response.status !== 200)
+                    throw (data as ControlNetError).detail;
+
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
                 await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top);
