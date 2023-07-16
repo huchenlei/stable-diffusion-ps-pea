@@ -52,6 +52,21 @@ class PhotopeaContext {
         console.debug(message);
         return this.postMessageToPhotopea(message);
     }
+
+    public async pasteImageOnPhotopea(imageURL: string, left: number, top: number) {
+        const layerCount = await this.invoke('pasteImageAsNewLayer', imageURL) as number;
+
+        return new Promise((resolve) => {
+            const waitTranslate = setInterval(async () => {
+                const status = await this.invoke(
+                    'translateIfNewLayerAdded', layerCount, left, top);
+                if (status === 'success') {
+                    clearInterval(waitTranslate);
+                    resolve(true);
+                }
+            }, 50);
+        });
+    }
 };
 
 type PhotopeaBound = [number, number, number, number];

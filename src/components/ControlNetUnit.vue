@@ -3,8 +3,10 @@ import { ResizeMode } from '@/Automatic1111';
 import { ControlMode, ControlNetUnit, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { CloseOutlined, CheckOutlined, StopOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
 import { computed, ref } from 'vue';
+import { photopeaContext, type PhotopeaBound } from '@/Photopea';
+import { cropImage } from '@/ImageUtil';
 
 interface ModuleOption {
     label: string;
@@ -31,6 +33,7 @@ export default {
         CloseOutlined,
         CheckOutlined,
         StopOutlined,
+        CaretRightOutlined,
     },
     emits: ['remove:unit'],
     setup(props, { emit }) {
@@ -38,6 +41,7 @@ export default {
             model_free: false,
             sliders: [],
         } as ModuleDetail);
+        const linkedLayerName = ref('');
 
         const attrNames = ['processor_res', 'threshold_a', 'threshold_b'];
         const sliders = [0, 1, 2].map(index => computed(() => {
@@ -85,6 +89,54 @@ export default {
             });
         }
 
+        /**
+         * Run preprocessor on current selection area or current active layer.
+         * This will generate a controlnet layer on Photopea canvas.
+         * 
+         * When hitting generate button, the corresponding area of the controlnet
+         * layer will be cropped out and send to A1111 as payload.
+         */
+        async function runPreprocessor() {
+            async function generateHash(value: string): Promise<string> {
+                const msgUint8 = new TextEncoder().encode(value); // encode as (utf-8) Uint8Array
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8); // hash the message    
+                const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+                return hashHex;
+            }
+
+            try {
+                const context = useA1111ContextStore().controlnetContext;
+                const timestamp = new Date().getTime().toString();
+                const hash = await generateHash(timestamp + props.unit.module);
+
+                const imageBuffer = await photopeaContext.invoke('exportControlNetInputImage', 'PNG') as ArrayBuffer;
+                const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
+                const image = await cropImage(imageBuffer, bounds);
+
+                const response = await fetch(context.detectURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        controlnet_module: props.unit.module,
+                        controlnet_input_images: [image.dataURL],
+                        controlnet_processor_res: props.unit.processor_res,
+                        controlnet_threshold_a: props.unit.threshold_a,
+                        controlnet_threshold_b: props.unit.threshold_b,
+                    }),
+                });
+                const data = await response.json();
+                const detectedMap = `data:image/png;base64,${data['images'][0]}`;
+
+                await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top);
+                linkedLayerName.value = `CN:${props.unit.module}:${hash}`;
+                await photopeaContext.invoke('renameActiveLayer', linkedLayerName.value);
+            } catch (e) {
+                // TODO make this an notification.
+                console.error(e);
+            }
+        }
+
         return {
             moduleDetail,
             sliders,
@@ -92,6 +144,7 @@ export default {
             moduleOptions,
             removeUnit,
             onModuleChange,
+            runPreprocessor,
             ControlMode,
             ResizeMode,
         };
@@ -113,8 +166,13 @@ export default {
             </a-space>
         </template>
 
-        <a-space direction="vertical">
-            <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
+        <a-space direction="vertical" class="cnet-form">
+            <a-space>
+                <a-button @click="runPreprocessor" size="small">
+                    <CaretRightOutlined></CaretRightOutlined>
+                </a-button>
+                <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
+            </a-space>
             <div>
                 <a-tag>{{ $t('cnet.module') }}</a-tag>
                 <a-select class="module-select" v-model:value="unit.module" :options="moduleOptions"
@@ -148,7 +206,7 @@ export default {
 </template>
 
 <style scoped>
-.ant-tag {
+.cnet-form .ant-tag {
     border: none !important;
 }
 

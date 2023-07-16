@@ -21,31 +21,16 @@ export default {
     setup(props) {
         const selectedIndex = ref(0);
 
-        async function pasteImageOnPhotopea(imageURL: string) {
-            const layerCount = await photopeaContext.invoke('pasteImageAsNewLayer', imageURL) as number;
-
-            return new Promise((resolve) => {
-                const waitTranslate = setInterval(async () => {
-                    const status = await photopeaContext.invoke(
-                        'translateIfNewLayerAdded', layerCount, props.left, props.top);
-                    if (status === 'success') {
-                        clearInterval(waitTranslate);
-                        resolve(true);
-                    }
-                }, 50);
-            });
-        }
-
         watch(props.imageUrls, async (newValue: string[], _) => {
             for (const url of newValue) {
-                await pasteImageOnPhotopea(url);
+                await photopeaContext.pasteImageOnPhotopea(url, props.left, props.top);
             }
         });
 
         return {
             selectedIndex,
             async selectResultImage(imageURL: string, index: number) {
-                await pasteImageOnPhotopea(imageURL);
+                await photopeaContext.pasteImageOnPhotopea(imageURL, props.left, props.top);
                 selectedIndex.value = index;
             }
         };

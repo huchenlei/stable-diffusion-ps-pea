@@ -117,6 +117,15 @@ function exportMaskFromSelection(format) {
     app.activeDocument.activeLayer.remove();
 }
 
+function boundsToString(bounds) {
+    return JSON.stringify([
+        bounds[0].value,
+        bounds[1].value,
+        bounds[2].value,
+        bounds[3].value,
+    ]);
+}
+
 function getSelectionBound() {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
@@ -124,11 +133,30 @@ function getSelectionBound() {
     if (!hasSelection()) {
         app.echoToOE("");
     } else {
-        app.echoToOE(JSON.stringify([
-            bounds[0].value,
-            bounds[1].value,
-            bounds[2].value,
-            bounds[3].value,
-        ]));
+        app.echoToOE(boundsToString(bounds));
     }
+}
+
+/**
+ * Export current selection to controlnet for preprocessing.
+ * If selection does not exist, export current layer instead.
+ */
+function exportControlNetInputImage(format) {
+    if (hasSelection()) {
+        exportAllLayers(format);
+    } else {
+        exportSelectedLayerOnly(format);
+    }
+}
+
+function getControlNetSelectionBound() {
+    app.echoToOE(boundsToString(hasSelection() ?
+        app.activeDocument.selection.bounds :
+        app.activeDocument.activeLayer.bounds
+    ));
+}
+
+function renameActiveLayer(name) {
+    app.activeDocument.activeLayer.name = name;
+    app.echoToOE("success");
 }
