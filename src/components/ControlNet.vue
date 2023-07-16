@@ -54,7 +54,8 @@ export default {
                 </a-space>
             </template>
             <a-collapse :bordered="false">
-                <ControlNetUnitComponent v-for="(unit, index) in $props.units" :unit="unit" :index="index">
+                <ControlNetUnitComponent v-for="(unit, index) in $props.units" :unit="unit" :index="index"
+                    @remove:unit="removeUnit">
                 </ControlNetUnitComponent>
             </a-collapse>
         </a-collapse-panel>
