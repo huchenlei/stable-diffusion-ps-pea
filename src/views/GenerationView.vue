@@ -118,7 +118,7 @@ async function generate() {
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
         </a-form-item>
-        <a-form-item :label="$t('sampler')">
+        <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
         <a-form-item>
