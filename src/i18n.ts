@@ -25,6 +25,7 @@ const messages = {
         cnet: {
             guidanceRange: 'Guidance Range',
             lowvram: 'Low VRAM',
+            model: 'Model',
         },
 
         weight: 'Weight',

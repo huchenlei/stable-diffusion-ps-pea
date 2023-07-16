@@ -93,7 +93,7 @@ class ControlNetContext {
                 setting,
             ] = await Promise.all(fetchPromises);
 
-            this.models = models as string[];
+            this.models = models['model_list'] as string[];
             this.modules = modules as string[];
             this.version = version['version'] as number;
             this.setting = setting as ControlNetSetting;

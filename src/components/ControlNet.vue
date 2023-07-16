@@ -22,6 +22,16 @@ export default {
         StopOutlined,
     },
     setup(props) {
+        const modelOptions = computed(() => {
+            const context = useA1111ContextStore().controlnetContext;
+            return context.models.map(modelName => {
+                return {
+                    label: modelName,
+                    value: modelName,
+                };
+            });
+        });
+
         function addNewUnit() {
             const context = useA1111ContextStore().controlnetContext;
             if (props.units.length < context.setting.control_net_max_models_num) {
@@ -37,6 +47,7 @@ export default {
         }
 
         return {
+            modelOptions,
             addNewUnit,
             removeUnit,
             ControlMode,
@@ -75,6 +86,10 @@ export default {
                     <a-space direction="vertical">
                         <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
                         <div>
+                            <a-tag>{{ $t('cnet.model') }}</a-tag>
+                            <a-select class="model-select" v-model:value="unit.model" :options="modelOptions"></a-select>
+                        </div>
+                        <div>
                             <a-tag>{{ $t('weight') }}</a-tag>
                             <a-slider v-model:value="unit.weight" :min="0" :max="2" :step="0.05" />
                         </div>
@@ -97,5 +112,9 @@ export default {
 <style scoped>
 .ant-tag {
     border: none !important;
+}
+
+.model-select {
+    width: 100%;
 }
 </style>
