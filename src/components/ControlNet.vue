@@ -73,8 +73,11 @@ export default {
                     </template>
 
                     <a-space direction="vertical">
-                        <PayloadRadio v-model:value="unit.control_mode" :enum-type="ControlMode"></PayloadRadio>
-                        <PayloadRadio v-model:value="unit.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
+                        <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
+                        <div>
+                            <a-tag>{{ $t('weight') }}</a-tag>
+                            <a-slider v-model:value="unit.weight" :min="0" :max="2" :step="0.05" />
+                        </div>
                         <div>
                             <a-tag>{{ $t('cnet.guidanceRange') }}</a-tag>
                             <a-slider :value="[unit.guidance_start, unit.guidance_end]" range :min="0" :max="1" :step="0.05"
@@ -82,9 +85,17 @@ export default {
                                     [unit.guidance_start, unit.guidance_end] = values;
                                 }" />
                         </div>
+                        <PayloadRadio v-model:value="unit.control_mode" :enum-type="ControlMode"></PayloadRadio>
+                        <PayloadRadio v-model:value="unit.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
                     </a-space>
                 </a-collapse-panel>
             </a-collapse>
         </a-collapse-panel>
     </a-collapse>
 </template>
+
+<style scoped>
+.ant-tag {
+    border: none !important;
+}
+</style>

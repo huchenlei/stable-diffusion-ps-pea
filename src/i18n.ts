@@ -24,8 +24,10 @@ const messages = {
         },
         cnet: {
             guidanceRange: 'Guidance Range',
+            lowvram: 'Low VRAM',
         },
 
+        weight: 'Weight',
         width: 'Width',
         height: 'Height',
 
