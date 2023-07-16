@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
 import {
-  type ISampler,
   CommonPayload,
   Img2ImgPayload,
   Txt2ImgPayload,
@@ -17,6 +16,8 @@ import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
+import ControlNet from '@/components/ControlNet.vue';
+import { ControlNetUnit } from '@/ControlNet';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
@@ -29,6 +30,9 @@ const commonPayload = reactive(new CommonPayload());
 commonPayload.sampler_name = context.samplers[0].name;
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
+
+// Extension payloads.
+const controlnetUnits = reactive([new ControlNetUnit()]);
 
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
@@ -131,25 +135,28 @@ async function generate() {
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
       </a-form>
 
-      <a-collapse :bordered="false">
-        <a-collapse-panel :header="$t('gen.advancedSettings')">
-          <a-space direction="vertical">
-            <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
-              :max="2048" />
-            <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
-              :max="2048" />
+      <div>
+        <a-collapse :bordered="false">
+          <a-collapse-panel :header="$t('gen.advancedSettings')">
+            <a-space direction="vertical">
+              <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
+                :max="2048" />
+              <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
+                :max="2048" />
 
-            <div :hidden="generationMode !== GenerationMode.Img2Img">
-              <Img2ImgPayloadDisplay :payload="img2imgPayload">
-              </Img2ImgPayloadDisplay>
-            </div>
-            <div :hidden="generationMode !== GenerationMode.Txt2Img">
-              <Txt2ImgPayloadDisplay :payload="txt2imgPayload">
-              </Txt2ImgPayloadDisplay>
-            </div>
-          </a-space>
-        </a-collapse-panel>
-      </a-collapse>
+              <div :hidden="generationMode !== GenerationMode.Img2Img">
+                <Img2ImgPayloadDisplay :payload="img2imgPayload">
+                </Img2ImgPayloadDisplay>
+              </div>
+              <div :hidden="generationMode !== GenerationMode.Txt2Img">
+                <Txt2ImgPayloadDisplay :payload="txt2imgPayload">
+                </Txt2ImgPayloadDisplay>
+              </div>
+            </a-space>
+          </a-collapse-panel>
+        </a-collapse>
+        <ControlNet :units="controlnetUnits"></ControlNet>
+      </div>
     </a-space>
   </div>
 </template>
