@@ -1,46 +1,24 @@
 <script lang="ts">
-import { ResizeMode } from '@/Automatic1111';
-import { ControlMode, ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
+import { ControlNetUnit } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { PlusOutlined, CloseOutlined, CheckOutlined, StopOutlined } from '@ant-design/icons-vue';
-import { computed } from 'vue';
+import { PlusOutlined } from '@ant-design/icons-vue';
+import ControlNetUnitComponent from '@/components/ControlNetUnit.vue';
 
 export default {
     name: 'ControlNet',
     props: {
         units: {
-            type: Array<IControlNetUnit>,
+            type: Array<ControlNetUnit>,
             required: true,
         },
     },
     components: {
         PayloadRadio,
         PlusOutlined,
-        CloseOutlined,
-        CheckOutlined,
-        StopOutlined,
+        ControlNetUnitComponent,
     },
     setup(props) {
-        const modelOptions = computed(() => {
-            const context = useA1111ContextStore().controlnetContext;
-            return context.models.map(modelName => {
-                return {
-                    label: modelName,
-                    value: modelName,
-                };
-            });
-        });
-
-        const moduleOptions = computed(() => {
-            return useA1111ContextStore().controlnetContext.modules.map(moduleName => {
-                return {
-                    label: moduleName,
-                    value: moduleName,
-                };
-            });
-        });
-
         function addNewUnit() {
             const context = useA1111ContextStore().controlnetContext;
             if (props.units.length < context.setting.control_net_max_models_num) {
@@ -56,12 +34,8 @@ export default {
         }
 
         return {
-            modelOptions,
-            moduleOptions,
             addNewUnit,
             removeUnit,
-            ControlMode,
-            ResizeMode,
         };
     },
 };
@@ -80,56 +54,9 @@ export default {
                 </a-space>
             </template>
             <a-collapse :bordered="false">
-                <a-collapse-panel v-for="(unit, index) in $props.units" :key="index">
-                    <template #header>
-                        <a-space>
-                            <a-button type="dashed" :danger="!unit.enabled" size="small"
-                                @click.stop="() => unit.enabled = !unit.enabled">
-                                <CheckOutlined v-if="unit.enabled"></CheckOutlined>
-                                <StopOutlined v-if="!unit.enabled"></StopOutlined>
-                            </a-button>
-                            <span>Unit {{ index }}</span>
-                            <CloseOutlined @click.stop="removeUnit(index)"></CloseOutlined>
-                        </a-space>
-                    </template>
-
-                    <a-space direction="vertical">
-                        <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
-                        <div>
-                            <a-tag>{{ $t('cnet.module') }}</a-tag>
-                            <a-select class="module-select" v-model:value="unit.module" :options="moduleOptions"></a-select>
-                        </div>
-                        <div>
-                            <a-tag>{{ $t('cnet.model') }}</a-tag>
-                            <a-select class="model-select" v-model:value="unit.model" :options="modelOptions"></a-select>
-                        </div>
-                        <div>
-                            <a-tag>{{ $t('weight') }}</a-tag>
-                            <a-slider v-model:value="unit.weight" :min="0" :max="2" :step="0.05" />
-                        </div>
-                        <div>
-                            <a-tag>{{ $t('cnet.guidanceRange') }}</a-tag>
-                            <a-slider :value="[unit.guidance_start, unit.guidance_end]" range :min="0" :max="1" :step="0.05"
-                                @change="(values: [number, number]) => {
-                                    [unit.guidance_start, unit.guidance_end] = values;
-                                }" />
-                        </div>
-                        <PayloadRadio v-model:value="unit.control_mode" :enum-type="ControlMode"></PayloadRadio>
-                        <PayloadRadio v-model:value="unit.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
-                    </a-space>
-                </a-collapse-panel>
+                <ControlNetUnitComponent v-for="(unit, index) in $props.units" :unit="unit" :index="index">
+                </ControlNetUnitComponent>
             </a-collapse>
         </a-collapse-panel>
     </a-collapse>
 </template>
-
-<style scoped>
-.ant-tag {
-    border: none !important;
-}
-
-.model-select,
-.module-select {
-    width: 100%;
-}
-</style>

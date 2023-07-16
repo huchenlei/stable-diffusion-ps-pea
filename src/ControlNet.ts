@@ -124,6 +124,7 @@ class ControlNetContext {
 
 export {
     type IControlNetUnit,
+    type ModuleDetail,
     ControlNetUnit,
     ControlMode,
     ControlNetContext,
