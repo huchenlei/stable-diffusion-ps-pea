@@ -4,7 +4,7 @@ import { ControlMode, ControlNetUnit, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
-import { computed, ref } from 'vue';
+import { computed, getCurrentInstance, ref } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { cropImage } from '@/ImageUtil';
 
@@ -42,6 +42,8 @@ export default {
     },
     emits: ['remove:unit'],
     setup(props, { emit }) {
+        const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
+
         const moduleDetail = ref({
             model_free: false,
             sliders: [],
@@ -141,8 +143,7 @@ export default {
                 linkedLayerName.value = `CN:${props.unit.module}:${hash}`;
                 await photopeaContext.invoke('renameActiveLayer', linkedLayerName.value);
             } catch (e) {
-                // TODO make this an notification.
-                console.error(e);
+                $notify(`ControlNet: ${e}`);
             }
         }
 
