@@ -48,7 +48,6 @@ export default {
             model_free: false,
             sliders: [],
         } as ModuleDetail);
-        const linkedLayerName = ref('');
 
         const attrNames = ['processor_res', 'threshold_a', 'threshold_b'];
         const sliders = [0, 1, 2].map(index => computed(() => {
@@ -140,8 +139,8 @@ export default {
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
                 await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
-                linkedLayerName.value = `CN:${props.unit.module}:${hash}`;
-                await photopeaContext.invoke('controlNetDetectedMapPostProcess', linkedLayerName.value);
+                props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
+                await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName);
             } catch (e) {
                 $notify(`ControlNet: ${e}`);
             }
@@ -171,7 +170,7 @@ export default {
                     <CheckOutlined v-if="unit.enabled"></CheckOutlined>
                     <StopOutlined v-if="!unit.enabled"></StopOutlined>
                 </a-button>
-                <span>Unit {{ index }}</span>
+                <span class="layer-name">{{ $props.unit.linkedLayerName || $t('cnet.unlinked') }}</span>
                 <CloseOutlined @click.stop="removeUnit(index)"></CloseOutlined>
             </a-space>
         </template>
@@ -223,5 +222,17 @@ export default {
 .model-select,
 .module-select {
     width: 100%;
+}
+
+.ant-space-item {
+    display: flex;
+}
+
+.layer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 20ch;
 }
 </style>

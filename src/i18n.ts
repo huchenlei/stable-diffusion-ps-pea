@@ -27,6 +27,7 @@ const messages = {
             lowvram: 'Low VRAM',
             model: 'Model',
             module: 'Preprocessor',
+            unlinked: 'Unlinked',
         },
 
         weight: 'Weight',

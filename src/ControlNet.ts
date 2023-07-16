@@ -54,6 +54,9 @@ class ControlNetUnit implements IControlNetUnit {
     threshold_a: number = 64;
     threshold_b: number = 64;
     weight: number = 1.0;
+
+    // The linked photopea/photoshop layer name under ControlNet folder.
+    linkedLayerName: string = '';
 }
 
 async function fetchJSON(url: string): Promise<any> {
