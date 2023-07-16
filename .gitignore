@@ -31,3 +31,7 @@ logs/
 tests_output/
 
 .vscode/
+
+# HTTPs cred
+key.pem
+cert.pem

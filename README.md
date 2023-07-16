@@ -2,7 +2,7 @@
 Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
 
 ## Setup
-Add `--cors-allow-origins http://localhost:5173` to WebUI command line args for local development.
+Add `--cors-allow-origins https://localhost:5173` to WebUI command line args for local development.
 Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 
 ## Development plan
@@ -35,7 +35,16 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
 (512x512?).
    - Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
- 
+
+# Development
+## Setup HTTPS
+Linux/Mac bash
+`openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost"`
+
+Windows bash
+`openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj "//CN=localhost"`
+
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
