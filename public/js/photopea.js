@@ -71,7 +71,7 @@ function pasteImageAsNewLayer(base64image) {
 }
 
 // Translate the newly added layer if the new layer has been added.
-function translateIfNewLayerAdded(layerCount, leftOffset, topOffset) {
+function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, height) {
     if (app.activeDocument.layers.length === layerCount) {
         app.echoToOE("fail");
         return;
@@ -82,7 +82,19 @@ function translateIfNewLayerAdded(layerCount, leftOffset, topOffset) {
     if (hasSelection()) {
         app.activeDocument.selection.deselect();
     }
+
     const layer = app.activeDocument.activeLayer;
+    if (width && height) {
+        const bounds = layer.bounds;
+        const currentWidth = bounds[2].value - bounds[0].value;
+        const currentHeight = bounds[3].value - bounds[1].value;
+
+        layer.resize(
+            (width / currentWidth) * 100,
+            (height / currentHeight) * 100,
+            AnchorPosition.MIDDLECENTER
+        );
+    }
     layer.translate(
         leftOffset - layer.bounds[0].value,
         topOffset - layer.bounds[1].value
@@ -175,7 +187,59 @@ function getControlNetSelectionBound() {
     }
 }
 
-function renameActiveLayer(name) {
-    app.activeDocument.activeLayer.name = name;
+function fillLayerWithBlack(layer) {
+    // Save the current active layer
+    var originalActiveLayer = app.activeDocument.activeLayer;
+
+    // Save the current foreground color
+    var originalForegroundColor = app.foregroundColor;
+
+    // Make the layer passed to the function the active layer
+    app.activeDocument.activeLayer = layer;
+
+    // Change the foreground color to black
+    app.foregroundColor.rgb.red = 0;
+    app.foregroundColor.rgb.green = 0;
+    app.foregroundColor.rgb.blue = 0;
+
+    // Select all and fill with the foreground color
+    app.activeDocument.selection.selectAll();
+    app.activeDocument.selection.fill(app.foregroundColor);
+    app.activeDocument.selection.deselect();
+
+    // Restore the original active layer
+    app.activeDocument.activeLayer = originalActiveLayer;
+
+    // Restore the original foreground color
+    app.foregroundColor = originalForegroundColor;
+}
+
+function createControlNetFolderIfNotExist() {
+    const document = app.activeDocument;
+    for (let i = 0; i < document.layers.length; i++) {
+        const currentLayer = document.layers[i];
+        if (currentLayer.typename === "LayerSet") {
+            if (currentLayer.name === "ControlNet") {
+                return currentLayer;
+            }
+        }
+    }
+
+    const newFolder = document.layerSets.add();
+    newFolder.name = "ControlNet";
+
+    const backgroundLayer = newFolder.artLayers.add();
+    backgroundLayer.name = "Background";
+    fillLayerWithBlack(backgroundLayer);
+    return newFolder;
+}
+
+function controlNetDetectedMapPostProcess(layerName) {
+    const layer = app.activeDocument.activeLayer;
+    layer.name = layerName;
+    const folder = createControlNetFolderIfNotExist();
+    layer.move(folder, ElementPlacement.INSIDE);
+    layer.opacity = 50;
+    layer.blendMode = BlendMode.DIFFERENCE;
     app.echoToOE("success");
 }

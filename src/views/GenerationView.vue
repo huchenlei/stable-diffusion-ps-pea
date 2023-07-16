@@ -24,6 +24,8 @@ const autoGenerationMode = ref(true);
 const generationActive = ref(false);
 const left = ref(0);
 const top = ref(0);
+const width = ref(0);
+const height = ref(0);
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
@@ -89,6 +91,8 @@ async function generate() {
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
     left.value = image.left;
     top.value = image.top;
+    width.value = image.width;
+    height.value = image.height;
   } catch (e) {
     console.error(e);
     return;
@@ -132,7 +136,8 @@ async function generate() {
           <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
             :max="150" />
         </a-form-item>
-        <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top"></ResultImagesPicker>
+        <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top" :width="width" :height="height">
+        </ResultImagesPicker>
       </a-form>
 
       <div>

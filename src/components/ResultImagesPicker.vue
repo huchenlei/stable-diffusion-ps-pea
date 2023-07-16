@@ -17,20 +17,28 @@ export default {
             type: Number,
             required: true,
         },
+        width: {
+            type: Number,
+            required: true,
+        },
+        height: {
+            type: Number,
+            required: true,
+        }
     },
     setup(props) {
         const selectedIndex = ref(0);
 
         watch(props.imageUrls, async (newValue: string[], _) => {
             for (const url of newValue) {
-                await photopeaContext.pasteImageOnPhotopea(url, props.left, props.top);
+                await photopeaContext.pasteImageOnPhotopea(url, props.left, props.top, props.width, props.height);
             }
         });
 
         return {
             selectedIndex,
             async selectResultImage(imageURL: string, index: number) {
-                await photopeaContext.pasteImageOnPhotopea(imageURL, props.left, props.top);
+                await photopeaContext.pasteImageOnPhotopea(imageURL, props.left, props.top, props.width, props.height);
                 selectedIndex.value = index;
             }
         };

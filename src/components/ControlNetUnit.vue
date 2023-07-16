@@ -139,9 +139,9 @@ export default {
 
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
-                await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top);
+                await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
                 linkedLayerName.value = `CN:${props.unit.module}:${hash}`;
-                await photopeaContext.invoke('renameActiveLayer', linkedLayerName.value);
+                await photopeaContext.invoke('controlNetDetectedMapPostProcess', linkedLayerName.value);
             } catch (e) {
                 $notify(`ControlNet: ${e}`);
             }
