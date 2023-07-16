@@ -3,7 +3,7 @@ import { ResizeMode } from '@/Automatic1111';
 import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { PlusOutlined, CloseOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, CloseOutlined, CheckOutlined, StopOutlined } from '@ant-design/icons-vue';
 import { computed } from 'vue';
 
 export default {
@@ -18,6 +18,8 @@ export default {
         PayloadRadio,
         PlusOutlined,
         CloseOutlined,
+        CheckOutlined,
+        StopOutlined,
     },
     setup(props) {
         function addNewUnit() {
@@ -54,10 +56,15 @@ export default {
                     </a-button>
                 </a-space>
             </template>
-            <a-collapse>
+            <a-collapse :bordered="false">
                 <a-collapse-panel v-for="(unit, index) in $props.units" :key="index">
                     <template #header>
                         <a-space>
+                            <a-button type="dashed" :danger="!unit.enabled" size="small"
+                                @click.stop="() => unit.enabled = !unit.enabled">
+                                <CheckOutlined v-if="unit.enabled"></CheckOutlined>
+                                <StopOutlined v-if="!unit.enabled"></StopOutlined>
+                            </a-button>
                             <span>Unit {{ index }}</span>
                             <CloseOutlined @click.stop="removeUnit(index)"></CloseOutlined>
                         </a-space>
