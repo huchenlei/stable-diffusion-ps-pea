@@ -26,6 +26,7 @@ const messages = {
             guidanceRange: 'Guidance Range',
             lowvram: 'Low VRAM',
             model: 'Model',
+            module: 'Preprocessor',
         },
 
         weight: 'Weight',

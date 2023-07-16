@@ -32,6 +32,15 @@ export default {
             });
         });
 
+        const moduleOptions = computed(() => {
+            return useA1111ContextStore().controlnetContext.modules.map(moduleName => {
+                return {
+                    label: moduleName,
+                    value: moduleName,
+                };
+            });
+        });
+
         function addNewUnit() {
             const context = useA1111ContextStore().controlnetContext;
             if (props.units.length < context.setting.control_net_max_models_num) {
@@ -48,6 +57,7 @@ export default {
 
         return {
             modelOptions,
+            moduleOptions,
             addNewUnit,
             removeUnit,
             ControlMode,
@@ -86,6 +96,10 @@ export default {
                     <a-space direction="vertical">
                         <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
                         <div>
+                            <a-tag>{{ $t('cnet.module') }}</a-tag>
+                            <a-select class="module-select" v-model:value="unit.module" :options="moduleOptions"></a-select>
+                        </div>
+                        <div>
                             <a-tag>{{ $t('cnet.model') }}</a-tag>
                             <a-select class="model-select" v-model:value="unit.model" :options="modelOptions"></a-select>
                         </div>
@@ -114,7 +128,8 @@ export default {
     border: none !important;
 }
 
-.model-select {
+.model-select,
+.module-select {
     width: 100%;
 }
 </style>

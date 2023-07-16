@@ -65,9 +65,23 @@ interface ControlNetSetting {
     control_net_max_models_num: number;
 };
 
+interface ModuleSlider {
+    name: string;
+    value: number;
+    min: number;
+    max: number;
+    step: number;
+};
+
+interface ModuleDetail {
+    model_free: boolean;
+    sliders: Array<ModuleSlider | null>;
+};
+
 class ControlNetContext {
     models: string[] = [];
     modules: string[] = []; // Preprocessors
+    module_details: Record<string, ModuleDetail> = {};
     version: number = 0; // API version, not the actual ControlNet extension version.
     setting: ControlNetSetting = { control_net_max_models_num: 1 };
     detectURL: string = '';
@@ -94,7 +108,8 @@ class ControlNetContext {
             ] = await Promise.all(fetchPromises);
 
             this.models = models['model_list'] as string[];
-            this.modules = modules as string[];
+            this.modules = modules['module_list'] as string[];
+            this.module_details = modules['module_detail'] as Record<string, ModuleDetail>;
             this.version = version['version'] as number;
             this.setting = setting as ControlNetSetting;
 
