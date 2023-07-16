@@ -22,6 +22,10 @@ const messages = {
             sampler: 'Sampler',
             advancedSettings: 'Advanced settings',
         },
+        cnet: {
+            guidanceRange: 'Guidance Range',
+        },
+
         width: 'Width',
         height: 'Height',
 

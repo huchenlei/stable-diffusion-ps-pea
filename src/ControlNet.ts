@@ -1,14 +1,14 @@
 import { ResizeMode } from '@/Automatic1111';
 
 enum ControlMode {
-    BALANCED = "Balanced",
-    PROMPT = "My prompt is more important",
-    CONTROL = "ControlNet is more important",
+    Balanced,
+    Prompt,
+    ControlNet,
 };
 
 enum InputMode {
-    SIMPLE = 'simple',
-    BATCH = 'batch',
+    Simple,
+    Batch,
 };
 
 interface ControlNetImage {
@@ -38,12 +38,12 @@ interface IControlNetUnit {
 
 class ControlNetUnit implements IControlNetUnit {
     batch_images: string = '';
-    control_mode: ControlMode = ControlMode.BALANCED;
+    control_mode: ControlMode = ControlMode.Balanced;
     enabled: boolean = false;
     guidance_end: number = 1.0;
     guidance_start: number = 0.0;
     image: ControlNetImage | undefined = undefined;
-    input_mode: InputMode = InputMode.SIMPLE;
+    input_mode: InputMode = InputMode.Simple;
     low_vram: boolean = false;
     model: string = '';
     module: string = '';

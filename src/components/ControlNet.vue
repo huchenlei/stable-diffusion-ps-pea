@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ResizeMode } from '@/Automatic1111';
-import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
+import { ControlMode, ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { PlusOutlined, CloseOutlined, CheckOutlined, StopOutlined } from '@ant-design/icons-vue';
@@ -39,6 +39,8 @@ export default {
         return {
             addNewUnit,
             removeUnit,
+            ControlMode,
+            ResizeMode,
         };
     },
 };
@@ -70,7 +72,17 @@ export default {
                         </a-space>
                     </template>
 
-                    hello
+                    <a-space direction="vertical">
+                        <PayloadRadio v-model:value="unit.control_mode" :enum-type="ControlMode"></PayloadRadio>
+                        <PayloadRadio v-model:value="unit.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
+                        <div>
+                            <a-tag>{{ $t('cnet.guidanceRange') }}</a-tag>
+                            <a-slider :value="[unit.guidance_start, unit.guidance_end]" range :min="0" :max="1" :step="0.05"
+                                @change="(values: [number, number]) => {
+                                    [unit.guidance_start, unit.guidance_end] = values;
+                                }" />
+                        </div>
+                    </a-space>
                 </a-collapse-panel>
             </a-collapse>
         </a-collapse-panel>
