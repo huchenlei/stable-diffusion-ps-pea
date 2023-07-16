@@ -51,6 +51,15 @@ function hasSelection() {
     return !!app.activeDocument.selection.bounds;
 }
 
+function hasActiveLayer() {
+    const bounds = app.activeDocument.activeLayer.bounds;
+    for (let i = 0; i < bounds.length; i++) {
+        if (bounds[i] !== 0)
+            return true;
+    }
+    return false;
+}
+
 /**
  * Paste the given image to Photopea as a new Image layer.
  * @param base64image base64 string representing an image.
@@ -144,16 +153,26 @@ function getSelectionBound() {
 function exportControlNetInputImage(format) {
     if (hasSelection()) {
         exportAllLayers(format);
-    } else {
+    } else if (hasActiveLayer()) {
         exportSelectedLayerOnly(format);
+    } else {
+        alert('No selection / active layer.');
+        app.echoToOE('');
     }
 }
 
 function getControlNetSelectionBound() {
-    app.echoToOE(boundsToString(hasSelection() ?
-        app.activeDocument.selection.bounds :
-        app.activeDocument.activeLayer.bounds
-    ));
+    if (hasSelection()) {
+        app.echoToOE(boundsToString(
+            app.activeDocument.selection.bounds
+        ));
+    } else if (hasActiveLayer()) {
+        app.echoToOE(boundsToString(
+            app.activeDocument.activeLayer.bounds
+        ));
+    } else {
+        app.echoToOE('');
+    }
 }
 
 function renameActiveLayer(name) {
