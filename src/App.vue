@@ -17,9 +17,6 @@ const route = useRoute();
           <a-menu-item key="/generation" :disabled="!context.initialized">
             <RouterLink to="/generation">{{ $t('nav.generation') }}</RouterLink>
           </a-menu-item>
-          <a-menu-item key="/about">
-            <RouterLink to="/about">{{ $t('nav.about') }}</RouterLink>
-          </a-menu-item>
         </a-menu>
       </a-affix>
     </header>
