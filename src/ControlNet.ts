@@ -49,7 +49,7 @@ class ControlNetUnit implements IControlNetUnit {
     module: string = '';
     output_dir: string = '';
     pixel_perfect: boolean = false;
-    processor_res: number = 64;
+    processor_res: number = 512;
     resize_mode: ResizeMode = ResizeMode.InnerFit;
     threshold_a: number = 64;
     threshold_b: number = 64;
