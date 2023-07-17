@@ -1,16 +1,14 @@
 // Note: Many ES6+ features are not available in photopea environment. 
 
+const MAX_NESTING = 10;
 function makeLayerVisible(layer) {
     let currentLayer = layer;
-    const MAX_NESTING = 5;
     let nest = 0;
 
     while (currentLayer != app.activeDocument && nest < MAX_NESTING) {
         nest++;
-
         currentLayer.visible = true;
-
-        if (currentLayer.parent && currentLayer.parent != currentLayer) {
+        if (currentLayer.parent.typename != 'Document') {
             currentLayer = currentLayer.parent;
         } else {
             break;
