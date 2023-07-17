@@ -1,10 +1,20 @@
 // Note: Many ES6+ features are not available in photopea environment. 
 
 function makeLayerVisible(layer) {
-    layer.visible = true;
+    let currentLayer = layer;
+    const MAX_NESTING = 5;
+    let nest = 0;
 
-    if (layer.parent !== app.activeDocument) {
-        makeLayerVisible(layer.parent);
+    while (currentLayer != app.activeDocument && nest < MAX_NESTING) {
+        nest++;
+
+        currentLayer.visible = true;
+
+        if (currentLayer.parent && currentLayer.parent != currentLayer) {
+            currentLayer = currentLayer.parent;
+        } else {
+            break;
+        }
     }
 }
 
@@ -43,8 +53,8 @@ function exportSelectedLayerOnly(format, layerSelector) {
         const layer = allLayers[i];
         const selected = layerSelector ? layerSelector(layer) : layer.selected;
         if (selected) {
-            console.debug('sd-pea: capture ' + layer.name);
             makeLayerVisible(layer);
+            console.debug('sd-pea: capture ' + layer.name);
         }
     }
     app.activeDocument.saveToOE(format);
