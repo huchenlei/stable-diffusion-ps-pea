@@ -184,10 +184,16 @@ export default {
         </template>
 
         <a-space direction="vertical" class="cnet-form">
-            <a-row>
-                <a-image v-if="preprocessorInput" :src="preprocessorInput.dataURL"></a-image>
-                <a-image v-if="unit.image" :src="unit.image.image"></a-image>
-            </a-row>
+            <a-space>
+                <div v-if="preprocessorInput">
+                    <a-tag>Preprocessor Input</a-tag>
+                    <a-image :src="preprocessorInput.dataURL"></a-image>
+                </div>
+                <div v-if="unit.image">
+                    <a-tag>Preprocessor Result</a-tag>
+                    <a-image :src="unit.image.image"></a-image>
+                </div>
+            </a-space>
 
             <a-space>
                 <a-button @click="runPreprocessor" size="small">
