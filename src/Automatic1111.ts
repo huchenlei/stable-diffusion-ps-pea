@@ -371,6 +371,10 @@ class A1111Context {
     }
 };
 
+interface IScriptDetail {
+    args: Array<any>,
+}
+
 interface ICommonPayload {
     // Basic generation params.
     batch_size: number;
@@ -404,6 +408,9 @@ interface ICommonPayload {
     script_name: string | null;
     styles: string[];
     subseed_strength: number;
+
+    // Extensions
+    alwayson_scripts: Record<string, IScriptDetail>;
 };
 
 // Payload params specific to txt2img.
@@ -487,6 +494,7 @@ class CommonPayload implements ICommonPayload {
     script_args: string[] = [];
     script_name: string | null = null;
     styles: string[] = [];
+    alwayson_scripts: Record<string, IScriptDetail> = {};
 };
 
 class Img2ImgPayload implements IImg2ImgPayload {
@@ -532,6 +540,7 @@ export {
     MaskMode,
     ResizeMode,
     GenerationMode,
+    type IScriptDetail,
     type ILoRA,
     type IEmbedding,
     type ISampler,

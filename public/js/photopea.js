@@ -2,7 +2,7 @@
 
 // Hides all layers except the current one, outputs the whole image, then restores the previous
 // layers state.
-function exportSelectedLayerOnly(format) {
+function exportSelectedLayerOnly(format, layerSelector) {
     // Gets all layers recursively, including the ones inside folders.
     function getAllArtLayers(document) {
         let allArtLayers = [];
@@ -26,9 +26,7 @@ function exportSelectedLayerOnly(format) {
         const layer = allLayers[i];
 
         layerStates.push(layer.visible);
-        // Don't use `===` here as the compare is for the value of the layer,
-        // not address.
-        layer.visible = layer == app.activeDocument.activeLayer;
+        layer.visible = layerSelector ? layerSelector(layer) : layer.selected;
     }
 
     app.activeDocument.saveToOE(format);
@@ -166,7 +164,10 @@ function exportControlNetInputImage(format) {
     if (hasSelection()) {
         exportAllLayers(format);
     } else if (hasActiveLayer()) {
-        exportSelectedLayerOnly(format);
+        const activeLayer = app.activeDocument.activeLayer;
+        exportSelectedLayerOnly(format, (layer) => layer == activeLayer);
+        // Hide the source layer for better viewing of preprocessor result.
+        activeLayer.visible = false;
     } else {
         alert('No selection / active layer.');
         app.echoToOE('');
@@ -242,4 +243,8 @@ function controlNetDetectedMapPostProcess(layerName) {
     layer.opacity = 100;
     layer.blendMode = BlendMode.DIFFERENCE;
     app.echoToOE("success");
+}
+
+function exportLayersWithName(layerName, format) {
+    exportSelectedLayerOnly(format, /* layerSelector */(layer) => layer.name === layerName);
 }

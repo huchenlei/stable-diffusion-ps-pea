@@ -13,7 +13,7 @@ enum InputMode {
 
 interface ControlNetImage {
     image: string;
-    mask: string | undefined;
+    mask: string | null;
 };
 
 interface IControlNetUnit {

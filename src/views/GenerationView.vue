@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, toRaw } from 'vue';
 import {
   CommonPayload,
   Img2ImgPayload,
@@ -17,7 +17,7 @@ import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
-import { ControlNetUnit } from '@/ControlNet';
+import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
@@ -48,6 +48,33 @@ const samplerOptions = computed(() => {
   });
 });
 
+async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
+  for (const unit of controlnetUnits) {
+    const mapBuffer = await photopeaContext.invoke('exportLayersWithName', unit.linkedLayerName, 'PNG') as ArrayBuffer;
+    const map = await cropImage(mapBuffer, maskBound);
+    unit.image = {
+      image: map.dataURL,
+      mask: null,
+    };
+  }
+}
+
+function fillExtensionsArgs() {
+  if (useA1111ContextStore().controlnetContext.initialized) {
+    commonPayload.alwayson_scripts['ControlNet'] = {
+      args: toRaw(controlnetUnits).map(unit => {
+        const payloadUnit = Object.fromEntries(
+          Object.entries(unit)
+            .filter(([key]) => key !== 'linkedLayerName')
+        ) as any as IControlNetUnit;
+        // TODO: Some modes still need preprocessor, such as Inpaint.
+        payloadUnit.module = 'none';
+        return payloadUnit;
+      })
+    }; 
+  }
+}
+
 async function generate() {
   try {
     const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
@@ -70,6 +97,10 @@ async function generate() {
     }
     commonPayload.width = image.width;
     commonPayload.height = image.height;
+
+    // Handling extension
+    await setControlNetInputs(maskBound);
+    fillExtensionsArgs();
 
     // Start progress bar.
     generationActive.value = true;

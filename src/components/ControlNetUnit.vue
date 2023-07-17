@@ -141,6 +141,9 @@ export default {
                 await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
                 props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
                 await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName);
+
+                if (!props.unit.enabled)
+                    props.unit.enabled = true;
             } catch (e) {
                 $notify(`ControlNet: ${e}`);
             }
@@ -176,6 +179,8 @@ export default {
         </template>
 
         <a-space direction="vertical" class="cnet-form">
+            <a-image v-if="unit.image" :src="unit.image.image"></a-image>
+            
             <a-space>
                 <a-button @click="runPreprocessor" size="small">
                     <CaretRightOutlined></CaretRightOutlined>
