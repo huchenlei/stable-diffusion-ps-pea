@@ -6,7 +6,7 @@ import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
-import { cropImage } from '@/ImageUtil';
+import { PayloadImage, cropImage } from '@/ImageUtil';
 
 interface ModuleOption {
     label: string;
@@ -43,6 +43,7 @@ export default {
     emits: ['remove:unit'],
     setup(props, { emit }) {
         const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
+        const preprocessorInput = ref<PayloadImage | undefined>(undefined);
 
         const moduleDetail = ref({
             model_free: false,
@@ -120,6 +121,8 @@ export default {
                 const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
                 const image = await cropImage(imageBuffer, bounds);
 
+                preprocessorInput.value = image;
+                
                 const response = await fetch(context.detectURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -145,11 +148,13 @@ export default {
                 if (!props.unit.enabled)
                     props.unit.enabled = true;
             } catch (e) {
+                console.error(e);
                 $notify(`ControlNet: ${e}`);
             }
         }
 
         return {
+            preprocessorInput,
             moduleDetail,
             sliders,
             modelOptions,
@@ -179,8 +184,9 @@ export default {
         </template>
 
         <a-space direction="vertical" class="cnet-form">
+            <a-image v-if="preprocessorInput" :src="preprocessorInput.dataURL"></a-image>
             <a-image v-if="unit.image" :src="unit.image.image"></a-image>
-            
+
             <a-space>
                 <a-button @click="runPreprocessor" size="small">
                     <CaretRightOutlined></CaretRightOutlined>

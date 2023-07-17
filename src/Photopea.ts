@@ -49,8 +49,12 @@ class PhotopeaContext {
         }
         const funcCall = `${funcName}(${args.map(arg => JSON.stringify(arg)).join(',')});`;
         const message = (this.context + funcCall);
-        console.debug(message);
-        return this.postMessageToPhotopea(message);
+        console.debug(funcCall);
+        try {
+            return await this.postMessageToPhotopea(message);
+        } catch (e) {
+            throw `Failed to invoke ${funcName}. ${e}.`;
+        }
     }
 
     public async pasteImageOnPhotopea(imageURL: string, left: number, top: number, width: number, height: number) {

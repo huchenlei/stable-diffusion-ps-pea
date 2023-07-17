@@ -1,5 +1,13 @@
 // Note: Many ES6+ features are not available in photopea environment. 
 
+function makeLayerVisible(layer) {
+    layer.visible = true;
+
+    if (layer.parent !== app.activeDocument) {
+        makeLayerVisible(layer.parent);
+    }
+}
+
 // Hides all layers except the current one, outputs the whole image, then restores the previous
 // layers state.
 function exportSelectedLayerOnly(format, layerSelector) {
@@ -24,11 +32,21 @@ function exportSelectedLayerOnly(format, layerSelector) {
     const layerStates = [];
     for (let i = 0; i < allLayers.length; i++) {
         const layer = allLayers[i];
-
         layerStates.push(layer.visible);
-        layer.visible = layerSelector ? layerSelector(layer) : layer.selected;
     }
-
+    // Hide all layers to begin with
+    for (let i = 0; i < allLayers.length; i++) {
+        const layer = allLayers[i];
+        layer.visible = false;
+    }
+    for (let i = 0; i < allLayers.length; i++) {
+        const layer = allLayers[i];
+        const selected = layerSelector ? layerSelector(layer) : layer.selected;
+        if (selected) {
+            console.debug('sd-pea: capture ' + layer.name);
+            makeLayerVisible(layer);
+        }
+    }
     app.activeDocument.saveToOE(format);
 
     for (let i = 0; i < allLayers.length; i++) {
@@ -137,12 +155,14 @@ function exportMaskFromSelection(format) {
 }
 
 function boundsToString(bounds) {
-    return JSON.stringify([
+    const result = JSON.stringify([
         bounds[0].value,
         bounds[1].value,
         bounds[2].value,
         bounds[3].value,
     ]);
+    console.debug('sd-pea: capture bound ' + result);
+    return result;
 }
 
 function getSelectionBound() {
@@ -165,9 +185,10 @@ function exportControlNetInputImage(format) {
         exportAllLayers(format);
     } else if (hasActiveLayer()) {
         const activeLayer = app.activeDocument.activeLayer;
-        exportSelectedLayerOnly(format, (layer) => layer == activeLayer);
-        // Hide the source layer for better viewing of preprocessor result.
-        activeLayer.visible = false;
+        function layerSelector(layer) {
+            return layer == activeLayer;
+        }
+        exportSelectedLayerOnly(format, layerSelector);
     } else {
         alert('No selection / active layer.');
         app.echoToOE('');
@@ -246,5 +267,8 @@ function controlNetDetectedMapPostProcess(layerName) {
 }
 
 function exportLayersWithName(layerName, format) {
-    exportSelectedLayerOnly(format, /* layerSelector */(layer) => layer.name === layerName);
+    function layerSelector(layer) {
+        return layer.name === layerName;
+    }
+    exportSelectedLayerOnly(format, layerSelector);
 }

@@ -101,6 +101,11 @@ async function preparePayload() {
 
     inputImage.value = image;
     inputMask.value = mask;
+
+    left.value = image.left;
+    top.value = image.top;
+    width.value = image.width;
+    height.value = image.height;
   } catch (e) {
     $notify(`${e}`);
   }
@@ -138,10 +143,6 @@ async function generate() {
     // Clear array content.
     resultImages.length = 0;
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
-    left.value = image.left;
-    top.value = image.top;
-    width.value = image.width;
-    height.value = image.height;
   } catch (e) {
     $notify(`${e}`);
   }
@@ -170,6 +171,7 @@ async function generate() {
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
           <a-button @click="preparePayload">prepare</a-button>
+          <a-button @click="setControlNetInputs">prepare cnet</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
