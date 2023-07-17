@@ -108,7 +108,7 @@ async function preparePayload() {
     top.value = image.top;
     width.value = image.width;
     height.value = image.height;
-    
+
     payloadPrepared.value = true;
   } catch (e) {
     console.error(e);
@@ -199,9 +199,15 @@ async function generate() {
           <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
             :max="150" />
         </a-form-item>
-        <a-space>
-          <a-image v-if="inputImage" :src="inputImage.dataURL"></a-image>
-          <a-image v-if="inputMask" :src="inputMask.dataURL"></a-image>
+        <a-space v-if="generationMode === GenerationMode.Img2Img">
+          <div>
+            <a-tag>Input image</a-tag>
+            <a-image v-if="inputImage" :src="inputImage.dataURL"></a-image>
+          </div>
+          <div>
+            <a-tag>Input mask</a-tag>
+            <a-image v-if="inputMask" :src="inputMask.dataURL"></a-image>
+          </div>
         </a-space>
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top" :width="width" :height="height">
         </ResultImagesPicker>
