@@ -272,6 +272,7 @@ function controlNetDetectedMapPostProcess(layerName) {
     const layer = app.activeDocument.activeLayer;
     layer.name = layerName;
     const folder = createControlNetFolderIfNotExist();
+    folder.visible = true; // Make folder visible if not.
     layer.move(folder, ElementPlacement.INSIDE);
     layer.opacity = 100;
     layer.blendMode = BlendMode.DIFFERENCE;
