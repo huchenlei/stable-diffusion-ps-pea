@@ -26,10 +26,10 @@ class PhotopeaContext {
         return new Promise((resolve, reject) => {
             const responseDataPieces: any[] = [];
             function photopeaMessageHandle(event: MessageEvent) {
-                if (event.data == MESSAGE_END_ACK) {
+                if (event.data === MESSAGE_END_ACK) {
                     window.removeEventListener("message", photopeaMessageHandle);
                     resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
-                } else if (!event.data) {
+                } else if (event.data === '') {
                     reject('Photopea Error.');
                 } else {
                     responseDataPieces.push(event.data);
