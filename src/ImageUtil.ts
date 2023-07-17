@@ -161,6 +161,7 @@ function areColorsEqual(color1: Uint8ClampedArray, color2: Uint8ClampedArray): b
 }
 
 export {
+    PayloadImage,
     applyMask,
     cropImage,
 }

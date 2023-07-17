@@ -8,7 +8,7 @@ import {
 } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
-import { cropImage } from '../ImageUtil';
+import { PayloadImage, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
@@ -18,6 +18,7 @@ import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
 import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
+import { getCurrentInstance } from 'vue';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
@@ -32,6 +33,9 @@ const commonPayload = reactive(new CommonPayload());
 commonPayload.sampler_name = context.samplers[0].name;
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
+
+const inputImage = ref<PayloadImage | undefined>(undefined);
+const inputMask = ref<PayloadImage | undefined>(undefined);
 
 // Extension payloads.
 const controlnetUnits = reactive([new ControlNetUnit()]);
@@ -71,22 +75,42 @@ function fillExtensionsArgs() {
         payloadUnit.module = 'none';
         return payloadUnit;
       })
-    }; 
+    };
   }
 }
 
-async function generate() {
+const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
+
+async function preparePayload() {
   try {
     const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
     const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
     const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-
     const [image, mask] = await Promise.all([cropImage(imageBuffer, maskBound), cropImage(maskBuffer, maskBound)]);
+    await setControlNetInputs(maskBound);
+    // Handling extension
+    fillExtensionsArgs();
 
     if (autoGenerationMode.value) {
       const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
       generationMode.value = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
     }
+
+    commonPayload.width = image.width;
+    commonPayload.height = image.height;
+
+    inputImage.value = image;
+    inputMask.value = mask;
+  } catch (e) {
+    $notify(`${e}`);
+  }
+}
+
+async function generate() {
+  try {
+    await preparePayload();
+    const [image, mask] = [inputImage.value, inputMask.value];
+    if (!image || !mask) return;
 
     const isImg2Img = generationMode.value === GenerationMode.Img2Img;
     const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
@@ -95,12 +119,6 @@ async function generate() {
       img2imgPayload.init_images = [image.dataURL];
       img2imgPayload.mask = mask.dataURL;
     }
-    commonPayload.width = image.width;
-    commonPayload.height = image.height;
-
-    // Handling extension
-    await setControlNetInputs(maskBound);
-    fillExtensionsArgs();
 
     // Start progress bar.
     generationActive.value = true;
@@ -125,8 +143,7 @@ async function generate() {
     width.value = image.width;
     height.value = image.height;
   } catch (e) {
-    console.error(e);
-    return;
+    $notify(`${e}`);
   }
 }
 
@@ -152,6 +169,7 @@ async function generate() {
         </a-form-item>
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
+          <a-button @click="preparePayload">prepare</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
@@ -167,6 +185,10 @@ async function generate() {
           <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
             :max="150" />
         </a-form-item>
+        <a-space>
+          <a-image v-if="inputImage" :src="inputImage.dataURL"></a-image>
+          <a-image v-if="inputMask" :src="inputMask.dataURL"></a-image>
+        </a-space>
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top" :width="width" :height="height">
         </ResultImagesPicker>
       </a-form>
