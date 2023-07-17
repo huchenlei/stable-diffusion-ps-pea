@@ -3,10 +3,13 @@ class PhotopeaContext {
     photopeaWindow: Window;
     // The content is a JS file that defines many useful photopea operations.
     context: string;
+    // Timeout for a photopea operation.
+    timeout: number;
 
-    constructor() {
+    constructor(timeout: number = 10) {
         this.photopeaWindow = window.parent;
         this.context = '';
+        this.timeout = timeout;
     }
 
     async initialize() {
@@ -38,7 +41,7 @@ class PhotopeaContext {
 
             window.addEventListener("message", photopeaMessageHandle);
             // Timeout after 5s.
-            setTimeout(() => reject("Photopea message timeout"), 5 * 1000);
+            setTimeout(() => reject("Photopea message timeout"), this.timeout * 1000);
             this.photopeaWindow.postMessage(message, "*");
         });
     }
