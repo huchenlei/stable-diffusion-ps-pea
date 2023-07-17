@@ -25,9 +25,8 @@ function exportSelectedLayerOnly(format, layerSelector) {
 
         for (let i = 0; i < document.layers.length; i++) {
             const currentLayer = document.layers[i];
-            if (currentLayer.typename === "ArtLayer") {
-                allArtLayers.push(currentLayer);
-            } else if (currentLayer.typename === "LayerSet") {
+            allArtLayers.push(currentLayer);
+            if (currentLayer.typename === "LayerSet") {
                 allArtLayers = allArtLayers.concat(getAllArtLayers(currentLayer));
             }
         }
@@ -41,6 +40,7 @@ function exportSelectedLayerOnly(format, layerSelector) {
     for (let i = 0; i < allLayers.length; i++) {
         const layer = allLayers[i];
         layerStates.push(layer.visible);
+        console.debug('sd-debug: Record Layer(' + layer.name + ') visible: ' + layer.visible);
     }
     // Hide all layers to begin with
     for (let i = 0; i < allLayers.length; i++) {
@@ -60,6 +60,7 @@ function exportSelectedLayerOnly(format, layerSelector) {
     for (let i = 0; i < allLayers.length; i++) {
         const layer = allLayers[i];
         layer.visible = layerStates[i];
+        console.debug('sd-debug: Set layer(' + layer.name + ') visible: ' + layer.visible);
     }
 }
 
