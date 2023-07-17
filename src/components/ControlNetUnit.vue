@@ -6,7 +6,7 @@ import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
-import { PayloadImage, cropImage, base64ArrayBuffer } from '@/ImageUtil';
+import { PayloadImage, cropImage } from '@/ImageUtil';
 
 interface ModuleOption {
     label: string;
@@ -43,7 +43,6 @@ export default {
     emits: ['remove:unit'],
     setup(props, { emit }) {
         const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
-        const rawCapture = ref('');
         const preprocessorInput = ref<PayloadImage | undefined>(undefined);
 
         const moduleDetail = ref({
@@ -123,7 +122,6 @@ export default {
                 const image = await cropImage(imageBuffer, bounds);
 
                 preprocessorInput.value = image;
-                rawCapture.value = `data:image/png;base64,${base64ArrayBuffer(imageBuffer)}`;
 
                 const response = await fetch(context.detectURL, {
                     method: 'POST',
@@ -156,7 +154,6 @@ export default {
         }
 
         return {
-            rawCapture,
             preprocessorInput,
             moduleDetail,
             sliders,
@@ -187,9 +184,10 @@ export default {
         </template>
 
         <a-space direction="vertical" class="cnet-form">
-            <a-image v-if="rawCapture" :src="rawCapture"></a-image>
-            <a-image v-if="preprocessorInput" :src="preprocessorInput.dataURL"></a-image>
-            <a-image v-if="unit.image" :src="unit.image.image"></a-image>
+            <a-row>
+                <a-image v-if="preprocessorInput" :src="preprocessorInput.dataURL"></a-image>
+                <a-image v-if="unit.image" :src="unit.image.image"></a-image>
+            </a-row>
 
             <a-space>
                 <a-button @click="runPreprocessor" size="small">
