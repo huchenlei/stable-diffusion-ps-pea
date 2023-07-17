@@ -29,7 +29,7 @@ function exportSelectedLayerOnly(format, layerSelector) {
             const currentLayer = document.layers[i];
             if (currentLayer.typename === "ArtLayer") {
                 allArtLayers.push(currentLayer);
-            } else {
+            } else if (currentLayer.typename === "LayerSet") {
                 allArtLayers = allArtLayers.concat(getAllArtLayers(currentLayer));
             }
         }
