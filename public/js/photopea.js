@@ -199,6 +199,8 @@ function exportControlNetInputImage(format) {
             return layer == activeLayer;
         }
         exportSelectedLayerOnly(format, layerSelector);
+        // After the ControlNet processing, make ref layer invisible.
+        activeLayer.visible = false;
     } else {
         alert('No selection / active layer.');
         app.echoToOE('');
