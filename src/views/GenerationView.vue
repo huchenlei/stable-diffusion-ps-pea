@@ -28,6 +28,8 @@ const top = ref(0);
 const width = ref(0);
 const height = ref(0);
 
+const payloadPrepared = ref<boolean>(false);
+
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
 commonPayload.sampler_name = context.samplers[0].name;
@@ -106,14 +108,16 @@ async function preparePayload() {
     top.value = image.top;
     width.value = image.width;
     height.value = image.height;
+    
+    payloadPrepared.value = true;
   } catch (e) {
+    console.error(e);
     $notify(`${e}`);
   }
 }
 
-async function generate() {
+async function sendPayload() {
   try {
-    await preparePayload();
     const [image, mask] = [inputImage.value, inputMask.value];
     if (!image || !mask) return;
 
@@ -143,9 +147,17 @@ async function generate() {
     // Clear array content.
     resultImages.length = 0;
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
+
+    payloadPrepared.value = false;
   } catch (e) {
+    console.error(e);
     $notify(`${e}`);
   }
+}
+
+async function generate() {
+  await preparePayload();
+  await sendPayload();
 }
 
 </script>
@@ -170,7 +182,8 @@ async function generate() {
         </a-form-item>
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
-          <a-button @click="preparePayload">prepare</a-button>
+          <a-button v-if="!payloadPrepared" @click="preparePayload">{{ $t('gen.prepare') }}</a-button>
+          <a-button v-if="payloadPrepared" @click="sendPayload">{{ $t('gen.send') }}</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>

@@ -21,6 +21,8 @@ const messages = {
             batchSize: 'Batch Size',
             sampler: 'Sampler',
             advancedSettings: 'Advanced settings',
+            prepare: 'Prepare',
+            send: 'Send',
         },
         cnet: {
             guidanceRange: 'Guidance Range',
