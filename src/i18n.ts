@@ -21,7 +21,7 @@ const messages = {
             batchSize: 'Batch Size',
             sampler: 'Sampler',
             advancedSettings: 'Advanced settings',
-            prepare: 'Prepare',
+            prepare: 'Prepare Payload',
             selectRefArea: 'Select Ref Area',
         },
         cnet: {

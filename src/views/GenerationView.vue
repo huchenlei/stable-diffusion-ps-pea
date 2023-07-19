@@ -65,15 +65,24 @@ const inputMaskBound = ref<PhotopeaBound | undefined>(undefined);
  * On previous 2 options, the ref area is automatically determined by the app.
  * This option lets the user to manually specify the reference area.
  */
-const initialState = computed(() => {
-  return _.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value === undefined);
-});
-const selectRefAreaState = computed(() => {
-  return _.every([inputImageBuffer, inputMaskBuffer], r => r.value !== undefined) &&
-    _.every([inputImage, inputMask, inputMaskBound], r => r.value === undefined);
-});
-const payloadPreparedState = computed(() => {
-  return _.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value !== undefined);
+enum GenerationState {
+  kInitialState = 0,
+  kSelectRefAreaState = 1,
+  kPayloadPreparedState = 2,
+  kFinishedState = 3,
+}
+
+const generationState = computed(() => {
+  if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value === undefined)) {
+    return GenerationState.kInitialState;
+  } else if (_.every([inputImageBuffer, inputMaskBuffer], r => r.value !== undefined) &&
+    _.every([inputImage, inputMask, inputMaskBound], r => r.value === undefined)) {
+    return GenerationState.kSelectRefAreaState;
+  } else if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value !== undefined)) {
+    return GenerationState.kPayloadPreparedState;
+  }
+
+  throw `UNREACHED! ${[inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound]}`;
 });
 
 // Extension payloads.
@@ -245,10 +254,13 @@ async function startSelectRefArea() {
           <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
         <a-form-item>
-          <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
-          <a-button v-if="initialState || selectRefAreaState" @click="preparePayload">{{ $t('gen.prepare')
+          <a-progress class="generation-step" :percent="generationState * 25" :steps="4" :showInfo="false" />
+          <a-button :disabled="generationState >= GenerationState.kSelectRefAreaState" @click="startSelectRefArea">{{
+            $t('gen.selectRefArea') }}</a-button>
+          <a-button :disabled="generationState >= GenerationState.kPayloadPreparedState" @click="preparePayload">{{
+            $t('gen.prepare')
           }}</a-button>
-          <a-button v-if="initialState" @click="startSelectRefArea">{{ $t('gen.selectRefArea') }}</a-button>
+          <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
@@ -306,7 +318,8 @@ async function startSelectRefArea() {
 
 <style scoped>
 .root,
-.generate {
+.generate,
+.generation-step {
   width: 100%;
 }
 </style>
