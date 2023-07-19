@@ -301,3 +301,48 @@ function exportLayersWithName(layerName, format) {
     }
     exportSelectedLayerOnly(format, layerSelector);
 }
+
+function fillSelectionWithBlackInNewLayer(layerName) {
+    if (!hasSelection()) {
+        alert("No selection!");
+        app.echoToOE('');
+        return;
+    }
+
+    // Create a temp layer.
+    const newLayer = app.activeDocument.artLayers.add();
+    newLayer.name = layerName;
+
+    // Save the current foreground color
+    var originalForegroundColor = app.foregroundColor;
+
+    // Change the foreground color to black
+    app.foregroundColor.rgb.red = 0;
+    app.foregroundColor.rgb.green = 0;
+    app.foregroundColor.rgb.blue = 0;
+
+    // Fill with the foreground color and deselect.
+    app.activeDocument.selection.fill(app.foregroundColor);
+    app.activeDocument.selection.deselect();
+
+    // Restore the original active layer
+    app.activeDocument.activeLayer = originalActiveLayer;
+
+    // Restore the original foreground color
+    app.foregroundColor = originalForegroundColor;
+
+    app.echoToOE('success');
+}
+
+function removeTopLevelLayer(layerName) {
+    let layerRemoved = false;
+    const doc = app.activeDocument;
+    for (let i = 0; i < doc.layers.length; i++) {
+        const layer = doc.layers[i];
+        if (layer.name === layerName) {
+            layer.remove();
+            layerRemoved = true;
+        }
+    }
+    app.echoToOE(layerRemoved ? 'success' : '');
+}

@@ -22,7 +22,7 @@ const messages = {
             sampler: 'Sampler',
             advancedSettings: 'Advanced settings',
             prepare: 'Prepare',
-            send: 'Send',
+            selectRefArea: 'Select Ref Area',
         },
         cnet: {
             guidanceRange: 'Guidance Range',

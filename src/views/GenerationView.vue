@@ -19,6 +19,7 @@ import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
 import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
 import { getCurrentInstance } from 'vue';
+import _ from 'lodash';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
@@ -28,16 +29,52 @@ const top = ref(0);
 const width = ref(0);
 const height = ref(0);
 
-const payloadPrepared = ref<boolean>(false);
-
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
 commonPayload.sampler_name = context.samplers[0].name;
 const img2imgPayload = reactive(new Img2ImgPayload());
 const txt2imgPayload = reactive(new Txt2ImgPayload());
 
+const inputImageBuffer = ref<ArrayBuffer | undefined>(undefined);
+const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
+
 const inputImage = ref<PayloadImage | undefined>(undefined);
 const inputMask = ref<PayloadImage | undefined>(undefined);
+const inputMaskBound = ref<PhotopeaBound | undefined>(undefined);
+
+/**
+ * Overall workflow:
+ * Option1:
+ * - Do a selection on canvas.
+ * - Click generate. 
+ * Most common usage. Equivalent to hit prepare + generate.
+ * 
+ * Option2:
+ * - Do a selection on canvas.
+ * - Click prepare.
+ * - Click generate.
+ * This will let user preview all the inputs before sending them to A1111. User
+ * can make necessary changes to the payload if they undesirable params.
+ * 
+ * Option3:
+ * - Do a selection on canvas.
+ * - Click select ref area.
+ * - Do another selection on canvas.
+ * - [Optional] Click prepare.
+ * - Click generate.
+ * On previous 2 options, the ref area is automatically determined by the app.
+ * This option lets the user to manually specify the reference area.
+ */
+const initialState = computed(() => {
+  return _.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value === undefined);
+});
+const selectRefAreaState = computed(() => {
+  return _.every([inputImageBuffer, inputMaskBuffer], r => r.value !== undefined) &&
+    _.every([inputImage, inputMask, inputMaskBound], r => r.value === undefined);
+});
+const payloadPreparedState = computed(() => {
+  return _.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value !== undefined);
+});
 
 // Extension payloads.
 const controlnetUnits = reactive([new ControlNetUnit()]);
@@ -85,8 +122,14 @@ const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
 async function preparePayload() {
   try {
-    const imageBuffer = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-    const maskBuffer = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+    if (selectRefAreaState.value) {
+      // Remove the temp layer on canvas.
+      await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
+    }
+
+    const imageBuffer = inputImageBuffer.value ? inputImageBuffer.value : (await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer);
+    const maskBuffer = inputMaskBuffer.value ? inputMaskBuffer.value : (await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer);
+
     const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
     const [image, mask] = await Promise.all([cropImage(imageBuffer, maskBound), cropImage(maskBuffer, maskBound)]);
     await setControlNetInputs(maskBound);
@@ -108,8 +151,6 @@ async function preparePayload() {
     top.value = image.top;
     width.value = image.width;
     height.value = image.height;
-
-    payloadPrepared.value = true;
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
@@ -148,7 +189,11 @@ async function sendPayload() {
     resultImages.length = 0;
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
 
-    payloadPrepared.value = false;
+    inputImageBuffer.value = undefined;
+    inputMaskBuffer.value = undefined;
+    inputMaskBound.value = undefined;
+    inputImage.value = undefined;
+    inputMask.value = undefined;
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
@@ -158,6 +203,25 @@ async function sendPayload() {
 async function generate() {
   await preparePayload();
   await sendPayload();
+}
+
+/**
+ * Two-stage selection on Photoshop/Photopea canvas.
+ * The first stage selects the area to workon (inpaint area).
+ * The second stage selects the reference area, bounding box of the image actually
+ * send to A1111.
+ * 
+ * In normal generation, the bounding box is automatically determined. Here we let
+ * user manually determine the bounding box of reference area.
+ * 
+ * Triggering this function will make the app going into a intemediant state,
+ * where the current selection(mask) is persisted, and user need to do another 
+ * selection on canvas to continue.
+ */
+async function startSelectRefArea() {
+  inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+  inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+  await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
 }
 
 </script>
@@ -182,8 +246,9 @@ async function generate() {
         </a-form-item>
         <a-form-item>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
-          <a-button v-if="!payloadPrepared" @click="preparePayload">{{ $t('gen.prepare') }}</a-button>
-          <a-button v-if="payloadPrepared" @click="sendPayload">{{ $t('gen.send') }}</a-button>
+          <a-button v-if="initialState || selectRefAreaState" @click="preparePayload">{{ $t('gen.prepare')
+          }}</a-button>
+          <a-button v-if="initialState" @click="startSelectRefArea">{{ $t('gen.selectRefArea') }}</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
