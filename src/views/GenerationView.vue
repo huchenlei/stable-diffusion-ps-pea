@@ -231,6 +231,24 @@ async function startSelectRefArea() {
   await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
 }
 
+const hoveredStep = ref<GenerationState | undefined>(undefined);
+function highlightGenerationStep(state: GenerationState) {
+  hoveredStep.value = state;
+}
+
+function removeGenerationStepHighlight() {
+  hoveredStep.value = undefined;
+}
+
+const stepProgressPercent = computed(() => {
+  const stepLength = 100 / 3;
+  if (hoveredStep.value !== undefined) {
+    return stepLength * hoveredStep.value;
+  } else {
+    return stepLength * generationState.value;
+  }
+});
+
 </script>
 <template>
   <div>
@@ -252,15 +270,20 @@ async function startSelectRefArea() {
           <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
         <a-form-item>
-          <a-progress class="generation-step" :percent="generationState * 33.33" :steps="3" :showInfo="false" />
+          <a-progress :class="{ 'generation-step': true, 'blink': hoveredStep !== undefined }"
+            :percent="stepProgressPercent" :steps="3" :showInfo="false" />
           <a-button class="ref-area-button" :disabled="generationState >= GenerationState.kSelectRefAreaState"
-            @click="startSelectRefArea">{{
+            @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
+            @mouseout="removeGenerationStepHighlight">{{
               $t('gen.selectRefArea') }}</a-button>
           <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
-            @click="preparePayload">{{
+            @click="preparePayload" @mouseover="highlightGenerationStep(GenerationState.kPayloadPreparedState)"
+            @mouseout="removeGenerationStepHighlight">{{
               $t('gen.prepare')
             }}</a-button>
-          <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
+          <a-button class="generate" type="primary" @click="generate"
+            @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
+            @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
@@ -326,5 +349,23 @@ async function startSelectRefArea() {
 .prepare-button,
 .ref-area-button {
   width: 50%;
+}
+
+/* Define the blinking animation */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* This class will be added to start the blinking */
+.blink {
+  animation: blink 2s ease-in-out infinite !important;
 }
 </style>
