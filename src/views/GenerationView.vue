@@ -252,7 +252,7 @@ async function startSelectRefArea() {
           <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
         <a-form-item>
-          <a-progress class="generation-step" :percent="generationState * 25" :steps="4" :showInfo="false" />
+          <a-progress class="generation-step" :percent="generationState * 33.33" :steps="3" :showInfo="false" />
           <a-button :disabled="generationState >= GenerationState.kSelectRefAreaState" @click="startSelectRefArea">{{
             $t('gen.selectRefArea') }}</a-button>
           <a-button :disabled="generationState >= GenerationState.kPayloadPreparedState" @click="preparePayload">{{
