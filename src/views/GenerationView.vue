@@ -200,13 +200,13 @@ async function generate() {
             :max="150" />
         </a-form-item>
         <a-space v-if="generationMode === GenerationMode.Img2Img">
-          <div>
+          <div v-if="inputImage">
             <a-tag>Input image</a-tag>
-            <a-image v-if="inputImage" :src="inputImage.dataURL"></a-image>
+            <a-image :src="inputImage.dataURL"></a-image>
           </div>
-          <div>
+          <div v-if="inputMask">
             <a-tag>Input mask</a-tag>
-            <a-image v-if="inputMask" :src="inputMask.dataURL"></a-image>
+            <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
         <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top" :width="width" :height="height">
