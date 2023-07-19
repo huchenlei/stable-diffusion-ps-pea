@@ -26,15 +26,17 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
      - Search bar on LoRA selection
-4. ControlNet support
-   - Select a layer, choose a preprocessor can convert it to ControlNet layer.
-   - ControlNet layer will be used as ControlNet input
-   - Black background of the preprocessor result will be replaced by transparent background
-   - White lines, shapes will be inverted
+4. ControlNet support 
+   - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
+   - [*DONE*] ControlNet layer will be used as ControlNet input
+   - [*DONE*] Control type selection
+   - Inpaint support
+   - Reference support
 5. Inpaint
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
 (512x512?).
    - Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
+6. Connection management.
 
 # Development
 ## Setup HTTPS
