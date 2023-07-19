@@ -267,7 +267,14 @@ function createControlNetFolderIfNotExist() {
     return newFolder;
 }
 
-function controlNetDetectedMapPostProcess(layerName) {
+/**
+ * After the detected map has been pasted on Photopea as a new layer,
+ * do some post process house keeping.
+ * @param {string} layerName The name to assign to the new layer.
+ * @param {string} previousLayerName The name of previously linked layer.
+ */
+function controlNetDetectedMapPostProcess(layerName, previousLayerName) {
+    // Handle new layer.
     const layer = app.activeDocument.activeLayer;
     layer.name = layerName;
     const folder = createControlNetFolderIfNotExist();
@@ -275,6 +282,16 @@ function controlNetDetectedMapPostProcess(layerName) {
     layer.move(folder, ElementPlacement.INSIDE);
     layer.opacity = 100;
     layer.blendMode = BlendMode.DIFFERENCE;
+
+    // Rename and hides the previous linked layer.
+    for (let i = 0; i < folder.layers.length; i++) {
+        const layer = folder.layers[i];
+        if (layer.typename === 'ArtLayer' && layer.name === previousLayerName) {
+            layer.name = 'unlinked';
+            layer.visible = false;
+        }
+    }
+
     app.echoToOE("success");
 }
 

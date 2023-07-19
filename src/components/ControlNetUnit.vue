@@ -166,8 +166,9 @@ export default {
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
                 await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
+                const previousLayerName = props.unit.linkedLayerName;
                 props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
-                await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName);
+                await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);
 
                 if (!props.unit.enabled)
                     props.unit.enabled = true;
