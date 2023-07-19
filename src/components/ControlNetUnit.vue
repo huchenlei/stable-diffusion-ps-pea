@@ -202,7 +202,8 @@ export default {
         <template #header>
             <a-space>
                 <a-button type="dashed" :danger="!unit.enabled" size="small"
-                    @click.stop="() => unit.enabled = !unit.enabled">
+                    @click.stop="() => unit.enabled = !unit.enabled"
+                    :title="$t(unit.enabled ? 'cnet.unitEnabled' : 'cnet.unitDisabled')">
                     <CheckOutlined v-if="unit.enabled"></CheckOutlined>
                     <StopOutlined v-if="!unit.enabled"></StopOutlined>
                 </a-button>

@@ -30,6 +30,8 @@ const messages = {
             model: 'Model',
             module: 'Preprocessor',
             unlinked: 'Unlinked',
+            unitDisabled: 'ControlNet unit disabled',
+            unitEnabled: 'ControlNet unit enabled',
         },
 
         weight: 'Weight',
