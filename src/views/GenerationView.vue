@@ -131,7 +131,7 @@ const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
 async function preparePayload() {
   try {
-    if (selectRefAreaState.value) {
+    if (generationState.value === GenerationState.kSelectRefAreaState) {
       // Remove the temp layer on canvas.
       await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
     }
