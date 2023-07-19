@@ -40,7 +40,6 @@ const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
 
 const inputImage = ref<PayloadImage | undefined>(undefined);
 const inputMask = ref<PayloadImage | undefined>(undefined);
-const inputMaskBound = ref<PhotopeaBound | undefined>(undefined);
 
 /**
  * Overall workflow:
@@ -73,16 +72,16 @@ enum GenerationState {
 }
 
 const generationState = computed(() => {
-  if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value === undefined)) {
+  if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask], r => r.value === undefined)) {
     return GenerationState.kInitialState;
   } else if (_.every([inputImageBuffer, inputMaskBuffer], r => r.value !== undefined) &&
-    _.every([inputImage, inputMask, inputMaskBound], r => r.value === undefined)) {
+    _.every([inputImage, inputMask], r => r.value === undefined)) {
     return GenerationState.kSelectRefAreaState;
-  } else if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound], r => r.value !== undefined)) {
+  } else if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask], r => r.value !== undefined)) {
     return GenerationState.kPayloadPreparedState;
   }
 
-  throw `UNREACHED! ${[inputImageBuffer, inputMaskBuffer, inputImage, inputMask, inputMaskBound]}`;
+  throw `UNREACHED! ${[inputImageBuffer, inputMaskBuffer, inputImage, inputMask]}`;
 });
 
 // Extension payloads.
@@ -200,7 +199,6 @@ async function sendPayload() {
 
     inputImageBuffer.value = undefined;
     inputMaskBuffer.value = undefined;
-    inputMaskBound.value = undefined;
     inputImage.value = undefined;
     inputMask.value = undefined;
   } catch (e) {
