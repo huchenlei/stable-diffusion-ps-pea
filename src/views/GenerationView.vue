@@ -253,11 +253,13 @@ async function startSelectRefArea() {
         </a-form-item>
         <a-form-item>
           <a-progress class="generation-step" :percent="generationState * 33.33" :steps="3" :showInfo="false" />
-          <a-button :disabled="generationState >= GenerationState.kSelectRefAreaState" @click="startSelectRefArea">{{
-            $t('gen.selectRefArea') }}</a-button>
-          <a-button :disabled="generationState >= GenerationState.kPayloadPreparedState" @click="preparePayload">{{
-            $t('gen.prepare')
-          }}</a-button>
+          <a-button class="ref-area-button" :disabled="generationState >= GenerationState.kSelectRefAreaState"
+            @click="startSelectRefArea">{{
+              $t('gen.selectRefArea') }}</a-button>
+          <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
+            @click="preparePayload">{{
+              $t('gen.prepare')
+            }}</a-button>
           <a-button class="generate" type="primary" @click="generate">{{ $t('generate') }}</a-button>
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
@@ -319,5 +321,10 @@ async function startSelectRefArea() {
 .generate,
 .generation-step {
   width: 100%;
+}
+
+.prepare-button,
+.ref-area-button {
+  width: 50%;
 }
 </style>
