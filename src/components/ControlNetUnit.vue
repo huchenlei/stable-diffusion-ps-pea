@@ -4,7 +4,7 @@ import { ControlMode, ControlNetUnit, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
-import { computed, getCurrentInstance, ref } from 'vue';
+import { computed, getCurrentInstance, ref, nextTick } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { PayloadImage, cropImage } from '@/ImageUtil';
 
@@ -44,6 +44,26 @@ export default {
     setup(props, { emit }) {
         const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
         const preprocessorInput = ref<PayloadImage | undefined>(undefined);
+        const controlType = ref<string>('');
+        const controlTypes = computed(() => {
+            return Object.keys(useA1111ContextStore().controlnetContext.control_types).map(k => {
+                return { value: k, label: k };
+            });
+        });
+        const modulesAllowed = ref<string[]>([]);
+        const modelsAllowed = ref<string[]>([]);
+        function onControlTypeChange(controlType: string) {
+            const controlTypes = useA1111ContextStore().controlnetContext.control_types;
+            const typeDetail = controlTypes[controlType];
+            props.unit.module = typeDetail.default_option;
+            props.unit.model = typeDetail.default_model;
+            modulesAllowed.value = typeDetail.module_list;
+            modelsAllowed.value = typeDetail.model_list;
+        }
+        nextTick(() => {
+            controlType.value = 'All';
+            onControlTypeChange(controlType.value);
+        });
 
         const moduleDetail = ref({
             model_free: false,
@@ -63,23 +83,27 @@ export default {
 
         const modelOptions = computed(() => {
             const context = useA1111ContextStore().controlnetContext;
-            return context.models.map(modelName => {
-                return {
-                    label: modelName,
-                    value: modelName,
-                };
-            });
+            return context.models
+                .filter(modelName => modelsAllowed.value.includes(modelName))
+                .map(modelName => {
+                    return {
+                        label: modelName,
+                        value: modelName,
+                    };
+                });
         });
 
         const moduleOptions = computed(() => {
             const context = useA1111ContextStore().controlnetContext;
-            return context.modules.map(moduleName => {
-                return {
-                    label: moduleName,
-                    value: moduleName,
-                    detail: context.module_details[moduleName],
-                };
-            });
+            return context.modules
+                .filter(moduleName => modulesAllowed.value.includes(moduleName))
+                .map(moduleName => {
+                    return {
+                        label: moduleName,
+                        value: moduleName,
+                        detail: context.module_details[moduleName],
+                    };
+                });
         });
 
         function removeUnit(index: number) {
@@ -155,6 +179,9 @@ export default {
 
         return {
             preprocessorInput,
+            controlType,
+            controlTypes,
+            onControlTypeChange,
             moduleDetail,
             sliders,
             modelOptions,
@@ -201,6 +228,8 @@ export default {
                 </a-button>
                 <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
             </a-space>
+            <a-select v-model:value="controlType" @change="onControlTypeChange" :options="controlTypes"
+                class="control-type-select"></a-select>
             <div>
                 <a-tag>{{ $t('cnet.module') }}</a-tag>
                 <a-select class="module-select" v-model:value="unit.module" :options="moduleOptions"
@@ -239,7 +268,8 @@ export default {
 }
 
 .model-select,
-.module-select {
+.module-select,
+.control-type-select {
     width: 100%;
 }
 

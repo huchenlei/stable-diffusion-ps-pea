@@ -81,12 +81,20 @@ interface ModuleDetail {
     sliders: Array<ModuleSlider | null>;
 };
 
+interface ControlType {
+    module_list: string[];
+    model_list: string[];
+    default_option: string;
+    default_model: string;
+}
+
 class ControlNetContext {
     models: string[] = [];
     modules: string[] = []; // Preprocessors
     module_details: Record<string, ModuleDetail> = {};
     version: number = 0; // API version, not the actual ControlNet extension version.
     setting: ControlNetSetting = { control_net_max_models_num: 1 };
+    control_types: Record<string, ControlType> = {};
     detectURL: string = '';
 
     initialized: boolean = false;
@@ -100,6 +108,7 @@ class ControlNetContext {
             fetchJSON(`${controlNetURL}/module_list`),
             fetchJSON(`${controlNetURL}/version`),
             fetchJSON(`${controlNetURL}/settings`),
+            fetchJSON(`${controlNetURL}/control_types`),
         ];
 
         try {
@@ -108,6 +117,7 @@ class ControlNetContext {
                 modules,
                 version,
                 setting,
+                control_types,
             ] = await Promise.all(fetchPromises);
 
             this.models = models['model_list'] as string[];
@@ -115,6 +125,7 @@ class ControlNetContext {
             this.module_details = modules['module_detail'] as Record<string, ModuleDetail>;
             this.version = version['version'] as number;
             this.setting = setting as ControlNetSetting;
+            this.control_types = control_types['control_types'] as Record<string, ControlType>;
 
             this.initialized = true;
             return true;
@@ -128,6 +139,7 @@ class ControlNetContext {
 export {
     type IControlNetUnit,
     type ModuleDetail,
+    type ControlType,
     ControlNetUnit,
     ControlMode,
     ControlNetContext,
