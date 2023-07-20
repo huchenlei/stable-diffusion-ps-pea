@@ -107,16 +107,18 @@ async function selectResultImage(imageItem: ImageItem) {
     imageItem.imageURL, left.value, top.value, width.value, height.value, 'ResultTempLayer');
 }
 const ctrlPressed = ref(false);
-function keydownOnResultImage(e: KeyboardEvent) {
-  if (e.key === 'Ctrl') {
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Control') {
     ctrlPressed.value = true;
   }
 }
-function keyupOnResultImage(e: KeyboardEvent) {
-  if (e.key === 'Ctrl') {
+function onKeyup(e: KeyboardEvent) {
+  if (e.key === 'Control') {
     ctrlPressed.value = false;
   }
 }
+window.addEventListener('keydown', onKeydown);
+window.addEventListener('keyup', onKeyup);
 
 const samplerOptions = computed(() => {
   return context.samplers.map(sampler => {
@@ -365,7 +367,7 @@ const stepProgress = computed(() => {
           </div>
         </a-space>
         <ImagePicker :images="resultImageItems" :selectedImages="selectResultImageNames" @item-clicked="switchResultImage"
-          @keydown="keydownOnResultImage" @keyup="keyupOnResultImage" :displayNames="false"></ImagePicker>
+          :displayNames="false"></ImagePicker>
       </a-form>
 
       <div>
