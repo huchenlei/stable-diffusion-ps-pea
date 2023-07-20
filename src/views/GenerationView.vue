@@ -159,6 +159,12 @@ async function preparePayload() {
     top.value = image.top;
     width.value = image.width;
     height.value = image.height;
+
+    const isImg2Img = generationMode.value === GenerationMode.Img2Img;
+    if (isImg2Img) {
+      img2imgPayload.init_images = [image.dataURL];
+      img2imgPayload.mask = mask.dataURL;
+    }
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
@@ -167,20 +173,12 @@ async function preparePayload() {
 
 async function sendPayload() {
   try {
-    const [image, mask] = [inputImage.value, inputMask.value];
-    if (!image || !mask) return;
+    // Start progress bar.
+    generationActive.value = true;
 
     const isImg2Img = generationMode.value === GenerationMode.Img2Img;
     const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
     const extraPayload = isImg2Img ? img2imgPayload : txt2imgPayload;
-    if (isImg2Img) {
-      img2imgPayload.init_images = [image.dataURL];
-      img2imgPayload.mask = mask.dataURL;
-    }
-
-    // Start progress bar.
-    generationActive.value = true;
-
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -210,7 +208,7 @@ async function sendPayload() {
 async function generate() {
   if (generationState.value !== GenerationState.kPayloadPreparedState)
     await preparePayload();
-    
+
   await sendPayload();
 }
 
