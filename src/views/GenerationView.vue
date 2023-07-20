@@ -410,16 +410,16 @@ const stepProgress = computed(() => {
             <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
-        <a-space v-if="resultImageItems.length > 0">
-          <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
-            @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
-          <a-button :danger="true" @click="discardResultImages">
+        <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
+          @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
+        <a-row v-if="resultImageItems.length > 0">
+          <a-button :danger="true" class="discard-result" @click="discardResultImages">
             <CloseOutlined></CloseOutlined>
           </a-button>
-          <a-button type="primary" @click="pickSelectedResultImages">
+          <a-button type="primary" class="pick-result" @click="pickSelectedResultImages">
             <CheckOutlined></CheckOutlined>
           </a-button>
-        </a-space>
+        </a-row>
       </a-form>
 
       <div>
@@ -456,7 +456,9 @@ const stepProgress = computed(() => {
 }
 
 .prepare-button,
-.ref-area-button {
+.ref-area-button,
+.pick-result,
+.discard-result {
   width: 50%;
 }
 
