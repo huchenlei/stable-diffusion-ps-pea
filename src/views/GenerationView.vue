@@ -133,13 +133,17 @@ async function preparePayload() {
     if (generationState.value === GenerationState.kSelectRefAreaState) {
       // Remove the temp layer on canvas.
       await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
+    } else {
+      inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+      inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
     }
 
-    const imageBuffer = inputImageBuffer.value ? inputImageBuffer.value : (await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer);
-    const maskBuffer = inputMaskBuffer.value ? inputMaskBuffer.value : (await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer);
-
     const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-    const [image, mask] = await Promise.all([cropImage(imageBuffer, maskBound), cropImage(maskBuffer, maskBound)]);
+    const [image, mask] = await Promise.all([
+      cropImage(inputImageBuffer.value!, maskBound), 
+      cropImage(inputMaskBuffer.value!, maskBound),
+    ]);
+
     await setControlNetInputs(maskBound);
     // Handling extension
     fillExtensionsArgs();
