@@ -240,12 +240,11 @@ function removeGenerationStepHighlight() {
   hoveredStep.value = undefined;
 }
 
-const stepProgressPercent = computed(() => {
-  const stepLength = 100 / 3;
+const stepProgress = computed(() => {
   if (hoveredStep.value !== undefined) {
-    return stepLength * hoveredStep.value;
+    return hoveredStep.value;
   } else {
-    return stepLength * generationState.value;
+    return generationState.value;
   }
 });
 
@@ -270,17 +269,24 @@ const stepProgressPercent = computed(() => {
           <PromptInput v-model:payload="commonPayload"></PromptInput>
         </a-form-item>
         <a-form-item>
-          <a-progress :class="{ 'generation-step': true, 'blink': hoveredStep !== undefined }"
-            :percent="stepProgressPercent" :steps="3" :showInfo="false" />
-          <a-button class="ref-area-button" :disabled="generationState >= GenerationState.kSelectRefAreaState"
-            @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
-            @mouseout="removeGenerationStepHighlight">{{
-              $t('gen.selectRefArea') }}</a-button>
-          <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
-            @click="preparePayload" @mouseover="highlightGenerationStep(GenerationState.kPayloadPreparedState)"
-            @mouseout="removeGenerationStepHighlight">{{
-              $t('gen.prepare')
-            }}</a-button>
+          <a-space>
+            <a-progress :class="{ 'generation-step': true, 'blink': hoveredStep !== undefined }"
+              :percent="stepProgress * 33.33" :steps="3" :showInfo="false" />
+            <a-tag class="next-step-tag">
+              {{ $t(`gen.steps.${hoveredStep === undefined ? '' : 'To'}${GenerationState[stepProgress]}`) }}
+            </a-tag>
+          </a-space>
+          <a-row>
+            <a-button class="ref-area-button" :disabled="generationState >= GenerationState.kSelectRefAreaState"
+              @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
+              @mouseout="removeGenerationStepHighlight">{{
+                $t('gen.selectRefArea') }}</a-button>
+            <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
+              @click="preparePayload" @mouseover="highlightGenerationStep(GenerationState.kPayloadPreparedState)"
+              @mouseout="removeGenerationStepHighlight">{{
+                $t('gen.prepare')
+              }}</a-button>
+          </a-row>
           <a-button class="generate" type="primary" @click="generate"
             @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
             @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
@@ -367,5 +373,9 @@ const stepProgressPercent = computed(() => {
 /* This class will be added to start the blinking */
 .blink {
   animation: blink 2s ease-in-out infinite !important;
+}
+
+.next-step-tag {
+  border: none;
 }
 </style>

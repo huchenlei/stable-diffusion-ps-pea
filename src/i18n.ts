@@ -23,6 +23,17 @@ const messages = {
             advancedSettings: 'Advanced settings',
             prepare: 'Preview Payload',
             selectRefArea: 'Select Ref Area',
+
+            steps: {
+                kInitialState: '',
+                kSelectRefAreaState: 'Select reference area on canvas',
+                kPayloadPreparedState: 'Click generate when satisfied with payload',
+                kFinishedState: 'Pick the result image(s) to keep',
+
+                TokSelectRefAreaState: 'Manually select reference area',
+                TokPayloadPreparedState: 'Preview payload before sending it',
+                TokFinishedState: 'Generate image based on current setting',
+            },
         },
         cnet: {
             guidanceRange: 'Guidance Range',
