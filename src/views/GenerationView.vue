@@ -208,7 +208,9 @@ async function sendPayload() {
 }
 
 async function generate() {
-  await preparePayload();
+  if (generationState.value !== GenerationState.kPayloadPreparedState)
+    await preparePayload();
+    
   await sendPayload();
 }
 
