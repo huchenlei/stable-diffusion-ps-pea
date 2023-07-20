@@ -60,13 +60,16 @@ class PhotopeaContext {
         }
     }
 
-    public async pasteImageOnPhotopea(imageURL: string, left: number, top: number, width: number, height: number) {
+    public async pasteImageOnPhotopea(
+        imageURL: string, left: number, top: number, width: number, height: number, 
+        layerName: string = 'image'
+    ) {
         const layerCount = await this.invoke('pasteImageAsNewLayer', imageURL) as number;
 
         return new Promise((resolve) => {
             const waitTranslate = setInterval(async () => {
                 const status = await this.invoke(
-                    'translateIfNewLayerAdded', layerCount, left, top, width, height);
+                    'translateIfNewLayerAdded', layerCount, left, top, width, height, layerName);
                 if (status === 'success') {
                     clearInterval(waitTranslate);
                     resolve(true);

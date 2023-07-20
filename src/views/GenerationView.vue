@@ -13,7 +13,7 @@ import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
-import ResultImagesPicker from '@/components/ResultImagesPicker.vue';
+import ImagePicker from '@/components/ImagePicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
@@ -71,24 +71,52 @@ enum GenerationState {
   kFinishedState = 3,
 }
 
-const generationState = computed(() => {
-  if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask], r => r.value === undefined)) {
-    return GenerationState.kInitialState;
-  } else if (_.every([inputImageBuffer, inputMaskBuffer], r => r.value !== undefined) &&
-    _.every([inputImage, inputMask], r => r.value === undefined)) {
-    return GenerationState.kSelectRefAreaState;
-  } else if (_.every([inputImageBuffer, inputMaskBuffer, inputImage, inputMask], r => r.value !== undefined)) {
-    return GenerationState.kPayloadPreparedState;
-  }
-
-  throw `UNREACHED! ${[inputImageBuffer, inputMaskBuffer, inputImage, inputMask]}`;
-});
+const generationState = ref(GenerationState.kInitialState);
 
 // Extension payloads.
 const controlnetUnits = reactive([new ControlNetUnit()]);
 
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
+const selectResultImageNames: string[] = reactive([]);
+
+interface ImageItem {
+  imageURL: string;
+  name: string;
+};
+const resultImageItems = computed(() => {
+  return resultImages.map((url, index) => {
+    return {
+      imageURL: url,
+      name: `result-${index}`,
+    };
+  });
+});
+async function switchResultImage(imageItem: ImageItem) {
+  // Remove ResultTempLayer (Deselect previous item).
+  await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
+  await selectResultImage(imageItem);
+
+  if (!ctrlPressed.value) {
+    selectResultImageNames.length = 0;
+  }
+  selectResultImageNames.push(imageItem.name);
+}
+async function selectResultImage(imageItem: ImageItem) {
+  await photopeaContext.pasteImageOnPhotopea(
+    imageItem.imageURL, left.value, top.value, width.value, height.value, 'ResultTempLayer');
+}
+const ctrlPressed = ref(false);
+function keydownOnResultImage(e: KeyboardEvent) {
+  if (e.key === 'Ctrl') {
+    ctrlPressed.value = true;
+  }
+}
+function keyupOnResultImage(e: KeyboardEvent) {
+  if (e.key === 'Ctrl') {
+    ctrlPressed.value = false;
+  }
+}
 
 const samplerOptions = computed(() => {
   return context.samplers.map(sampler => {
@@ -128,6 +156,33 @@ function fillExtensionsArgs() {
 
 const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
+/**
+ * Two-stage selection on Photoshop/Photopea canvas.
+ * The first stage selects the area to workon (inpaint area).
+ * The second stage selects the reference area, bounding box of the image actually
+ * send to A1111.
+ * 
+ * In normal generation, the bounding box is automatically determined. Here we let
+ * user manually determine the bounding box of reference area.
+ * 
+ * Triggering this function will make the app going into a intemediant state,
+ * where the current selection(mask) is persisted, and user need to do another 
+ * selection on canvas to continue.
+ */
+async function startSelectRefArea() {
+  try {
+    inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+    inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+    await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
+    generationState.value = GenerationState.kSelectRefAreaState;
+    return true;
+  } catch (e) {
+    console.error(e);
+    $notify(`${e}`);
+    return false;
+  }
+}
+
 async function preparePayload() {
   try {
     if (generationState.value === GenerationState.kSelectRefAreaState) {
@@ -140,7 +195,7 @@ async function preparePayload() {
 
     const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
     const [image, mask] = await Promise.all([
-      cropImage(inputImageBuffer.value!, maskBound), 
+      cropImage(inputImageBuffer.value!, maskBound),
       cropImage(inputMaskBuffer.value!, maskBound),
     ]);
 
@@ -169,9 +224,13 @@ async function preparePayload() {
       img2imgPayload.init_images = [image.dataURL];
       img2imgPayload.mask = mask.dataURL;
     }
+
+    generationState.value = GenerationState.kPayloadPreparedState;
+    return true;
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
+    return false;
   }
 }
 
@@ -195,14 +254,16 @@ async function sendPayload() {
     });
     const data = await response.json();
 
-    // Clear array content.
-    resultImages.length = 0;
+    resultImages.length = 0; // Clear array content.
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
+    selectResultImage(resultImageItems.value[0]);
 
     inputImageBuffer.value = undefined;
     inputMaskBuffer.value = undefined;
     inputImage.value = undefined;
     inputMask.value = undefined;
+
+    generationState.value = GenerationState.kFinishedState;
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
@@ -210,29 +271,13 @@ async function sendPayload() {
 }
 
 async function generate() {
-  if (generationState.value !== GenerationState.kPayloadPreparedState)
-    await preparePayload();
-
+  if (generationState.value !== GenerationState.kPayloadPreparedState) {
+    const success = await preparePayload();
+    if (!success) {
+      return false;
+    }
+  }
   await sendPayload();
-}
-
-/**
- * Two-stage selection on Photoshop/Photopea canvas.
- * The first stage selects the area to workon (inpaint area).
- * The second stage selects the reference area, bounding box of the image actually
- * send to A1111.
- * 
- * In normal generation, the bounding box is automatically determined. Here we let
- * user manually determine the bounding box of reference area.
- * 
- * Triggering this function will make the app going into a intemediant state,
- * where the current selection(mask) is persisted, and user need to do another 
- * selection on canvas to continue.
- */
-async function startSelectRefArea() {
-  inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-  inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-  await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
 }
 
 const hoveredStep = ref<GenerationState | undefined>(undefined);
@@ -319,8 +364,8 @@ const stepProgress = computed(() => {
             <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
-        <ResultImagesPicker :image-urls="resultImages" :left="left" :top="top" :width="width" :height="height">
-        </ResultImagesPicker>
+        <ImagePicker :images="resultImageItems" :selectedImages="selectResultImageNames" @item-clicked="switchResultImage"
+          @keydown="keydownOnResultImage" @keyup="keyupOnResultImage" :displayNames="false"></ImagePicker>
       </a-form>
 
       <div>

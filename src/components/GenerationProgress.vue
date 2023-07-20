@@ -86,7 +86,7 @@ export default {
 
 <template>
     <a-space class="modal-container" v-if="active">
-        <a-progress type="circle" :percent="(progress * 100).toFixed(0)"></a-progress>
+        <a-progress type="circle" :percent="Math.floor(progress * 100)"></a-progress>
         <a-button :ghost="true">
             {{ (Math.abs(eta)).toFixed(0) }} seconds
         </a-button>

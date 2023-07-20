@@ -96,7 +96,7 @@ function pasteImageAsNewLayer(base64image) {
 }
 
 // Translate the newly added layer if the new layer has been added.
-function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, height) {
+function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, height, layerName) {
     if (app.activeDocument.layers.length === layerCount) {
         app.echoToOE("fail");
         return;
@@ -124,6 +124,7 @@ function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, heig
         leftOffset - layer.bounds[0].value,
         topOffset - layer.bounds[1].value
     );
+    layer.name = layerName;
     app.echoToOE("success");
 }
 

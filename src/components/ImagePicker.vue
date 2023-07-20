@@ -16,12 +16,22 @@ export default {
             type: Array<string>,
             default: [],
         },
+        displayNames: {
+            type: Boolean,
+            default: true,
+        },
     },
-    emits: ['item-clicked'],
+    emits: ['item-clicked', 'onkeydown', 'onkeyup'],
     setup(props, { emit }) {
         return {
             onItemClicked(item: ImageItem) {
                 emit('item-clicked', item);
+            },
+            onKeydown(e: KeyboardEvent) {
+                emit('onkeydown', e);
+            },
+            onKeyup(e: KeyboardEvent) {
+                emit('onkeyup', e);
             },
         };
     },
@@ -31,9 +41,10 @@ export default {
 <template>
     <div class="image-grid">
         <div :class="{ 'grid-item': true, 'selected': $props.selectedImages!.includes(item.name) }"
-            v-for="(item, index) in $props.images" :key="index" @click="onItemClicked(item)">
+            v-for="(item, index) in $props.images" :key="index" @click="onItemClicked(item)" @keydown="onKeydown"
+            @keyup="onKeyup">
             <a-image :src="item.imageURL" fallback="image_alt.png" :preview="false" />
-            <div class="actions">
+            <div class="actions" :hidden="!displayNames">
                 <span class="name">{{ item.name }}</span>
             </div>
         </div>
