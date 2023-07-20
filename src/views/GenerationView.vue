@@ -19,6 +19,7 @@ import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
 import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
 import { getCurrentInstance } from 'vue';
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import _ from 'lodash';
 
 const generationMode = ref(GenerationMode.Img2Img);
@@ -78,7 +79,9 @@ const controlnetUnits = reactive([new ControlNetUnit()]);
 
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
-const selectResultImageNames: string[] = reactive([]);
+const selectedResultImageNames = computed(() => {
+  return selectedResultImages.map(image => image.name);
+});
 
 interface ImageItem {
   imageURL: string;
@@ -92,20 +95,43 @@ const resultImageItems = computed(() => {
     };
   });
 });
+const selectedResultImages: ImageItem[] = reactive([]);
+
 async function switchResultImage(imageItem: ImageItem) {
-  // Remove ResultTempLayer (Deselect previous item).
-  await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
+  await deselectResultImage();
   await selectResultImage(imageItem);
 
   if (!ctrlPressed.value) {
-    selectResultImageNames.length = 0;
+    selectedResultImages.length = 0;
   }
-  selectResultImageNames.push(imageItem.name);
+  selectedResultImages.push(imageItem);
+}
+async function deselectResultImage() {
+  // Remove ResultTempLayer (Deselect previous item).
+  await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
 }
 async function selectResultImage(imageItem: ImageItem) {
   await photopeaContext.pasteImageOnPhotopea(
     imageItem.imageURL, left.value, top.value, width.value, height.value, 'ResultTempLayer');
 }
+function finalizeSelection() {
+  resultImages.length = 0;
+  selectedResultImages.length = 0;
+  generationState.value = GenerationState.kInitialState;
+}
+async function pickSelectedResultImages() {
+  await deselectResultImage();
+  for (const image of selectedResultImages) {
+    await selectResultImage(image);
+  }
+  finalizeSelection();
+}
+
+async function discardResultImages() {
+  await deselectResultImage();
+  finalizeSelection();
+}
+
 const ctrlPressed = ref(false);
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Control') {
@@ -258,7 +284,9 @@ async function sendPayload() {
 
     resultImages.length = 0; // Clear array content.
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
-    selectResultImage(resultImageItems.value[0]);
+    const imageItem = resultImageItems.value[0];
+    selectResultImage(imageItem);
+    selectedResultImages.push(imageItem);
 
     inputImageBuffer.value = undefined;
     inputMaskBuffer.value = undefined;
@@ -339,6 +367,7 @@ const stepProgress = computed(() => {
               }}</a-button>
           </a-row>
           <a-button class="generate" type="primary" @click="generate"
+            :disabled="generationState >= GenerationState.kFinishedState"
             @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
             @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
         </a-form-item>
@@ -366,8 +395,16 @@ const stepProgress = computed(() => {
             <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
-        <ImagePicker :images="resultImageItems" :selectedImages="selectResultImageNames" @item-clicked="switchResultImage"
-          :displayNames="false"></ImagePicker>
+        <a-space v-if="resultImageItems.length > 0">
+          <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
+            @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
+          <a-button :danger="true" @click="discardResultImages">
+            <CloseOutlined></CloseOutlined>
+          </a-button>
+          <a-button type="primary" @click="pickSelectedResultImages">
+            <CheckOutlined></CheckOutlined>
+          </a-button>
+        </a-space>
       </a-form>
 
       <div>
