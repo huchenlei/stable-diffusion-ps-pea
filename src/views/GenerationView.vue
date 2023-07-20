@@ -98,18 +98,22 @@ const resultImageItems = computed(() => {
 const selectedResultImages: ImageItem[] = reactive([]);
 
 async function switchResultImage(imageItem: ImageItem) {
-  await deselectResultImage();
-  await selectResultImage(imageItem);
+  await photopeaContext.executeTask(async () => {
+    await deselectResultImage();
+    await selectResultImage(imageItem);
+  });
 
   if (!ctrlPressed.value) {
     selectedResultImages.length = 0;
   }
   selectedResultImages.push(imageItem);
 }
+// Thead unsafe. Need to be called within task.
 async function deselectResultImage() {
   // Remove ResultTempLayer (Deselect previous item).
   await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
 }
+// Thead unsafe. Need to be called within task.
 async function selectResultImage(imageItem: ImageItem) {
   await photopeaContext.pasteImageOnPhotopea(
     imageItem.imageURL, left.value, top.value, width.value, height.value, 'ResultTempLayer');
@@ -120,15 +124,19 @@ function finalizeSelection() {
   generationState.value = GenerationState.kInitialState;
 }
 async function pickSelectedResultImages() {
-  await deselectResultImage();
-  for (const image of selectedResultImages) {
-    await selectResultImage(image);
-  }
+  await photopeaContext.executeTask(async () => {
+    await deselectResultImage();
+    for (const image of selectedResultImages) {
+      await selectResultImage(image);
+    }
+  });
   finalizeSelection();
 }
 
 async function discardResultImages() {
-  await deselectResultImage();
+  await photopeaContext.executeTask(async () => {
+    await deselectResultImage();
+  });
   finalizeSelection();
 }
 
@@ -157,7 +165,7 @@ const samplerOptions = computed(() => {
 
 async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
   for (const unit of controlnetUnits) {
-    const mapBuffer = await photopeaContext.invoke('exportLayersWithName', unit.linkedLayerName, 'PNG') as ArrayBuffer;
+    const mapBuffer = await photopeaContext.invokeAsTask('exportLayersWithName', unit.linkedLayerName, 'PNG') as ArrayBuffer;
     const map = await cropImage(mapBuffer, maskBound);
     unit.image = {
       image: map.dataURL,
@@ -199,10 +207,12 @@ const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
  */
 async function startSelectRefArea() {
   try {
-    inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-    inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-    await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
-    generationState.value = GenerationState.kSelectRefAreaState;
+    await photopeaContext.executeTask(async () => {
+      inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+      inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+      await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
+      generationState.value = GenerationState.kSelectRefAreaState;
+    });
     return true;
   } catch (e) {
     console.error(e);
@@ -213,21 +223,24 @@ async function startSelectRefArea() {
 
 async function preparePayload() {
   try {
-    if (generationState.value === GenerationState.kSelectRefAreaState) {
-      // Remove the temp layer on canvas.
-      await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
-    } else {
-      inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-      inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-    }
+    const [image, mask, maskBound] = await photopeaContext.executeTask(async () => {
+      if (generationState.value === GenerationState.kSelectRefAreaState) {
+        // Remove the temp layer on canvas.
+        await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
+      } else {
+        inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+        inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+      }
 
-    const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-    const [image, mask] = await Promise.all([
-      cropImage(inputImageBuffer.value!, maskBound),
-      cropImage(inputMaskBuffer.value!, maskBound),
-    ]);
+      const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+      const [image, mask] = await Promise.all([
+        cropImage(inputImageBuffer.value!, maskBound),
+        cropImage(inputMaskBuffer.value!, maskBound),
+      ]);
+      return [image, mask, maskBound];
+    });
 
-    await setControlNetInputs(maskBound);
+    await setControlNetInputs(maskBound!);
     // Handling extension
     fillExtensionsArgs();
 
@@ -285,7 +298,9 @@ async function sendPayload() {
     resultImages.length = 0; // Clear array content.
     resultImages.push(...data['images'].map((image: string) => `data:image/png;base64,${image}`));
     const imageItem = resultImageItems.value[0];
-    selectResultImage(imageItem);
+    await photopeaContext.executeTask(async () => {
+      await selectResultImage(imageItem);
+    });
     selectedResultImages.push(imageItem);
 
     inputImageBuffer.value = undefined;

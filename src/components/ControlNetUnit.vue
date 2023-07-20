@@ -141,8 +141,11 @@ export default {
                 const timestamp = new Date().getTime().toString();
                 const hash = await generateHash(timestamp + props.unit.module);
 
-                const imageBuffer = await photopeaContext.invoke('exportControlNetInputImage', 'PNG') as ArrayBuffer;
-                const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
+                const [imageBuffer, bounds] = await photopeaContext.executeTask(async () => {
+                    const imageBuffer = await photopeaContext.invoke('exportControlNetInputImage', 'PNG') as ArrayBuffer;
+                    const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
+                    return [imageBuffer, bounds];
+                });
                 const image = await cropImage(imageBuffer, bounds);
 
                 preprocessorInput.value = image;
@@ -165,10 +168,12 @@ export default {
 
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
-                await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
-                const previousLayerName = props.unit.linkedLayerName;
-                props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
-                await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);
+                await photopeaContext.executeTask(async () => {
+                    await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
+                    const previousLayerName = props.unit.linkedLayerName;
+                    props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
+                    await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);
+                });
 
                 if (!props.unit.enabled)
                     props.unit.enabled = true;
