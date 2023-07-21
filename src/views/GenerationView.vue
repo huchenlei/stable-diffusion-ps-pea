@@ -118,9 +118,9 @@ async function deselectResultImage() {
   await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
 }
 // Thead unsafe. Need to be called within task.
-async function selectResultImage(imageItem: ImageItem) {
+async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
   await photopeaContext.pasteImageOnPhotopea(
-    imageItem.imageURL, left.value, top.value, width.value, height.value, 'ResultTempLayer');
+    imageItem.imageURL, left.value, top.value, width.value, height.value, layerName);
 }
 function finalizeSelection() {
   resultImages.length = 0;
@@ -131,7 +131,7 @@ async function pickSelectedResultImages() {
   await photopeaContext.executeTask(async () => {
     await deselectResultImage();
     for (const image of selectedResultImages) {
-      await selectResultImage(image);
+      await selectResultImage(image, /* layerName= */'ResultLayer');
     }
   });
   finalizeSelection();
