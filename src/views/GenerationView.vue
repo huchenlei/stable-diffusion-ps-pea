@@ -421,15 +421,16 @@ const stepProgress = computed(() => {
           </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <a-input-number :addonBefore="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1"
-            :max="64" />
+          <SliderGroup :label="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64" :step="1">
+          </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <a-input-number :addonBefore="$t('gen.cfg')" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" />
+          <SliderGroup :label="$t('gen.cfg')" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" :step="0.5">
+          </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <a-input-number :addonBefore="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1"
-            :max="150" />
+          <SliderGroup :label="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1" :max="150" :step="1">
+          </SliderGroup>
         </a-form-item>
         <a-space v-if="generationMode === GenerationMode.Img2Img">
           <div v-if="inputImage">
