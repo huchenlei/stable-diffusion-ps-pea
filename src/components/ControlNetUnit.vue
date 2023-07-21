@@ -295,8 +295,10 @@ export default {
                     [unit.guidance_start, unit.guidance_end] = values;
                 }" />
             </div>
-            <PayloadRadio v-model:value="unit.control_mode" :enum-type="ControlMode"></PayloadRadio>
-            <PayloadRadio v-model:value="unit.resize_mode" :enum-type="ResizeMode"></PayloadRadio>
+            <PayloadRadio :label="$t('cnet.controlMode')" v-model:value="unit.control_mode" :enum-type="ControlMode">
+            </PayloadRadio>
+            <PayloadRadio :label="$t('gen.resizeMode')" v-model:value="unit.resize_mode" :enum-type="ResizeMode">
+            </PayloadRadio>
         </a-space>
     </a-collapse-panel>
 </template>
@@ -305,6 +307,7 @@ export default {
 .cnet-form {
     width: 100%;
 }
+
 .cnet-form .ant-tag {
     border: none !important;
 }

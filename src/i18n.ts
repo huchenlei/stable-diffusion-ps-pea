@@ -25,6 +25,11 @@ const messages = {
             selectRefArea: 'Select Ref Area',
             scaleRatio: 'Scale Ratio',
 
+            inpaintArea: 'Inpaint Area',
+            resizeMode: 'Resize Mode',
+            inpaintFill: 'Inpaint Fill',
+            maskMode: 'Mask Mode',
+
             steps: {
                 kInitialState: '',
                 kSelectRefAreaState: 'Select reference area on canvas',
@@ -44,6 +49,7 @@ const messages = {
             unlinked: 'Unlinked',
             unitDisabled: 'ControlNet unit disabled',
             unitEnabled: 'ControlNet unit enabled',
+            controlMode: 'Control Mode',
         },
 
         weight: 'Weight',

@@ -10,6 +10,10 @@ export default {
             type: Object,
             required: true,
         },
+        label: {
+            type: String,
+            required: false,
+        },
     },
     emits: ['update:value'],
     setup(props, { emit }) {
@@ -24,10 +28,19 @@ export default {
 </script>
 
 <template>
-    <a-radio-group :value="$props.value" @change="onRadioChange" size="small">
-        <a-radio-button v-for="key in Object.values($props.enumType).filter(value => isNaN(Number(value)))" :key="key"
-            :value="$props.enumType[key]">
-            {{ key }}
-        </a-radio-button>
-    </a-radio-group>
+    <a-row>
+        <a-tag v-if="!!$props.label" class="label">{{ $props.label }}:</a-tag>
+        <a-radio-group :value="$props.value" @change="onRadioChange" size="small">
+            <a-radio-button v-for="key in Object.values($props.enumType).filter(value => isNaN(Number(value)))" :key="key"
+                :value="$props.enumType[key]">
+                {{ key }}
+            </a-radio-button>
+        </a-radio-group>
+    </a-row>
 </template>
+
+<style scoped>
+.label {
+    border: none;
+}
+</style>
