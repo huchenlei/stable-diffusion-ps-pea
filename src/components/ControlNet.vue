@@ -1,9 +1,11 @@
 <script lang="ts">
 import { ControlNetUnit } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
-import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import ControlNetUnitComponent from '@/components/ControlNetUnit.vue';
+import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+import _ from 'lodash';
+import { getCurrentInstance } from 'vue';
 
 export default {
     name: 'ControlNet',
@@ -19,23 +21,30 @@ export default {
         ControlNetUnitComponent,
     },
     setup(props) {
+        const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
+
         function addNewUnit() {
-            const context = useA1111ContextStore().controlnetContext;
-            if (props.units.length < context.setting.control_net_max_models_num) {
-                props.units.push(new ControlNetUnit());
-            } else {
-                // TODO: make this a notification.
-                console.error(`Max number of ControlNet unit reached!`);
-            }
+            props.units.push(new ControlNetUnit());
         }
 
         function removeUnit(index: number) {
             props.units.splice(index, 1);
         }
 
+        function enableUnit(unit: ControlNetUnit) {
+            const currentEnabledCount = _.sum(props.units.map(unit => unit.enabled ? 1 : 0));
+            const maxCount = useA1111ContextStore().controlnetContext.setting.control_net_max_models_num;
+            if (currentEnabledCount === maxCount) {
+                $notify(`Max number(${maxCount}) of enabled ControlNet unit reached!`);
+            } else {
+                unit.enabled = true;
+            }
+        }
+
         return {
             addNewUnit,
             removeUnit,
+            enableUnit,
         };
     },
 };
@@ -55,7 +64,7 @@ export default {
             </template>
             <a-collapse :bordered="false">
                 <ControlNetUnitComponent v-for="(unit, index) in $props.units" :unit="unit" :index="index"
-                    @remove:unit="removeUnit">
+                    @remove:unit="removeUnit" @enable:unit="enableUnit">
                 </ControlNetUnitComponent>
             </a-collapse>
         </a-collapse-panel>

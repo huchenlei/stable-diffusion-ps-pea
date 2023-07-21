@@ -41,7 +41,7 @@ export default {
         StopOutlined,
         CaretRightOutlined,
     },
-    emits: ['remove:unit'],
+    emits: ['remove:unit', 'enable:unit'],
     setup(props, { emit }) {
         const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
         const { t } = useI18n();
@@ -121,6 +121,16 @@ export default {
 
         function removeUnit(index: number) {
             emit('remove:unit', index);
+        }
+
+        function toggleUnitEnabled() {
+            if (props.unit.enabled) {
+                props.unit.enabled = false;
+            } else {
+                // Enable unit goes through `ControlNet` component as there is
+                // a cap of enabled unit count.
+                emit('enable:unit', props.unit);
+            }
         }
 
         function onModuleChange(moduleName: string, option: ModuleOption) {
@@ -208,6 +218,7 @@ export default {
             previewRunnable,
             unitTitle,
             removeUnit,
+            toggleUnitEnabled,
             onModuleChange,
             runPreprocessor,
             ControlMode,
@@ -222,7 +233,7 @@ export default {
         <template #header>
             <a-space>
                 <a-button type="dashed" :danger="!unit.enabled" size="small"
-                    @click.stop="() => unit.enabled = !unit.enabled"
+                    @click.stop="toggleUnitEnabled"
                     :title="$t(unit.enabled ? 'cnet.unitEnabled' : 'cnet.unitDisabled')">
                     <CheckOutlined v-if="unit.enabled"></CheckOutlined>
                     <StopOutlined v-if="!unit.enabled"></StopOutlined>
