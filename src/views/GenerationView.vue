@@ -18,6 +18,7 @@ import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
 import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
+import SliderGroup from '@/components/SliderGroup.vue';
 import { getCurrentInstance } from 'vue';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import _ from 'lodash';
@@ -41,6 +42,9 @@ const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
 
 const inputImage = ref<PayloadImage | undefined>(undefined);
 const inputMask = ref<PayloadImage | undefined>(undefined);
+
+// The scale ratio to upscale generated image.
+const imageScale = ref<number>(1.0);
 
 /**
  * Overall workflow:
@@ -249,8 +253,8 @@ async function preparePayload() {
       generationMode.value = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
     }
 
-    commonPayload.width = image.width;
-    commonPayload.height = image.height;
+    commonPayload.width = image.width * imageScale.value;
+    commonPayload.height = image.height * imageScale.value;
 
     inputImage.value = image;
     inputMask.value = mask;
@@ -388,6 +392,10 @@ const stepProgress = computed(() => {
         </a-form-item>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
+        </a-form-item>
+        <a-form-item>
+          <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="4" :step="0.25">
+          </SliderGroup>
         </a-form-item>
         <a-form-item>
           <a-input-number :addonBefore="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1"

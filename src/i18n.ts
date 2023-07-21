@@ -23,6 +23,7 @@ const messages = {
             advancedSettings: 'Advanced settings',
             prepare: 'Preview Payload',
             selectRefArea: 'Select Ref Area',
+            scaleRatio: 'Scale Ratio',
 
             steps: {
                 kInitialState: '',
