@@ -90,7 +90,17 @@ function hasActiveLayer() {
  * @param base64image base64 string representing an image.
  */
 function pasteImageAsNewLayer(base64image) {
-    const layerNumBeforePaste = app.activeDocument.layers.length;
+    const doc = app.activeDocument;
+    // Select a top level non-folder layer so that the image is not pasted in
+    // folder.
+    for (let i = 0; i < doc.layers.length; i++) {
+        const layer = doc.layers[i];
+        if (layer.typename !== "LayerSet") {
+            app.activeDocument.activeLayer = layer;
+            break;
+        }
+    }
+    const layerNumBeforePaste = doc.layers.length;
     app.open(base64image, null, /* asSmart */ true);
     app.echoToOE(layerNumBeforePaste.toString());
 }

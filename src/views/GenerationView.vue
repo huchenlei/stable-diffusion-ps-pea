@@ -303,9 +303,10 @@ async function sendPayload() {
 
     resultImages.length = 0; // Clear array content.
     const controlNetCount = _.sum(controlnetUnits.map(unit => unit.enabled ? 1 : 0));
-    resultImages.push(...data['images']
-      .slice(0, -controlNetCount) // Remove controlnet maps.
-      .map((image: string) => `data:image/png;base64,${image}`)
+    resultImages.push(...
+      // Remove controlnet maps from image results.
+      (controlNetCount > 0 ? data['images'].slice(0, -controlNetCount) : data['images'])
+        .map((image: string) => `data:image/png;base64,${image}`)
     );
     const imageItem = resultImageItems.value[0];
     await photopeaContext.executeTask(async () => {
