@@ -393,6 +393,16 @@ const stepProgress = computed(() => {
             @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
             @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
         </a-form-item>
+        <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
+          @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
+        <a-row v-if="resultImageItems.length > 0">
+          <a-button :danger="true" class="discard-result" @click="discardResultImages">
+            <CloseOutlined></CloseOutlined>
+          </a-button>
+          <a-button class="pick-result" @click="pickSelectedResultImages">
+            <CheckOutlined></CheckOutlined>
+          </a-button>
+        </a-row>
         <a-form-item :label="$t('gen.sampler')">
           <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
         </a-form-item>
@@ -421,16 +431,6 @@ const stepProgress = computed(() => {
             <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
-        <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
-          @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
-        <a-row v-if="resultImageItems.length > 0">
-          <a-button :danger="true" class="discard-result" @click="discardResultImages">
-            <CloseOutlined></CloseOutlined>
-          </a-button>
-          <a-button class="pick-result" @click="pickSelectedResultImages">
-            <CheckOutlined></CheckOutlined>
-          </a-button>
-        </a-row>
       </a-form>
 
       <div>
