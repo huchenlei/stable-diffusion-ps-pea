@@ -32,6 +32,10 @@ export default {
         }
 
         function enableUnit(unit: ControlNetUnit) {
+            if (unit.enabled) {
+                return;
+            }
+            
             const currentEnabledCount = _.sum(props.units.map(unit => unit.enabled ? 1 : 0));
             const maxCount = useA1111ContextStore().controlnetContext.setting.control_net_max_models_num;
             if (currentEnabledCount === maxCount) {

@@ -50,6 +50,7 @@ const messages = {
             unitDisabled: 'ControlNet unit disabled',
             unitEnabled: 'ControlNet unit enabled',
             controlMode: 'Control Mode',
+            uploadImage: 'Upload Image',
         },
 
         weight: 'Weight',

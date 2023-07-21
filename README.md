@@ -31,7 +31,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] ControlNet layer will be used as ControlNet input
    - [*DONE*] Control type selection
    - [*DONE*] Inpaint support
-   - Reference support
+   - [*DONE*] Reference support
    - Preset
 5. Inpaint
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context

@@ -3,7 +3,7 @@ import { ResizeMode } from '@/Automatic1111';
 import { ControlMode, ControlNetUnit, modelNoPreview, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined, UploadOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref, nextTick } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { PayloadImage, cropImage } from '@/ImageUtil';
@@ -40,6 +40,7 @@ export default {
         CheckOutlined,
         StopOutlined,
         CaretRightOutlined,
+        UploadOutlined,
     },
     emits: ['remove:unit', 'enable:unit'],
     setup(props, { emit }) {
@@ -213,6 +214,26 @@ export default {
             }
         }
 
+        const isReferenceModel = computed(() => {
+            return props.unit.module.toLowerCase().includes('reference');
+        });
+
+        function beforeUploadImage(file: Blob) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const url = e.target!.result! as string;
+                props.unit.image = {
+                    image: url,
+                    mask: null,
+                };
+                // Auto-enable after upload.
+                emit("enable:unit", props.unit);
+            };
+            reader.readAsDataURL(file);
+            // Return false to prevent the default upload behavior
+            return false;
+        }
+
         return {
             preprocessorInput,
             controlType,
@@ -228,6 +249,8 @@ export default {
             toggleUnitEnabled,
             onModuleChange,
             runPreprocessor,
+            isReferenceModel,
+            beforeUploadImage,
             ControlMode,
             ResizeMode,
         };
@@ -253,12 +276,23 @@ export default {
             <a-space>
                 <div v-if="preprocessorInput">
                     <a-tag>Preprocessor Input</a-tag>
-                    <a-image :src="preprocessorInput.dataURL"></a-image>
+                    <a-image :src="preprocessorInput.dataURL" :preview=false></a-image>
                 </div>
-                <div v-if="unit.image">
-                    <a-tag>Preprocessor Result</a-tag>
-                    <a-image :src="unit.image.image"></a-image>
-                </div>
+                <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
+                    :disabled="!isReferenceModel">
+                    <!-- Disable item rendering -->
+                    <template #itemRender="{ file, actions }"></template>
+                    <div v-if="unit.image">
+                        <a-tag>Preprocessor Result</a-tag>
+                        <a-image :src="unit.image.image" :preview="false"></a-image>
+                    </div>
+                    <div v-if="!unit.image && isReferenceModel">
+                        <a-button>
+                            <UploadOutlined></UploadOutlined>
+                            {{ $t('cnet.uploadImage') }}
+                        </a-button>
+                    </div>
+                </a-upload>
             </a-space>
 
             <a-space>
