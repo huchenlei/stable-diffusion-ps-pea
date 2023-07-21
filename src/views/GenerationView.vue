@@ -416,7 +416,7 @@ const stepProgress = computed(() => {
           <a-button :danger="true" class="discard-result" @click="discardResultImages">
             <CloseOutlined></CloseOutlined>
           </a-button>
-          <a-button type="primary" class="pick-result" @click="pickSelectedResultImages">
+          <a-button class="pick-result" @click="pickSelectedResultImages">
             <CheckOutlined></CheckOutlined>
           </a-button>
         </a-row>
