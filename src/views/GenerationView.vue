@@ -17,7 +17,7 @@ import ImagePicker from '@/components/ImagePicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
-import { ControlNetUnit, type IControlNetUnit } from '@/ControlNet';
+import { ControlNetUnit, type IControlNetUnit, modelNoPreview } from '@/ControlNet';
 import SliderGroup from '@/components/SliderGroup.vue';
 import { getCurrentInstance } from 'vue';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
@@ -169,9 +169,12 @@ const samplerOptions = computed(() => {
 
 async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
   for (const unit of controlnetUnits) {
+    if (modelNoPreview(unit.model)) {
+      continue;
+    }
     const mapBuffer = await photopeaContext.invokeAsTask(
       'exportLayersWithNames', [unit.linkedLayerName, 'CN:Background'], 'PNG'
-    ) as ArrayBuffer;
+    ) as ArrayBuffer; 
     const map = await cropImage(mapBuffer, maskBound);
     unit.image = {
       image: map.dataURL,
@@ -183,13 +186,17 @@ async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
 function fillExtensionsArgs() {
   if (useA1111ContextStore().controlnetContext.initialized) {
     commonPayload.alwayson_scripts['ControlNet'] = {
-      args: toRaw(controlnetUnits).map(unit => {
+      args: toRaw(controlnetUnits)
+      .filter(unit => unit.enabled)
+      .map(unit => {
         const payloadUnit = Object.fromEntries(
           Object.entries(unit)
             .filter(([key]) => key !== 'linkedLayerName')
         ) as any as IControlNetUnit;
-        // TODO: Some modes still need preprocessor, such as Inpaint.
-        payloadUnit.module = 'none';
+
+        if (!modelNoPreview(unit.model))
+          payloadUnit.module = 'none';
+          
         return payloadUnit;
       })
     };

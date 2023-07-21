@@ -1,12 +1,13 @@
 <script lang="ts">
 import { ResizeMode } from '@/Automatic1111';
-import { ControlMode, ControlNetUnit, type ModuleDetail } from '@/ControlNet';
+import { ControlMode, ControlNetUnit, modelNoPreview, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref, nextTick } from 'vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { PayloadImage, cropImage } from '@/ImageUtil';
+import { useI18n } from 'vue-i18n';
 
 interface ModuleOption {
     label: string;
@@ -43,6 +44,7 @@ export default {
     emits: ['remove:unit'],
     setup(props, { emit }) {
         const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
+        const { t } = useI18n();
         const preprocessorInput = ref<PayloadImage | undefined>(undefined);
         const controlType = ref<string>('');
         const controlTypes = computed(() => {
@@ -104,6 +106,17 @@ export default {
                         detail: context.module_details[moduleName],
                     };
                 });
+        });
+
+        const previewRunnable = computed(() => {
+            return !modelNoPreview(props.unit.model);
+        });
+
+        const unitTitle = computed(() => {
+            if (previewRunnable.value)
+                return props.unit.linkedLayerName || t('cnet.unlinked');
+            else
+                return t('cnet.linkedWithSelection');
         });
 
         function removeUnit(index: number) {
@@ -192,6 +205,8 @@ export default {
             sliders,
             modelOptions,
             moduleOptions,
+            previewRunnable,
+            unitTitle,
             removeUnit,
             onModuleChange,
             runPreprocessor,
@@ -212,7 +227,7 @@ export default {
                     <CheckOutlined v-if="unit.enabled"></CheckOutlined>
                     <StopOutlined v-if="!unit.enabled"></StopOutlined>
                 </a-button>
-                <span class="layer-name">{{ $props.unit.linkedLayerName || $t('cnet.unlinked') }}</span>
+                <span class="layer-name">{{ unitTitle }}</span>
                 <CloseOutlined @click.stop="removeUnit(index)"></CloseOutlined>
             </a-space>
         </template>
@@ -230,7 +245,7 @@ export default {
             </a-space>
 
             <a-space>
-                <a-button @click="runPreprocessor" size="small">
+                <a-button @click="runPreprocessor" size="small" :disabled="!previewRunnable">
                     <CaretRightOutlined></CaretRightOutlined>
                 </a-button>
                 <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>

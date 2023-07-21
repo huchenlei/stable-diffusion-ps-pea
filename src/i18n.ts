@@ -42,6 +42,7 @@ const messages = {
             model: 'Model',
             module: 'Preprocessor',
             unlinked: 'Unlinked',
+            linkedWithSelection: 'Linked to img2img input',
             unitDisabled: 'ControlNet unit disabled',
             unitEnabled: 'ControlNet unit enabled',
         },
@@ -59,5 +60,6 @@ const messages = {
 export default createI18n({
     locale: navigator.language.split('-')[0] || 'en',
     fallbackLocale: 'en',
+    legacy: false,
     messages,
 });

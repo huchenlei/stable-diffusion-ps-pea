@@ -1,4 +1,5 @@
 import { ResizeMode } from '@/Automatic1111';
+import _ from 'lodash';
 
 enum ControlMode {
     Balanced,
@@ -136,6 +137,18 @@ class ControlNetContext {
     }
 };
 
+// ControlNet Models that preprocessor cannot be run separately.
+const NO_PREVIEW_MODELS: string[] = [
+    'tile', // Tile by default should take the input from img2img input image.
+    'inpaint', // Inpaint by default should take the input and mask from img2img settings.
+    'ip2p', // IP2P does not have any preprocessors.
+    'reference', // Reference's preprocessor need to run in A1111 generation process to take effect.
+];
+
+function modelNoPreview(model: string): boolean {
+    return _.some(NO_PREVIEW_MODELS, m => model.toLowerCase().includes(m));
+}
+
 export {
     type IControlNetUnit,
     type ModuleDetail,
@@ -143,4 +156,5 @@ export {
     ControlNetUnit,
     ControlMode,
     ControlNetContext,
+    modelNoPreview,
 };

@@ -30,7 +30,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - [*DONE*] ControlNet layer will be used as ControlNet input
    - [*DONE*] Control type selection
-   - Inpaint support
+   - [*DONE*] Inpaint support
    - Reference support
    - Preset
 5. Inpaint
