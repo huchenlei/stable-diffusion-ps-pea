@@ -7,7 +7,7 @@ import Antd from 'ant-design-vue';
 import NotificationPlugin from './Notification';
 import App from './App.vue'
 import router from './router'
-import 'ant-design-vue/dist/antd.css';
+import 'ant-design-vue/dist/antd.dark.css';
 
 import i18n from './i18n';
 
