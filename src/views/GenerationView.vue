@@ -327,6 +327,9 @@ async function generate() {
     }
   }
   await sendPayload();
+  // Remove hightlight as progress layer display will unfocus the current layer.
+  // Leaving incorrect text display.
+  removeGenerationStepHighlight();
 }
 
 const hoveredStep = ref<GenerationState | undefined>(undefined);
