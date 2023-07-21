@@ -44,12 +44,36 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 
 # Development
 ## Setup HTTPS
+The dev server needs to run under HTTPS because the plugin runs in an iframe that is embedded in an HTTPS environment. 
+Using HTTP will make the browser complain about mixing HTTP/HTTPS content on a page.
+
 Linux/Mac bash
 `openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost"`
 
 Windows bash
 `openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj "//CN=localhost"`
 
+## Add dev plugin to photopea plugin store
+I do not make my dev plugin setup public as it might confuse user which plugin to install. So if you are planning to do development of
+this plugin, I kindly ask every developer to add their own dev plugin to photopea plugin store following these steps:
+
+**Step1: Click Window>Plugin**
+![Step1](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/a91df408-76c6-4300-8987-41f7971379a5)
+**Step2: Click Add Plugin**
+![Step2](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/c559bb60-113d-4a9b-a737-a6a14087c3a8)
+**Step3: Click New**
+![Step3](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/0f47a0dc-5916-44bd-823a-2a7d89c5e331)
+**Step4: Fill the Form**  
+![Step4](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/6aa8dd13-eba7-46df-bef1-4fe822726b23)
+- File: upload `photopea_dev.json` in project root directory
+- Thumbnail: Use any image link with proper size. I use `https://huchenlei.github.io/stable-diffusion-ps-pea/sd.png`
+- Make sure to check `Make Public`.
+
+**Step5: Install the plugin**  
+You should be able to find the newly added plugin in the plugin store.
+
+**Step6: Make the plugin private**  
+Go back to Step3 panel, and click `Edit` on the plugin you just added. Uncheck `Make Public`.
 
 ## Recommended IDE Setup
 
