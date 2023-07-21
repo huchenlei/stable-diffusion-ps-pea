@@ -326,7 +326,8 @@ async function sendPayload() {
     inputImage.value = undefined;
     inputMask.value = undefined;
     for (const unit of controlnetUnits) {
-      unit.image = undefined;
+      if (!modelNoPreview(unit.model)) // Only clear image when model has preview.
+        unit.image = undefined;
     }
 
     generationState.value = GenerationState.kFinishedState;
