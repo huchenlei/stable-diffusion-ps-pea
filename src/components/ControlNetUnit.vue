@@ -116,7 +116,7 @@ export default {
             if (previewRunnable.value)
                 return props.unit.linkedLayerName || t('cnet.unlinked');
             else
-                return t('cnet.linkedWithSelection');
+                return t('cnet.noLinkRequired');
         });
 
         function removeUnit(index: number) {
