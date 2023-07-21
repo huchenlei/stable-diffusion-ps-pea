@@ -345,5 +345,5 @@ function removeTopLevelLayer(layerName) {
             layerRemoved = true;
         }
     }
-    app.echoToOE(layerRemoved ? 'success' : '');
+    app.echoToOE(layerRemoved ? 'success' : 'fail');
 }
