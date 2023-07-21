@@ -55,12 +55,19 @@ export default {
         const modulesAllowed = ref<string[]>([]);
         const modelsAllowed = ref<string[]>([]);
         function onControlTypeChange(controlType: string) {
-            const controlTypes = useA1111ContextStore().controlnetContext.control_types;
+            const context = useA1111ContextStore().controlnetContext;
+            const controlTypes = context.control_types;
             const typeDetail = controlTypes[controlType];
             props.unit.module = typeDetail.default_option;
             props.unit.model = typeDetail.default_model;
             modulesAllowed.value = typeDetail.module_list;
             modelsAllowed.value = typeDetail.model_list;
+
+            onModuleChange(props.unit.module, {
+                label: props.unit.module,
+                value: props.unit.module,
+                detail: context.module_details[props.unit.module],
+            });
         }
         nextTick(() => {
             controlType.value = 'All';
