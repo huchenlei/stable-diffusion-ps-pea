@@ -128,12 +128,59 @@ class ControlNetContext {
             this.setting = setting as ControlNetSetting;
             this.control_types = control_types['control_types'] as Record<string, ControlType>;
 
+            this.control_types = _.mapValues(this.control_types, (controlType) => {
+                function convertAlias(module: string) {
+                    return INVERT_PREPROCESSOR_ALIAS[module] || module;
+                }
+                return {
+                    model_list: controlType.model_list,
+                    default_model: controlType.default_model,
+                    module_list: controlType.module_list.map(convertAlias),
+                    default_option: convertAlias(controlType.default_option),
+                } as ControlType;
+            });
+
+            this.validateModules();
+            this.validateControlTypes();
             this.initialized = true;
             return true;
         } catch (e) {
             console.error(e);
             return false;
         }
+    }
+
+    private validateModules() {
+        // Remove modules that don't have corresponding module detail.
+        this.modules = this.modules.filter(module => {
+            if (!this.module_details[module]) {
+                console.warn(`${module} not found in module details`);
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    private validateControlTypes() {
+        const filteredControlTypes: Record<string, ControlType> = {};
+        for (const [name, controlType] of Object.entries(this.control_types)) {
+            if (!this.module_details[controlType.default_option]) {
+                console.warn(`${controlType.default_option} not recognized.`);
+                continue;
+            }
+
+            if (_.some(controlType.module_list.map(module => !this.module_details[module]))) {
+                console.warn(`${controlType.module_list} not recognized.`);
+                continue;
+            }
+            filteredControlTypes[name] = controlType;
+        }
+        this.control_types = filteredControlTypes;
+    }
+
+    private mapModuleAlias() {
+
     }
 };
 
@@ -148,6 +195,31 @@ const NO_PREVIEW_MODELS: string[] = [
 function modelNoPreview(model: string): boolean {
     return _.some(NO_PREVIEW_MODELS, m => model.toLowerCase().includes(m));
 }
+
+// This is copied from ControlNet A1111 Extension repository, and subject to 
+// change in the future.
+// https://github.com/Mikubill/sd-webui-controlnet/blob/main/scripts/global_state.py
+const PREPROCESSOR_ALIAS: Record<string, string> = {
+    "invert": "invert (from white bg & black line)",
+    "lineart_standard": "lineart_standard (from white bg & black line)",
+    "lineart": "lineart_realistic",
+    "color": "t2ia_color_grid",
+    "clip_vision": "t2ia_style_clipvision",
+    "pidinet_sketch": "t2ia_sketch_pidi",
+    "depth": "depth_midas",
+    "normal_map": "normal_midas",
+    "hed": "softedge_hed",
+    "hed_safe": "softedge_hedsafe",
+    "pidinet": "softedge_pidinet",
+    "pidinet_safe": "softedge_pidisafe",
+    "segmentation": "seg_ufade20k",
+    "oneformer_coco": "seg_ofcoco",
+    "oneformer_ade20k": "seg_ofade20k",
+    "pidinet_scribble": "scribble_pidinet",
+    "inpaint": "inpaint_global_harmonious",
+}
+
+const INVERT_PREPROCESSOR_ALIAS = _.invert(PREPROCESSOR_ALIAS);
 
 export {
     type IControlNetUnit,
