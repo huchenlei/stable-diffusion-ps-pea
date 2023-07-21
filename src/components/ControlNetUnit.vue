@@ -302,6 +302,9 @@ export default {
 </template>
 
 <style scoped>
+.cnet-form {
+    width: 100%;
+}
 .cnet-form .ant-tag {
     border: none !important;
 }
