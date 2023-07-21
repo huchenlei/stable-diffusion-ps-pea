@@ -174,7 +174,7 @@ async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
     }
     const mapBuffer = await photopeaContext.invokeAsTask(
       'exportLayersWithNames', [unit.linkedLayerName, 'CN:Background'], 'PNG'
-    ) as ArrayBuffer; 
+    ) as ArrayBuffer;
     const map = await cropImage(mapBuffer, maskBound);
     unit.image = {
       image: map.dataURL,
@@ -187,18 +187,18 @@ function fillExtensionsArgs() {
   if (useA1111ContextStore().controlnetContext.initialized) {
     commonPayload.alwayson_scripts['ControlNet'] = {
       args: toRaw(controlnetUnits)
-      .filter(unit => unit.enabled)
-      .map(unit => {
-        const payloadUnit = Object.fromEntries(
-          Object.entries(unit)
-            .filter(([key]) => key !== 'linkedLayerName')
-        ) as any as IControlNetUnit;
+        .filter(unit => unit.enabled)
+        .map(unit => {
+          const payloadUnit = Object.fromEntries(
+            Object.entries(unit)
+              .filter(([key]) => key !== 'linkedLayerName')
+          ) as any as IControlNetUnit;
 
-        if (!modelNoPreview(unit.model))
-          payloadUnit.module = 'none';
+          if (!modelNoPreview(unit.model))
+            payloadUnit.module = 'none';
 
-        return payloadUnit;
-      })
+          return payloadUnit;
+        })
     };
   }
 }
@@ -420,9 +420,6 @@ const stepProgress = computed(() => {
             <CheckOutlined></CheckOutlined>
           </a-button>
         </a-row>
-        <a-form-item :label="$t('gen.sampler')">
-          <a-select ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
-        </a-form-item>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="4" :step="0.25">
           </SliderGroup>
@@ -439,6 +436,8 @@ const stepProgress = computed(() => {
           <SliderGroup :label="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1" :max="150" :step="1">
           </SliderGroup>
         </a-form-item>
+        <SliderGroup v-if="generationMode === GenerationMode.Img2Img" :label="$t('gen.denoisingStrength')"
+          v-model:value="img2imgPayload.denoising_strength" :min="0" :max="1" :step="0.05"></SliderGroup>
         <a-space v-if="generationMode === GenerationMode.Img2Img">
           <div v-if="inputImage">
             <a-tag>Input image</a-tag>
@@ -455,6 +454,10 @@ const stepProgress = computed(() => {
         <a-collapse :bordered="false">
           <a-collapse-panel :header="$t('gen.advancedSettings')">
             <a-space direction="vertical">
+              <a-row style="display: flex; align-items: center;">
+                <a-tag style="border: none; flex: 0 0 auto;">{{ $t('gen.sampler') }}</a-tag>
+                <a-select style="flex: 1 1 auto;" ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
+              </a-row>
               <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
                 :max="2048" />
               <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"

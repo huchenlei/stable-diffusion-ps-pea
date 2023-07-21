@@ -16,7 +16,7 @@ const messages = {
             enterNegativePrompt: 'Enter negative prompt',
             extraNetworks: 'Extra networks',
             clearPrompt: 'Clear current prompt',
-            samplingSteps: 'Sampling steps',
+            samplingSteps: 'Sampling Steps',
             cfg: 'CFG Scale',
             batchSize: 'Batch Size',
             sampler: 'Sampler',
@@ -29,7 +29,7 @@ const messages = {
             resizeMode: 'Resize Mode',
             inpaintFill: 'Inpaint Fill',
             maskMode: 'Mask Mode',
-
+            denoisingStrength: 'Denoising Strength',
             steps: {
                 kInitialState: '',
                 kSelectRefAreaState: 'Select reference area on canvas',

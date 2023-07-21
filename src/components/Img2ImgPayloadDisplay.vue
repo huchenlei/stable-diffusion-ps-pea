@@ -44,7 +44,6 @@ export default {
         </PayloadRadio>
         <PayloadRadio :label="$t('gen.maskMode')" v-model:value="payload.inpainting_mask_invert" :enum-type="MaskMode">
         </PayloadRadio>
-        <a-input-number addonBefore="Denoising strength" v-model:value="payload.denoising_strength" :min="0" :max="1" />
         <a-input-number addonBefore="Only masked padding" addonAfter="px" v-model:value="payload.inpaint_full_res_padding"
             :min="0" />
         <a-input-number addonBefore="Mask blur" addonAfter="px" :value="payload.mask_blur_x" :min="0"
