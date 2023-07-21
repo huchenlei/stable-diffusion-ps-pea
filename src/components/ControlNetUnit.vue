@@ -116,7 +116,7 @@ export default {
             if (previewRunnable.value)
                 return props.unit.linkedLayerName || t('cnet.unlinked');
             else
-                return t('cnet.noLinkRequired');
+                return `CN:${props.unit.module}`;
         });
 
         function removeUnit(index: number) {
@@ -232,8 +232,7 @@ export default {
     <a-collapse-panel :key="index">
         <template #header>
             <a-space>
-                <a-button type="dashed" :danger="!unit.enabled" size="small"
-                    @click.stop="toggleUnitEnabled"
+                <a-button type="dashed" :danger="!unit.enabled" size="small" @click.stop="toggleUnitEnabled"
                     :title="$t(unit.enabled ? 'cnet.unitEnabled' : 'cnet.unitDisabled')">
                     <CheckOutlined v-if="unit.enabled"></CheckOutlined>
                     <StopOutlined v-if="!unit.enabled"></StopOutlined>

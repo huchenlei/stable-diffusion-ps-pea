@@ -42,7 +42,6 @@ const messages = {
             model: 'Model',
             module: 'Preprocessor',
             unlinked: 'Unlinked',
-            noLinkRequired: 'No link required',
             unitDisabled: 'ControlNet unit disabled',
             unitEnabled: 'ControlNet unit enabled',
         },
