@@ -263,7 +263,7 @@ function createControlNetFolderIfNotExist() {
     newFolder.name = "ControlNet";
 
     const backgroundLayer = newFolder.artLayers.add();
-    backgroundLayer.name = "Background";
+    backgroundLayer.name = "CN:Background";
     fillLayerWithBlack(backgroundLayer);
     return newFolder;
 }
@@ -296,9 +296,9 @@ function controlNetDetectedMapPostProcess(layerName, previousLayerName) {
     app.echoToOE("success");
 }
 
-function exportLayersWithName(layerName, format) {
+function exportLayersWithNames(layerNames, format) {
     function layerSelector(layer) {
-        return layer.name === layerName;
+        return layerNames.includes(layer.name);
     }
     exportSelectedLayerOnly(format, layerSelector);
 }

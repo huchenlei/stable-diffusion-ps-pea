@@ -169,7 +169,9 @@ const samplerOptions = computed(() => {
 
 async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
   for (const unit of controlnetUnits) {
-    const mapBuffer = await photopeaContext.invokeAsTask('exportLayersWithName', unit.linkedLayerName, 'PNG') as ArrayBuffer;
+    const mapBuffer = await photopeaContext.invokeAsTask(
+      'exportLayersWithNames', [unit.linkedLayerName, 'CN:Background'], 'PNG'
+    ) as ArrayBuffer;
     const map = await cropImage(mapBuffer, maskBound);
     unit.image = {
       image: map.dataURL,
