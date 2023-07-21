@@ -196,7 +196,7 @@ function fillExtensionsArgs() {
 
         if (!modelNoPreview(unit.model))
           payloadUnit.module = 'none';
-          
+
         return payloadUnit;
       })
     };
@@ -489,6 +489,8 @@ const stepProgress = computed(() => {
 .pick-result,
 .discard-result {
   width: 50%;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 /* Define the blinking animation */
