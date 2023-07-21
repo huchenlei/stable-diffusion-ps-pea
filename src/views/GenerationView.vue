@@ -311,6 +311,9 @@ async function sendPayload() {
     inputMaskBuffer.value = undefined;
     inputImage.value = undefined;
     inputMask.value = undefined;
+    for (const unit of controlnetUnits) {
+      unit.image = undefined;
+    }
 
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
