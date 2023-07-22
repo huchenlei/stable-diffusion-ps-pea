@@ -275,7 +275,8 @@ async function preparePayload() {
       } else {
         inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
         inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-        expandSelectionBound(maskBound);
+        if (generationMode.value === GenerationMode.Img2Img)
+          expandSelectionBound(maskBound);
       }
 
       const [image, mask] = await Promise.all([
@@ -428,7 +429,8 @@ const stepProgress = computed(() => {
             </a-tag>
           </a-space>
           <a-row>
-            <a-button class="ref-area-button" :disabled="generationState >= GenerationState.kSelectRefAreaState"
+            <a-button class="ref-area-button"
+              :disabled="generationState >= GenerationState.kSelectRefAreaState || generationMode === GenerationMode.Txt2Img"
               @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
               @mouseout="removeGenerationStepHighlight">{{
                 $t('gen.selectRefArea') }}</a-button>
@@ -457,7 +459,7 @@ const stepProgress = computed(() => {
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="16" :log-scale="true">
           </SliderGroup>
         </a-form-item>
-        <a-form-item>
+        <a-form-item v-if="generationMode === GenerationMode.Img2Img">
           <div v-if="referenceRangeMode === ReferenceRangeMode.kPixel"
             style="display:flex; align-items: center; width: 100%">
             <a-button @click="referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
