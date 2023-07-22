@@ -41,7 +41,10 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 6. [*DONE*] Connection management.
 7. History view
    - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
-
+8. Support upscale script
+   - Automatically trigger upscale script if the target width/height is too big (after scale ratio)
+   - Support whole picture upscale. (Paste the result to a new file?)
+   
 ### Minior TODOs
 - [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
 - [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
