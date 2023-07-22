@@ -10,11 +10,11 @@ export default {
         },
         min: {
             type: Number,
-            default: 0,
+            default: 1,
         },
         max: {
             type: Number,
-            default: 1,
+            default: 100,
         },
         label: {
             type: String,
@@ -22,19 +22,45 @@ export default {
         },
         step: {
             type: Number,
-            required: false
+            required: false,
+        },
+        logScale: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ['update:value'],
     setup(props, { emit }) {
         const step = computed(() => {
-            return props.step ? props.step : (props.max - props.min) / 20;
+            if (props.logScale)
+                return 1;
+
+            return props.step ? props.step : 1;
         });
+
+        const logValue = computed(() => {
+            return props.logScale ? Math.log2(props.value) : props.value;
+        });
+
+        const logMax = computed(() => {
+            return props.logScale ? Math.log2(props.max) : props.max;
+        });
+
+        const logMin = computed(() => {
+            return props.logScale ? Math.log2(props.min) : props.min;
+        });
+
         return {
             onValueChange(value: number) {
-                emit('update:value', value);
+                emit('update:value', props.logScale ? Math.pow(2, value) : value);
+            },
+            formatTooltip(value: number) {
+                return props.logScale ? Math.pow(2, value) : value;
             },
             step,
+            logValue,
+            logMin,
+            logMax
         }
     },
 }
@@ -50,8 +76,8 @@ export default {
                 size="small" />
         </a-col>
         <a-col :span="24">
-            <a-slider :value="$props.value" :min="$props.min" :max="$props.max" @update:value="onValueChange"
-                :step="step" />
+            <a-slider :value="logValue" :min="logMin" :max="logMax" @update:value="onValueChange"
+                :tipFormatter="formatTooltip" :step="step"/>
         </a-col>
     </a-row>
 </template>

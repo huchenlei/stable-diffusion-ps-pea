@@ -45,7 +45,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 
 ### Minior TODOs
 - [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
-- Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
+- [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
 - Update favicon
 - Update thumbnail (sd.png)
 

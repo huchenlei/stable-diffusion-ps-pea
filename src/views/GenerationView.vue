@@ -422,11 +422,12 @@ const stepProgress = computed(() => {
           </a-button>
         </a-row>
         <a-form-item>
-          <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="4" :step="0.25">
+          <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="16" :log-scale="true">
           </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <SliderGroup :label="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64" :step="1">
+          <SliderGroup :label="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64"
+            :log-scale="true">
           </SliderGroup>
         </a-form-item>
         <a-form-item>
@@ -457,7 +458,8 @@ const stepProgress = computed(() => {
             <a-space direction="vertical">
               <a-row style="display: flex; align-items: center;">
                 <a-tag style="border: none; flex: 0 0 auto;">{{ $t('gen.sampler') }}</a-tag>
-                <a-select style="flex: 1 1 auto;" ref="select" v-model:value="commonPayload.sampler_name" :options="samplerOptions"></a-select>
+                <a-select style="flex: 1 1 auto;" ref="select" v-model:value="commonPayload.sampler_name"
+                  :options="samplerOptions"></a-select>
               </a-row>
               <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
                 :max="2048" />
