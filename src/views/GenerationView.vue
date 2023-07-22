@@ -45,6 +45,36 @@ const inputMask = ref<PayloadImage | undefined>(undefined);
 
 // The scale ratio to upscale generated image.
 const imageScale = ref<number>(1.0);
+// The range around the selection bounding box to reference when doing img2img
+// generation.
+// [Px number, percent number]. Default is 64px and 10 percent.
+const referenceRange = ref<[number, number]>([64, 10]);
+enum ReferenceRangeMode {
+  kPixel,
+  kPercent,
+};
+const referenceRangeMode = ref<ReferenceRangeMode>(ReferenceRangeMode.kPixel);
+
+function expandSelectionBound(bound: PhotopeaBound): void {
+  // Note `ImageUtil.cropImage` will handle out of image bound issue.
+  if (referenceRangeMode.value === ReferenceRangeMode.kPercent) {
+    const width = bound[2] - bound[0];
+    const height = bound[3] - bound[1];
+    const [_, percent] = referenceRange.value;
+    bound[0] = bound[0] - width * percent / 100;
+    bound[1] = bound[1] - height * percent / 100;
+    bound[2] = bound[2] + width * percent / 100;
+    bound[3] = bound[3] + height * percent / 100;
+  } else if (referenceRangeMode.value === ReferenceRangeMode.kPixel) {
+    const [px, _] = referenceRange.value;
+    bound[0] = bound[0] - px;
+    bound[1] = bound[1] - px;
+    bound[2] = bound[2] + px;
+    bound[3] = bound[3] + px;
+  } else {
+    throw `NOTREACHED! ${referenceRangeMode.value}`;
+  }
+}
 
 /**
  * Overall workflow:
@@ -237,15 +267,17 @@ async function startSelectRefArea() {
 async function preparePayload() {
   try {
     const [image, mask, maskBound] = await photopeaContext.executeTask(async () => {
+      const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+
       if (generationState.value === GenerationState.kSelectRefAreaState) {
         // Remove the temp layer on canvas.
         await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
       } else {
         inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
         inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+        expandSelectionBound(maskBound);
       }
 
-      const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
       const [image, mask] = await Promise.all([
         cropImage(inputImageBuffer.value!, maskBound),
         cropImage(inputMaskBuffer.value!, maskBound),
@@ -424,6 +456,20 @@ const stepProgress = computed(() => {
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="16" :log-scale="true">
           </SliderGroup>
+        </a-form-item>
+        <a-form-item>
+          <div v-if="referenceRangeMode === ReferenceRangeMode.kPixel"
+            style="display:flex; align-items: center; width: 100%">
+            <a-button @click="referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="referenceRange[0]" :min="1" :max="256"
+              :log-scale="true">
+            </SliderGroup>
+          </div>
+          <div v-else style="display:flex; align-items: center; width:100%">
+            <a-button @click="referenceRangeMode = ReferenceRangeMode.kPixel">%</a-button>
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="referenceRange[1]" :min="0" :max="100">
+            </SliderGroup>
+          </div>
         </a-form-item>
         <a-form-item>
           <SliderGroup :label="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64"

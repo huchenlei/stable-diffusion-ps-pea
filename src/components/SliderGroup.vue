@@ -67,7 +67,7 @@ export default {
 </script>
 
 <template>
-    <a-row>
+    <a-row class="row">
         <a-col :span="24" class="container">
             <a-tag class="label">
                 {{ $props.label }}
@@ -77,7 +77,7 @@ export default {
         </a-col>
         <a-col :span="24">
             <a-slider :value="logValue" :min="logMin" :max="logMax" @update:value="onValueChange"
-                :tipFormatter="formatTooltip" :step="step"/>
+                :tipFormatter="formatTooltip" :step="step" />
         </a-col>
     </a-row>
 </template>
@@ -90,5 +90,10 @@ export default {
 .container {
     display: flex;
     justify-content: space-between;
+}
+
+/* Take as much space as possible if put in a flex container */
+.row {
+    flex-grow: 1;
 }
 </style>

@@ -89,13 +89,27 @@ async function applyMask(imageBuffer: ArrayBuffer, maskBuffer: ArrayBuffer, boun
     return applyMaskInternal(imageObj, maskObj, boundingBox);
 }
 
+function clampBound(bound: PhotopeaBound, canvasBound: PhotopeaBound): PhotopeaBound {
+    return [
+        bound[0] > canvasBound[0] ? bound[0] : canvasBound[0],
+        bound[1] > canvasBound[1] ? bound[1] : canvasBound[1],
+        bound[2] < canvasBound[2] ? bound[2] : canvasBound[2],
+        bound[3] < canvasBound[3] ? bound[3] : canvasBound[3],
+    ];
+}
+
+// Note: `boundingBox` might overflow, i.e. There can be negative left/top, and width/height might exceed original
+// image's height width.
 async function cropImage(imageBuffer: ArrayBuffer, boundingBox: PhotopeaBound): Promise<PayloadImage> {
+    const imageObj = await loadImage(imageBuffer);
+
+    const clampedBound = clampBound(boundingBox, [0, 0, imageObj.width!, imageObj.height!]);
     // Create clipping rectangle
     const clippingRect = {
-        left: boundingBox[0],
-        top: boundingBox[1],
-        width: boundingBox[2] - boundingBox[0],
-        height: boundingBox[3] - boundingBox[1],
+        left: clampedBound[0],
+        top: clampedBound[1],
+        width: clampedBound[2] - clampedBound[0],
+        height: clampedBound[3] - clampedBound[1],
     };
 
     // Create a new fabric canvas
@@ -104,7 +118,6 @@ async function cropImage(imageBuffer: ArrayBuffer, boundingBox: PhotopeaBound): 
         height: clippingRect.height,
     });
 
-    const imageObj = await loadImage(imageBuffer);
     imageObj.set({
         left: -clippingRect.left,
         top: -clippingRect.top,

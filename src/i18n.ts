@@ -24,6 +24,7 @@ const messages = {
             prepare: 'Preview Payload',
             selectRefArea: 'Select Ref Area',
             scaleRatio: 'Scale Ratio',
+            referenceRange: 'Reference Range',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',

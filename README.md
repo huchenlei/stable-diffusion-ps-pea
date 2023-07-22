@@ -35,8 +35,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - Support openpose editor
    - Preset
 5. Inpaint
-   - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
-(512x512?).
+   - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
    - [*DONE*] Provide a progress on UI to show user the current state.
 6. Connection management.
