@@ -2,6 +2,7 @@
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { useRouter } from 'vue-router';
+import { DeleteOutlined } from '@ant-design/icons-vue';
 const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
 interface ConnectionItem {
@@ -60,6 +61,11 @@ function isCurrentConn(conn: ConnectionItem) {
   return store.a1111Context.baseURL === conn.url;
 }
 
+function removeConnection(conn: ConnectionItem) {
+  connectionHistory.value = connectionHistory.value.filter(c => c !== conn);
+  localStorage.setItem('connectionHistory', JSON.stringify(connectionHistory.value));
+}
+
 </script>
 
 <template>
@@ -82,6 +88,9 @@ function isCurrentConn(conn: ConnectionItem) {
             <template #actions>
               <a-button v-if="isCurrentConn(conn)" type="primary">{{ $t('connected') }}</a-button>
               <a-button v-else @click="initializeContext(conn.url)">{{ $t('con.connect') }}</a-button>
+              <div @click="removeConnection(conn)">
+                <DeleteOutlined></DeleteOutlined>
+              </div>
             </template>
           </a-list-item>
         </template>
