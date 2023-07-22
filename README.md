@@ -32,6 +32,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Control type selection
    - [*DONE*] Inpaint support
    - [*DONE*] Reference support
+   - Support openpose editor
    - Preset
 5. Inpaint
    - Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context
@@ -40,7 +41,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Provide a progress on UI to show user the current state.
 6. Connection management.
 7. History view
-   - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state)
+   - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
 
 ### Minior TODOs
 - Fix display of ControlNet unit header (close button should be at end of row)
