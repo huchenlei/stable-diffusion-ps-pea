@@ -44,12 +44,12 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
 
 ### Minior TODOs
-- Fix display of ControlNet unit header (close button should be at end of row)
+- [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
 - Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
 - Update favicon
 - Update thumbnail (sd.png)
 
-# Development
+ # Development
 ## Setup HTTPS
 The dev server needs to run under HTTPS because the plugin runs in an iframe that is embedded in an HTTPS environment. 
 Using HTTP will make the browser complain about mixing HTTP/HTTPS content on a page.

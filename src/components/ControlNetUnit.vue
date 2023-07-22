@@ -261,15 +261,17 @@ export default {
 <template>
     <a-collapse-panel :key="index">
         <template #header>
-            <a-space>
-                <a-button type="dashed" :danger="!unit.enabled" size="small" @click.stop="toggleUnitEnabled"
-                    :title="$t(unit.enabled ? 'cnet.unitEnabled' : 'cnet.unitDisabled')">
-                    <CheckOutlined v-if="unit.enabled"></CheckOutlined>
-                    <StopOutlined v-if="!unit.enabled"></StopOutlined>
-                </a-button>
-                <span class="layer-name">{{ unitTitle }}</span>
+            <a-row class="header-content">
+                <a-space>
+                    <a-button type="dashed" :danger="!unit.enabled" size="small" @click.stop="toggleUnitEnabled"
+                        :title="$t(unit.enabled ? 'cnet.unitEnabled' : 'cnet.unitDisabled')">
+                        <CheckOutlined v-if="unit.enabled"></CheckOutlined>
+                        <StopOutlined v-if="!unit.enabled"></StopOutlined>
+                    </a-button>
+                    <span class="layer-name">{{ unitTitle }}</span>
+                </a-space>
                 <CloseOutlined @click.stop="removeUnit(index)"></CloseOutlined>
-            </a-space>
+            </a-row>
         </template>
 
         <a-space direction="vertical" class="cnet-form">
@@ -362,5 +364,15 @@ export default {
     white-space: nowrap;
     display: block;
     width: 20ch;
+}
+
+.ant-collapse-header .header-content {
+    flex: 1 1 auto;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 </style>
