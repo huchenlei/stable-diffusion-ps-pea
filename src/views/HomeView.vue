@@ -64,11 +64,11 @@ function isCurrentConn(conn: ConnectionItem) {
 
 <template>
   <div>
-    <a-input :addonBefore="$t('con.newConnection')" v-model:value="a1111URL">
-      <template #addonAfter>
-        <a-button @click="initializeContext(a1111URL)">{{ $t('con.connect') }}</a-button>
-      </template>
-    </a-input>
+    <a-space>
+      <a-input :addonBefore="$t('con.newConnection')" v-model:value="a1111URL">
+      </a-input>
+      <a-button @click="initializeContext(a1111URL)">{{ $t('con.connect') }}</a-button>
+    </a-space>
     <div v-if="connectionHistory.length">
       <a-list item-layout="horizontal" :data-source="connectionHistory">
         <template #renderItem="{ item: conn }">
