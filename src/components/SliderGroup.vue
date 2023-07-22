@@ -1,6 +1,11 @@
 <script lang="ts">
 import { computed } from 'vue';
 
+enum ChangeSource {
+    kInputBox,
+    kSlider,
+};
+
 export default {
     name: 'SliderGroup',
     props: {
@@ -51,8 +56,11 @@ export default {
         });
 
         return {
-            onValueChange(value: number) {
-                emit('update:value', props.logScale ? Math.pow(2, value) : value);
+            onValueChange(value: number, source: ChangeSource) {
+                if (source === ChangeSource.kSlider)
+                    emit('update:value', props.logScale ? Math.pow(2, value) : value);
+                else
+                    emit('update:value', value);
             },
             formatTooltip(value: number) {
                 return props.logScale ? Math.pow(2, value) : value;
@@ -60,7 +68,8 @@ export default {
             step,
             logValue,
             logMin,
-            logMax
+            logMax,
+            ChangeSource,
         }
     },
 }
@@ -72,12 +81,13 @@ export default {
             <a-tag class="label">
                 {{ $props.label }}
             </a-tag>
-            <a-input-number :value="$props.value" :min="$props.min" :max="$props.max" @update:value="onValueChange"
-                size="small" />
+            <a-input-number :value="$props.value" :min="$props.min" :max="$props.max"
+                @update:value="(value: number) => onValueChange(value, ChangeSource.kInputBox)" size="small" />
         </a-col>
         <a-col :span="24">
-            <a-slider :value="logValue" :min="logMin" :max="logMax" @update:value="onValueChange"
-                :tipFormatter="formatTooltip" :step="step" />
+            <a-slider :value="logValue" :min="logMin" :max="logMax"
+                @update:value="(value: number) => onValueChange(value, ChangeSource.kSlider)" :tipFormatter="formatTooltip"
+                :step="step" />
         </a-col>
     </a-row>
 </template>
