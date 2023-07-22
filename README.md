@@ -38,7 +38,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
    - [*DONE*] Provide a progress on UI to show user the current state.
-6. Connection management.
+6. [*DONE*] Connection management.
 7. History view
    - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
 
@@ -47,8 +47,9 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 - [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
 - Update favicon
 - Update thumbnail (sd.png)
+- Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
 
- # Development
+# Development
 ## Setup HTTPS
 The dev server needs to run under HTTPS because the plugin runs in an iframe that is embedded in an HTTPS environment. 
 Using HTTP will make the browser complain about mixing HTTP/HTTPS content on a page.
