@@ -299,7 +299,7 @@ class A1111Context {
 
     initialized: boolean = false;
 
-    public async initialize(baseURL: string): Promise<boolean> {
+    public async initialize(baseURL: string) {
         this.baseURL = baseURL;
         const fetchPromises = [
             fetchJSON(`${this.apiURL}/samplers`),
@@ -312,33 +312,27 @@ class A1111Context {
             fetchJSON(`${this.apiURL}/options`),
         ];
 
-        try {
-            const [
-                samplers,
-                sdModels,
-                loras,
-                upscalers,
-                sdVAEs,
-                embeddings,
-                hypernetworks,
-                options,
-            ] = await Promise.all(fetchPromises);
+        const [
+            samplers,
+            sdModels,
+            loras,
+            upscalers,
+            sdVAEs,
+            embeddings,
+            hypernetworks,
+            options,
+        ] = await Promise.all(fetchPromises);
 
-            this.samplers = samplers as ISampler[];
-            this.sdModels = sdModels as IStableDiffusionModel[];
-            this.loras = loras as ILoRA[];
-            this.upscalers = upscalers as IUpscaler[];
-            this.sdVAEs = sdVAEs as IStableDiffusionVAE[];
-            this.embeddings = embeddings as IEmbeddings;
-            this.hypernetworks = hypernetworks as IHypernetwork[];
-            this.options = options as IOptions;
+        this.samplers = samplers as ISampler[];
+        this.sdModels = sdModels as IStableDiffusionModel[];
+        this.loras = loras as ILoRA[];
+        this.upscalers = upscalers as IUpscaler[];
+        this.sdVAEs = sdVAEs as IStableDiffusionVAE[];
+        this.embeddings = embeddings as IEmbeddings;
+        this.hypernetworks = hypernetworks as IHypernetwork[];
+        this.options = options as IOptions;
 
-            this.initialized = true;
-            return true;
-        } catch (e) {
-            console.error(e);
-            return false;
-        }
+        this.initialized = true;
     }
 
     get apiURL(): string {

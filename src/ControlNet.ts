@@ -100,7 +100,7 @@ class ControlNetContext {
 
     initialized: boolean = false;
 
-    public async initialize(baseURL: string): Promise<boolean> {
+    public async initialize(baseURL: string) {
         const controlNetURL = `${baseURL}/controlnet`;
         this.detectURL = `${controlNetURL}/detect`;
 
@@ -112,42 +112,37 @@ class ControlNetContext {
             fetchJSON(`${controlNetURL}/control_types`),
         ];
 
-        try {
-            const [
-                models,
-                modules,
-                version,
-                setting,
-                control_types,
-            ] = await Promise.all(fetchPromises);
 
-            this.models = models['model_list'] as string[];
-            this.modules = modules['module_list'] as string[];
-            this.module_details = modules['module_detail'] as Record<string, ModuleDetail>;
-            this.version = version['version'] as number;
-            this.setting = setting as ControlNetSetting;
-            this.control_types = control_types['control_types'] as Record<string, ControlType>;
+        const [
+            models,
+            modules,
+            version,
+            setting,
+            control_types,
+        ] = await Promise.all(fetchPromises);
 
-            this.control_types = _.mapValues(this.control_types, (controlType) => {
-                function convertAlias(module: string) {
-                    return INVERT_PREPROCESSOR_ALIAS[module] || module;
-                }
-                return {
-                    model_list: controlType.model_list,
-                    default_model: controlType.default_model,
-                    module_list: controlType.module_list.map(convertAlias),
-                    default_option: convertAlias(controlType.default_option),
-                } as ControlType;
-            });
+        this.models = models['model_list'] as string[];
+        this.modules = modules['module_list'] as string[];
+        this.module_details = modules['module_detail'] as Record<string, ModuleDetail>;
+        this.version = version['version'] as number;
+        this.setting = setting as ControlNetSetting;
+        this.control_types = control_types['control_types'] as Record<string, ControlType>;
 
-            this.validateModules();
-            this.validateControlTypes();
-            this.initialized = true;
-            return true;
-        } catch (e) {
-            console.error(e);
-            return false;
-        }
+        this.control_types = _.mapValues(this.control_types, (controlType) => {
+            function convertAlias(module: string) {
+                return INVERT_PREPROCESSOR_ALIAS[module] || module;
+            }
+            return {
+                model_list: controlType.model_list,
+                default_model: controlType.default_model,
+                module_list: controlType.module_list.map(convertAlias),
+                default_option: convertAlias(controlType.default_option),
+            } as ControlType;
+        });
+
+        this.validateModules();
+        this.validateControlTypes();
+        this.initialized = true;
     }
 
     private validateModules() {

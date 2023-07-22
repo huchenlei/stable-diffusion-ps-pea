@@ -58,8 +58,11 @@ const messages = {
         width: 'Width',
         height: 'Height',
 
-        connect: 'Connect',
-        a1111URL: 'A1111 URL:',
+        con: {
+            connect: 'Connect',
+            connected: 'Connected',
+            newConnection: 'New Connection',
+        },
         generate: 'Generate',
     },
 };
