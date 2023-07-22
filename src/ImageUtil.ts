@@ -23,6 +23,13 @@ class PayloadImage {
         this.dataURL = dataURL;
         this.isSolidColor = isSolidColor;
     }
+
+
+    get bound(): PhotopeaBound {
+        return [
+            this.left, this.top, this.left + this.width, this.top + this.height,
+        ];
+    }
 }
 
 async function loadImage(buffer: ArrayBuffer): Promise<fabric.Image> {

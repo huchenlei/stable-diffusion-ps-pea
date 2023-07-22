@@ -13,23 +13,21 @@ import SDModelSelection from '@/components/SDModelSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
-import ImagePicker from '@/components/ImagePicker.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
 import { ControlNetUnit, type IControlNetUnit, modelNoPreview } from '@/ControlNet';
 import SliderGroup from '@/components/SliderGroup.vue';
+import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
-import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import _ from 'lodash';
 
 const generationMode = ref(GenerationMode.Img2Img);
 const autoGenerationMode = ref(true);
 const generationActive = ref(false);
-const left = ref(0);
-const top = ref(0);
-const width = ref(0);
-const height = ref(0);
+
+// The bounding box to put the result image in.
+const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
 
 const context = useA1111ContextStore().a1111Context;
 const commonPayload = reactive(new CommonPayload());
@@ -113,80 +111,6 @@ const controlnetUnits = reactive([new ControlNetUnit()]);
 
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
-const selectedResultImageNames = computed(() => {
-  return selectedResultImages.map(image => image.name);
-});
-
-interface ImageItem {
-  imageURL: string;
-  name: string;
-};
-const resultImageItems = computed(() => {
-  return resultImages.map((url, index) => {
-    return {
-      imageURL: url,
-      name: `result-${index}`,
-    };
-  });
-});
-const selectedResultImages: ImageItem[] = reactive([]);
-
-async function switchResultImage(imageItem: ImageItem) {
-  await photopeaContext.executeTask(async () => {
-    await deselectResultImage();
-    await selectResultImage(imageItem);
-  });
-
-  if (!ctrlPressed.value) {
-    selectedResultImages.length = 0;
-  }
-  selectedResultImages.push(imageItem);
-}
-// Thead unsafe. Need to be called within task.
-async function deselectResultImage() {
-  // Remove ResultTempLayer (Deselect previous item).
-  await photopeaContext.invoke('removeTopLevelLayer', 'ResultTempLayer');
-}
-// Thead unsafe. Need to be called within task.
-async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
-  await photopeaContext.pasteImageOnPhotopea(
-    imageItem.imageURL, left.value, top.value, width.value, height.value, layerName);
-}
-function finalizeSelection() {
-  resultImages.length = 0;
-  selectedResultImages.length = 0;
-  generationState.value = GenerationState.kInitialState;
-}
-async function pickSelectedResultImages() {
-  await photopeaContext.executeTask(async () => {
-    await deselectResultImage();
-    for (const image of selectedResultImages) {
-      await selectResultImage(image, /* layerName= */'ResultLayer');
-    }
-  });
-  finalizeSelection();
-}
-
-async function discardResultImages() {
-  await photopeaContext.executeTask(async () => {
-    await deselectResultImage();
-  });
-  finalizeSelection();
-}
-
-const ctrlPressed = ref(false);
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Control') {
-    ctrlPressed.value = true;
-  }
-}
-function onKeyup(e: KeyboardEvent) {
-  if (e.key === 'Control') {
-    ctrlPressed.value = false;
-  }
-}
-window.addEventListener('keydown', onKeydown);
-window.addEventListener('keyup', onKeyup);
 
 const samplerOptions = computed(() => {
   return context.samplers.map(sampler => {
@@ -301,10 +225,7 @@ async function preparePayload() {
     inputImage.value = image;
     inputMask.value = mask;
 
-    left.value = image.left;
-    top.value = image.top;
-    width.value = image.width;
-    height.value = image.height;
+    resultImageBound.value = image.bound;
 
     const isImg2Img = generationMode.value === GenerationMode.Img2Img;
     if (isImg2Img) {
@@ -348,11 +269,6 @@ async function sendPayload() {
       (controlNetCount > 0 ? data['images'].slice(0, -controlNetCount) : data['images'])
         .map((image: string) => `data:image/png;base64,${image}`)
     );
-    const imageItem = resultImageItems.value[0];
-    await photopeaContext.executeTask(async () => {
-      await selectResultImage(imageItem);
-    });
-    selectedResultImages.push(imageItem);
 
     inputImageBuffer.value = undefined;
     inputMaskBuffer.value = undefined;
@@ -381,6 +297,12 @@ async function generate() {
   // Remove hightlight as progress layer display will unfocus the current layer.
   // Leaving incorrect text display.
   removeGenerationStepHighlight();
+}
+
+function onResultImagePicked() {
+  resultImageBound.value = undefined;
+  resultImages.length = 0;
+  generationState.value = GenerationState.kInitialState;
 }
 
 const hoveredStep = ref<GenerationState | undefined>(undefined);
@@ -445,16 +367,9 @@ const stepProgress = computed(() => {
             @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
             @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
         </a-form-item>
-        <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames"
-          @item-clicked="switchResultImage" :displayNames="false"></ImagePicker>
-        <a-row v-if="resultImageItems.length > 0">
-          <a-button :danger="true" class="discard-result" @click="discardResultImages">
-            <CloseOutlined></CloseOutlined>
-          </a-button>
-          <a-button class="pick-result" @click="pickSelectedResultImages">
-            <CheckOutlined></CheckOutlined>
-          </a-button>
-        </a-row>
+        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound"
+          @result-finalized="onResultImagePicked">
+        </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="16" :log-scale="true">
           </SliderGroup>
@@ -539,9 +454,7 @@ const stepProgress = computed(() => {
 }
 
 .prepare-button,
-.ref-area-button,
-.pick-result,
-.discard-result {
+.ref-area-button {
   width: 50%;
   text-overflow: ellipsis;
   overflow: hidden;
