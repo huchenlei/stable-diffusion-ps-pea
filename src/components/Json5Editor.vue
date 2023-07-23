@@ -40,7 +40,7 @@ export default defineComponent({
             jsoneditor.set(props.value);
         });
 
-        watch(props.value, (newValue, oldValue) => {
+        watch(() => props.value, (newValue, oldValue) => {
             jsoneditor.set(newValue);
         });
 

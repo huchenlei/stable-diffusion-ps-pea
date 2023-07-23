@@ -1,7 +1,7 @@
 <template>
   <a-space direction="vertical" style="width: 100%">
     <div style="display: flex">
-      <a-input :placeholder="$t('config.newConfig')" v-model="newEntryName" style="flex-grow: 1;">
+      <a-input :placeholder="$t('config.newConfig')" v-model:value="newEntryName" style="flex-grow: 1;">
       </a-input>
       <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
     </div>
@@ -38,6 +38,7 @@ const currentConfigContent = ref<IApplicationState | null>(null);
 
 const createNewEntry = () => {
   if (newEntryName.value.trim() !== "") {
+    console.debug(`Create new config: ${newEntryName.value}`);
     store.createConfigEntry({ [newEntryName.value]: new ApplicationState() });
     store.selectedConfigName = newEntryName.value;
     newEntryName.value = "";
@@ -49,12 +50,16 @@ const updateEntry = (newValue: IApplicationState) => {
 }
 
 const deleteSelectedConfig = () => {
+  console.debug(`Delete config ${store.selectedConfigName}`);
   store.deleteConfigEntry(store.selectedConfigName);
 }
 
 const saveConfig = () => {
-  if (currentConfigContent.value)
+  if (currentConfigContent.value) {
+    console.debug(`Save config ${JSON.stringify(currentConfigContent.value)}`);
     store.createConfigEntry({ [store.selectedConfigName]: currentConfigContent.value });
+  }
+  console.debug(`No editor content for saving.`);
 }
 
 const downloadConfig = () => {

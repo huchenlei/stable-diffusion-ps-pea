@@ -3,12 +3,19 @@ import JSON5 from 'json5';
 import { type IApplicationState, ApplicationState } from '@/Core';
 
 const DEFAULT_CONFIG = new ApplicationState();
+// Fetch configs from local storage.
+function fetchConfigs() {
+    const localConfigString = localStorage.getItem('configEntries');
+    if (!localConfigString || localConfigString === '{}') {
+        return { default: DEFAULT_CONFIG };
+    } else {
+        return JSON5.parse(localConfigString);
+    }
+}
 
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
-        configEntries:
-            JSON5.parse(localStorage.getItem('configEntries') || 'null') ||
-            { default: DEFAULT_CONFIG },
+        configEntries: fetchConfigs(),
         selectedConfigName: localStorage.getItem('selectedConfig') || 'default'
     }),
     actions: {
