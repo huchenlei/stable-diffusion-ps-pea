@@ -38,6 +38,11 @@ interface IApplicationState {
     controlnetUnits: IControlNetUnit[];
 };
 
+interface IHistoryItem {
+    appState: IApplicationState;
+    timestamp: number;
+};
+
 class ApplicationState implements IApplicationState {
     commonPayload: ICommonPayload = new CommonPayload();
     img2imgPayload: IImg2ImgPayload = new Img2ImgPayload();
@@ -52,6 +57,7 @@ class ApplicationState implements IApplicationState {
 
 export {
     type IApplicationState,
+    type IHistoryItem,
     ApplicationState,
     ReferenceRangeMode,
 };

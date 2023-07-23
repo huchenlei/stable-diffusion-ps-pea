@@ -6,6 +6,7 @@ const messages = {
             connection: 'Connection',
             about: 'About',
             generation: 'Generation',
+            history: 'History',
         },
         gen: {
             autoGenerationModeHint: 'Automatically select generation mode based on selected area.',

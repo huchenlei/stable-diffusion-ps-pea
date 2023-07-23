@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import GenerationView from '../views/GenerationView.vue';
+import HistoryView from '../views/HistoryView.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
 const router = createRouter({
@@ -15,6 +16,11 @@ const router = createRouter({
       path: '/generation',
       name: 'generation',
       component: GenerationView
+    },
+    {
+      path: '/history',
+      name: 'history',
+      component: HistoryView
     },
   ]
 });
