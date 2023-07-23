@@ -26,6 +26,7 @@ import JSON5 from 'json5';
 import Json5Editor from '@/components/Json5Editor.vue';
 import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons-vue';
 import { ApplicationState, type IApplicationState } from '@/Core';
+import { message } from 'ant-design-vue';
 
 const store = useConfigStore();
 const allConfigOptions = computed(() => Object.keys(store.configEntries).map(configName => {
@@ -59,6 +60,7 @@ const saveConfig = () => {
   if (currentConfigContent.value) {
     console.debug(`Save config ${JSON.stringify(currentConfigContent.value)}`);
     store.createConfigEntry({ [store.selectedConfigName]: currentConfigContent.value });
+    message.info(`Save config ${store.selectedConfigName}`);
   }
   console.debug(`No editor content for saving.`);
 }
