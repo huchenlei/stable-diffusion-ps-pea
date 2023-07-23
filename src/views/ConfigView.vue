@@ -10,8 +10,8 @@
       <a-select v-model="selectedEntry" style="flex-grow: 1;">
         <a-select-option v-for="(value, key) in configEntries" :key="key" :value="key">{{ key }}</a-select-option>
       </a-select>
-      <a-button @click="downloadConfig" :title="$t('downloadConfig')"><download-outlined></download-outlined></a-button>
-      <a-button @click="deleteSelectedConfig" :title="$t('deleteConfig')"><delete-outlined></delete-outlined></a-button>
+      <a-button @click="downloadConfig" :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
+      <a-button @click="deleteSelectedConfig" :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
     </div>
     <json5-editor :value="configEntries[selectedEntry]" @update:modelValue="updateEntry"></json5-editor>
   </a-space>

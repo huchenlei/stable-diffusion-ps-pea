@@ -3,6 +3,9 @@ import { defineComponent, onMounted, ref } from 'vue'
 import JSONEditor from 'jsoneditor'
 import JSON5 from 'json5';
 import 'jsoneditor/dist/jsoneditor.css'
+import 'brace';
+import 'brace/mode/json';
+import 'brace/theme/monokai';
 
 export default defineComponent({
     name: 'Json5Editor',
@@ -29,6 +32,10 @@ export default defineComponent({
                     }
                 },
             })
+            // Set the theme of the Ace editor instance
+            if (jsoneditor.aceEditor) {
+                jsoneditor.aceEditor.setTheme('ace/theme/monokai');
+            }
 
             jsoneditor.set(props.value);
         });
@@ -41,17 +48,19 @@ export default defineComponent({
 </script>
 
 <template>
-    <div ref="jsoneditorRef"></div>
+    <div ref="jsoneditorRef" style="height: 400px;"></div>
 </template>
 
 <style>
 /* dark styling of the editor */
 div.jsoneditor,
-div.jsoneditor-menu {
+div.jsoneditor-menu,
+div.jsoneditor-statusbar {
     border-color: #4b4b4b;
 }
 
-div.jsoneditor-menu {
+div.jsoneditor-menu,
+div.jsoneditor-statusbar {
     background-color: #4b4b4b;
 }
 
