@@ -16,10 +16,11 @@ import SliderGroup from '@/components/SliderGroup.vue';
 import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
-import { ApplicationState, ReferenceRangeMode } from '@/Core';
+import { ReferenceRangeMode } from '@/Core';
+import { useConfigStore } from '@/stores/configStore';
 
-const appState = reactive(new ApplicationState());
 const context = useA1111ContextStore().a1111Context;
+const appState = useConfigStore().getCurrentConfig();
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
 // Whether the generation is in progress.

@@ -6,7 +6,8 @@
       <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
     </div>
     <div style="display: flex">
-      <a-select v-model:value="store.selectedConfigName" :options="allConfigOptions" style="flex-grow: 1;">
+      <a-select :value="store.selectedConfigName" @update:value="store.updateCurrentConfig" :options="allConfigOptions"
+        style="flex-grow: 1;">
       </a-select>
       <a-button @click="downloadConfig"
         :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>

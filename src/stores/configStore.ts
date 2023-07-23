@@ -38,5 +38,9 @@ export const useConfigStore = defineStore('configStore', {
         getCurrentConfig(): IApplicationState {
             return this.configEntries[this.selectedConfigName];
         },
+        updateCurrentConfig(configName: string) {
+            this.selectedConfigName = configName;
+            localStorage.setItem('selectedConfig', configName);
+        },
     },
 });
