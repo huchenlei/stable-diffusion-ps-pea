@@ -41,11 +41,15 @@ export default {
             return selectedResultImages.map(image => image.name);
         });
 
+        const photopeaInProgress = ref<boolean>(false);
         async function switchResultImage(imageItem: ImageItem) {
+            if (photopeaInProgress.value) return;
+            photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
                 await deselectResultImage();
                 await selectResultImage(imageItem);
             });
+            photopeaInProgress.value = false;
 
             if (!ctrlPressed.value) {
                 selectedResultImages.length = 0;
@@ -71,19 +75,25 @@ export default {
             emit('result-finalized');
         }
         async function pickSelectedResultImages() {
+            if (photopeaInProgress.value) return;
+            photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
                 await deselectResultImage();
                 for (const image of selectedResultImages) {
                     await selectResultImage(image, /* layerName= */'ResultLayer');
                 }
             });
+            photopeaInProgress.value = false;
             finalizeSelection();
         }
 
         async function discardResultImages() {
+            if (photopeaInProgress.value) return;
+            photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
                 await deselectResultImage();
             });
+            photopeaInProgress.value = false;
             finalizeSelection();
         }
 
@@ -117,6 +127,7 @@ export default {
             resultImageItems,
             selectedResultImages,
             selectedResultImageNames,
+            photopeaInProgress,
 
             switchResultImage,
             discardResultImages,
@@ -127,8 +138,10 @@ export default {
 </script>
 
 <template>
-    <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames" @item-clicked="switchResultImage"
-        :displayNames="false"></ImagePicker>
+    <a-spin :spinning="photopeaInProgress">
+        <ImagePicker :images="resultImageItems" :selectedImages="selectedResultImageNames" @item-clicked="switchResultImage"
+            :displayNames="false"></ImagePicker>
+    </a-spin>
     <a-row v-if="resultImageItems.length > 0">
         <a-button :danger="true" class="discard-result" @click="discardResultImages">
             <CloseOutlined></CloseOutlined>
@@ -142,7 +155,7 @@ export default {
 <style scoped>
 .pick-result,
 .discard-result {
-  width: 50%;
+    width: 50%;
 }
 </style>
 
