@@ -22,6 +22,7 @@ const appState = reactive(new ApplicationState());
 const context = useA1111ContextStore().a1111Context;
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
+// Whether the generation is in progress.
 const generationActive = ref(false);
 
 // The bounding box to put the result image in.
