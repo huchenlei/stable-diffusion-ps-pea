@@ -540,4 +540,7 @@ export {
     type ISampler,
     type IStableDiffusionModel,
     type IProgress,
+    type ICommonPayload,
+    type IImg2ImgPayload,
+    type ITxt2ImgPayload,
 };

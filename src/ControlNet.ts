@@ -35,6 +35,7 @@ interface IControlNetUnit {
     threshold_a: number;
     threshold_b: number;
     weight: number;
+    linkedLayerName: string;
 }
 
 class ControlNetUnit implements IControlNetUnit {

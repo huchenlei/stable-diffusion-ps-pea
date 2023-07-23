@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, toRaw } from 'vue';
-import {
-  CommonPayload,
-  Img2ImgPayload,
-  Txt2ImgPayload,
-  GenerationMode,
-} from '../Automatic1111';
+import { GenerationMode } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { PayloadImage, cropImage } from '../ImageUtil';
@@ -16,24 +11,21 @@ import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
-import { ControlNetUnit, type IControlNetUnit, modelNoPreview } from '@/ControlNet';
+import { type IControlNetUnit, modelNoPreview } from '@/ControlNet';
 import SliderGroup from '@/components/SliderGroup.vue';
 import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
+import { ApplicationState, ReferenceRangeMode } from '@/Core';
 
-const generationMode = ref(GenerationMode.Img2Img);
-const autoGenerationMode = ref(true);
+const appState = reactive(new ApplicationState());
+const context = useA1111ContextStore().a1111Context;
+appState.commonPayload.sampler_name = context.samplers[0].name;
+
 const generationActive = ref(false);
 
 // The bounding box to put the result image in.
 const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
-
-const context = useA1111ContextStore().a1111Context;
-const commonPayload = reactive(new CommonPayload());
-commonPayload.sampler_name = context.samplers[0].name;
-const img2imgPayload = reactive(new Img2ImgPayload());
-const txt2imgPayload = reactive(new Txt2ImgPayload());
 
 const inputImageBuffer = ref<ArrayBuffer | undefined>(undefined);
 const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
@@ -41,36 +33,24 @@ const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
 const inputImage = ref<PayloadImage | undefined>(undefined);
 const inputMask = ref<PayloadImage | undefined>(undefined);
 
-// The scale ratio to upscale generated image.
-const imageScale = ref<number>(1.0);
-// The range around the selection bounding box to reference when doing img2img
-// generation.
-// [Px number, percent number]. Default is 64px and 10 percent.
-const referenceRange = ref<[number, number]>([64, 10]);
-enum ReferenceRangeMode {
-  kPixel,
-  kPercent,
-};
-const referenceRangeMode = ref<ReferenceRangeMode>(ReferenceRangeMode.kPixel);
-
 function expandSelectionBound(bound: PhotopeaBound): void {
   // Note `ImageUtil.cropImage` will handle out of image bound issue.
-  if (referenceRangeMode.value === ReferenceRangeMode.kPercent) {
+  if (appState.referenceRangeMode === ReferenceRangeMode.kPercent) {
     const width = bound[2] - bound[0];
     const height = bound[3] - bound[1];
-    const [_, percent] = referenceRange.value;
+    const [_, percent] = appState.referenceRange;
     bound[0] = bound[0] - width * percent / 100;
     bound[1] = bound[1] - height * percent / 100;
     bound[2] = bound[2] + width * percent / 100;
     bound[3] = bound[3] + height * percent / 100;
-  } else if (referenceRangeMode.value === ReferenceRangeMode.kPixel) {
-    const [px, _] = referenceRange.value;
+  } else if (appState.referenceRangeMode === ReferenceRangeMode.kPixel) {
+    const [px, _] = appState.referenceRange;
     bound[0] = bound[0] - px;
     bound[1] = bound[1] - px;
     bound[2] = bound[2] + px;
     bound[3] = bound[3] + px;
   } else {
-    throw `NOTREACHED! ${referenceRangeMode.value}`;
+    throw `NOTREACHED! ${appState.referenceRangeMode}`;
   }
 }
 
@@ -106,9 +86,6 @@ enum GenerationState {
 
 const generationState = ref(GenerationState.kInitialState);
 
-// Extension payloads.
-const controlnetUnits = reactive([new ControlNetUnit()]);
-
 // Image URLs of generated images.
 const resultImages: string[] = reactive([]);
 
@@ -122,7 +99,7 @@ const samplerOptions = computed(() => {
 });
 
 async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
-  for (const unit of controlnetUnits) {
+  for (const unit of appState.controlnetUnits) {
     if (modelNoPreview(unit.model)) {
       continue;
     }
@@ -139,8 +116,8 @@ async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
 
 function fillExtensionsArgs() {
   if (useA1111ContextStore().controlnetContext.initialized) {
-    commonPayload.alwayson_scripts['ControlNet'] = {
-      args: toRaw(controlnetUnits)
+    appState.commonPayload.alwayson_scripts['ControlNet'] = {
+      args: toRaw(appState.controlnetUnits)
         .filter(unit => unit.enabled)
         .map(unit => {
           const payloadUnit = Object.fromEntries(
@@ -199,7 +176,7 @@ async function preparePayload() {
       } else {
         inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
         inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-        if (generationMode.value === GenerationMode.Img2Img)
+        if (appState.generationMode === GenerationMode.Img2Img)
           expandSelectionBound(maskBound);
       }
 
@@ -214,23 +191,23 @@ async function preparePayload() {
     // Handling extension
     fillExtensionsArgs();
 
-    if (autoGenerationMode.value) {
+    if (appState.autoGenerationMode) {
       const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
-      generationMode.value = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
+      appState.generationMode = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
     }
 
-    commonPayload.width = image.width * imageScale.value;
-    commonPayload.height = image.height * imageScale.value;
+    appState.commonPayload.width = image.width * appState.imageScale;
+    appState.commonPayload.height = image.height * appState.imageScale;
 
     inputImage.value = image;
     inputMask.value = mask;
 
     resultImageBound.value = image.bound;
 
-    const isImg2Img = generationMode.value === GenerationMode.Img2Img;
+    const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
     if (isImg2Img) {
-      img2imgPayload.init_images = [image.dataURL];
-      img2imgPayload.mask = mask.dataURL;
+      appState.img2imgPayload.init_images = [image.dataURL];
+      appState.img2imgPayload.mask = mask.dataURL;
     }
 
     generationState.value = GenerationState.kPayloadPreparedState;
@@ -247,23 +224,23 @@ async function sendPayload() {
     // Start progress bar.
     generationActive.value = true;
 
-    const isImg2Img = generationMode.value === GenerationMode.Img2Img;
+    const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
     const url = isImg2Img ? context.img2imgURL : context.txt2imgURL;
-    const extraPayload = isImg2Img ? img2imgPayload : txt2imgPayload;
+    const extraPayload = isImg2Img ? appState.img2imgPayload : appState.txt2imgPayload;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...commonPayload,
+        ...appState.commonPayload,
         ...extraPayload,
       }),
     });
     const data = await response.json();
 
     resultImages.length = 0; // Clear array content.
-    const controlNetCount = _.sum(controlnetUnits.map(unit => unit.enabled ? 1 : 0));
+    const controlNetCount = _.sum(appState.controlnetUnits.map(unit => unit.enabled ? 1 : 0));
     resultImages.push(...
       // Remove controlnet maps from image results.
       (controlNetCount > 0 ? data['images'].slice(0, -controlNetCount) : data['images'])
@@ -274,7 +251,7 @@ async function sendPayload() {
     inputMaskBuffer.value = undefined;
     inputImage.value = undefined;
     inputMask.value = undefined;
-    for (const unit of controlnetUnits) {
+    for (const unit of appState.controlnetUnits) {
       if (!modelNoPreview(unit.model)) // Only clear image when model has preview.
         unit.image = undefined;
     }
@@ -333,14 +310,16 @@ const stepProgress = computed(() => {
       </SDModelSelection>
 
       <a-space>
-        <PayloadRadio :value="generationMode" @update:value="mode => generationMode = mode" :enum-type="GenerationMode">
+        <PayloadRadio :value="appState.generationMode" @update:value="mode => appState.generationMode = mode"
+          :enum-type="GenerationMode">
         </PayloadRadio>
-        <a-checkbox v-model:checked="autoGenerationMode" :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
+        <a-checkbox v-model:checked="appState.autoGenerationMode"
+          :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
       </a-space>
 
-      <a-form :model="commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
+      <a-form :model="appState.commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">
         <a-form-item>
-          <PromptInput v-model:payload="commonPayload"></PromptInput>
+          <PromptInput v-model:payload="appState.commonPayload"></PromptInput>
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -352,7 +331,7 @@ const stepProgress = computed(() => {
           </a-space>
           <a-row>
             <a-button class="ref-area-button"
-              :disabled="generationState >= GenerationState.kSelectRefAreaState || generationMode === GenerationMode.Txt2Img"
+              :disabled="generationState >= GenerationState.kSelectRefAreaState || appState.generationMode === GenerationMode.Txt2Img"
               @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
               @mouseout="removeGenerationStepHighlight">{{
                 $t('gen.selectRefArea') }}</a-button>
@@ -371,39 +350,42 @@ const stepProgress = computed(() => {
           @result-finalized="onResultImagePicked">
         </GenerationResultPicker>
         <a-form-item>
-          <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="imageScale" :min="1" :max="16" :log-scale="true">
+          <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"
+            :log-scale="true">
           </SliderGroup>
         </a-form-item>
-        <a-form-item v-if="generationMode === GenerationMode.Img2Img">
-          <div v-if="referenceRangeMode === ReferenceRangeMode.kPixel"
+        <a-form-item v-if="appState.generationMode === GenerationMode.Img2Img">
+          <div v-if="appState.referenceRangeMode === ReferenceRangeMode.kPixel"
             style="display:flex; align-items: center; width: 100%">
-            <a-button @click="referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
-            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="referenceRange[0]" :min="1" :max="256"
+            <a-button @click="appState.referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="1" :max="256"
               :log-scale="true">
             </SliderGroup>
           </div>
           <div v-else style="display:flex; align-items: center; width:100%">
-            <a-button @click="referenceRangeMode = ReferenceRangeMode.kPixel">%</a-button>
-            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="referenceRange[1]" :min="0" :max="100">
+            <a-button @click="appState.referenceRangeMode = ReferenceRangeMode.kPixel">%</a-button>
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[1]" :min="0" :max="100">
             </SliderGroup>
           </div>
         </a-form-item>
         <a-form-item>
-          <SliderGroup :label="$t('gen.batchSize')" v-model:value="commonPayload.batch_size" :min="1" :max="64"
+          <SliderGroup :label="$t('gen.batchSize')" v-model:value="appState.commonPayload.batch_size" :min="1" :max="64"
             :log-scale="true">
           </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <SliderGroup :label="$t('gen.cfg')" v-model:value="commonPayload.cfg_scale" :min="1" :max="30" :step="0.5">
+          <SliderGroup :label="$t('gen.cfg')" v-model:value="appState.commonPayload.cfg_scale" :min="1" :max="30"
+            :step="0.5">
           </SliderGroup>
         </a-form-item>
         <a-form-item>
-          <SliderGroup :label="$t('gen.samplingSteps')" v-model:value="commonPayload.steps" :min="1" :max="150" :step="1">
+          <SliderGroup :label="$t('gen.samplingSteps')" v-model:value="appState.commonPayload.steps" :min="1" :max="150"
+            :step="1">
           </SliderGroup>
         </a-form-item>
-        <SliderGroup v-if="generationMode === GenerationMode.Img2Img" :label="$t('gen.denoisingStrength')"
-          v-model:value="img2imgPayload.denoising_strength" :min="0" :max="1" :step="0.05"></SliderGroup>
-        <a-space v-if="generationMode === GenerationMode.Img2Img">
+        <SliderGroup v-if="appState.generationMode === GenerationMode.Img2Img" :label="$t('gen.denoisingStrength')"
+          v-model:value="appState.img2imgPayload.denoising_strength" :min="0" :max="1" :step="0.05"></SliderGroup>
+        <a-space v-if="appState.generationMode === GenerationMode.Img2Img">
           <div v-if="inputImage">
             <a-tag>Input image</a-tag>
             <a-image :src="inputImage.dataURL"></a-image>
@@ -421,26 +403,26 @@ const stepProgress = computed(() => {
             <a-space direction="vertical">
               <a-row style="display: flex; align-items: center;">
                 <a-tag style="border: none; flex: 0 0 auto;">{{ $t('gen.sampler') }}</a-tag>
-                <a-select style="flex: 1 1 auto;" ref="select" v-model:value="commonPayload.sampler_name"
+                <a-select style="flex: 1 1 auto;" ref="select" v-model:value="appState.commonPayload.sampler_name"
                   :options="samplerOptions"></a-select>
               </a-row>
-              <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="commonPayload.width" :min="64"
-                :max="2048" />
-              <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="commonPayload.height" :min="64"
-                :max="2048" />
+              <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="appState.commonPayload.width"
+                :min="64" :max="2048" />
+              <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="appState.commonPayload.height"
+                :min="64" :max="2048" />
 
-              <div :hidden="generationMode !== GenerationMode.Img2Img">
-                <Img2ImgPayloadDisplay :payload="img2imgPayload">
+              <div :hidden="appState.generationMode !== GenerationMode.Img2Img">
+                <Img2ImgPayloadDisplay :payload="appState.img2imgPayload">
                 </Img2ImgPayloadDisplay>
               </div>
-              <div :hidden="generationMode !== GenerationMode.Txt2Img">
-                <Txt2ImgPayloadDisplay :payload="txt2imgPayload">
+              <div :hidden="appState.generationMode !== GenerationMode.Txt2Img">
+                <Txt2ImgPayloadDisplay :payload="appState.txt2imgPayload">
                 </Txt2ImgPayloadDisplay>
               </div>
             </a-space>
           </a-collapse-panel>
         </a-collapse>
-        <ControlNet :units="controlnetUnits"></ControlNet>
+        <ControlNet :units="appState.controlnetUnits"></ControlNet>
       </div>
     </a-space>
   </div>
