@@ -7,52 +7,62 @@
       </template>
     </a-input>
     <div style="display: flex">
-      <a-select v-model="selectedEntry" style="flex-grow: 1;">
-        <a-select-option v-for="(value, key) in configEntries" :key="key" :value="key">{{ key }}</a-select-option>
+      <a-select v-model:value="store.selectedConfigName" :options="allConfigOptions" style="flex-grow: 1;">
       </a-select>
-      <a-button @click="downloadConfig" :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
-      <a-button @click="deleteSelectedConfig" :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
+      <a-button @click="downloadConfig"
+        :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
+      <a-button @click="deleteSelectedConfig"
+        :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
+      <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
     </div>
-    <json5-editor :value="configEntries[selectedEntry]" @update:modelValue="updateEntry"></json5-editor>
+    <json5-editor :value="store.getCurrentConfig()" @update:modelValue="updateEntry"></json5-editor>
   </a-space>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
 import JSON5 from 'json5';
 import Json5Editor from '@/components/Json5Editor.vue';
-import { DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons-vue';
+import { ApplicationState, type IApplicationState } from '@/Core';
 
 const store = useConfigStore();
-const configEntries = store.configEntries;
+const allConfigOptions = computed(() => Object.keys(store.configEntries).map(configName => {
+  return {
+    label: configName,
+    value: configName,
+  };
+}));
 const newEntryName = ref<string>("");
-const selectedEntry = ref(Object.keys(configEntries)[0]);
-
-watch(() => store.configEntries, () => {
-  selectedEntry.value = Object.keys(store.configEntries)[0];
-}, { immediate: true });
+const currentConfigContent = ref<IApplicationState | null>(null);
 
 const createNewEntry = () => {
   if (newEntryName.value.trim() !== "") {
-    store.createConfigEntry({ [newEntryName.value]: {} });
+    store.createConfigEntry({ [newEntryName.value]: new ApplicationState() });
+    store.selectedConfigName = newEntryName.value;
     newEntryName.value = "";
   }
 }
 
-const updateEntry = (newValue: any) => {
-  store.createConfigEntry({ [selectedEntry.value]: newValue });
+const updateEntry = (newValue: IApplicationState) => {
+  currentConfigContent.value = newValue;
 }
 
 const deleteSelectedConfig = () => {
-  store.deleteConfigEntry(selectedEntry.value);
+  store.deleteConfigEntry(store.selectedConfigName);
+}
+
+const saveConfig = () => {
+  if (currentConfigContent.value)
+    store.createConfigEntry({ [store.selectedConfigName]: currentConfigContent.value });
 }
 
 const downloadConfig = () => {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON5.stringify(store.configEntries[selectedEntry.value]));
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON5.stringify(store.getCurrentConfig()));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", selectedEntry.value + ".json5");
+  downloadAnchorNode.setAttribute("download", store.selectedConfigName + ".json5");
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();

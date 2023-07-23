@@ -15,7 +15,7 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ['update:modelValue'],
+    emits: ['update:modelValue', 'error:modelValue'],
     setup(props, { emit }) {
         const jsoneditorRef = ref<HTMLElement | null>(null);
         let jsoneditor: JSONEditor;
@@ -28,7 +28,7 @@ export default defineComponent({
                     try {
                         emit('update:modelValue', JSON5.parse(newValue));
                     } catch (error) {
-                        // you might want to do something with the error
+                        emit('error:modelValue', error);
                     }
                 },
             })

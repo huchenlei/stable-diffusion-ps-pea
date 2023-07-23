@@ -71,6 +71,7 @@ const messages = {
             newConfig: 'Enter new config name',
             downloadConfig: 'Download config as .json5 file',
             deleteConfig: 'Delete the selected config',
+            saveConfig: 'Save config',
         },
     },
 };
