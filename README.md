@@ -48,7 +48,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 ### Minior TODOs
 - [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
 - [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
-- Update favicon
+- [*DONE*] Update favicon
 - Update thumbnail (sd.png)
 - [*DONE*] Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
 
