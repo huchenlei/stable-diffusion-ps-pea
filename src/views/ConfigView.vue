@@ -1,17 +1,20 @@
 <template>
-  <a-row>
-    <a-col :span="12">
-      <a-input placeholder="Enter new config entry name" v-model="newEntryName" />
-      <a-button @click="createNewEntry" type="primary" style="margin-top: 10px">Create New Entry</a-button>
-    </a-col>
-    <a-col :span="12">
-      <a-select placeholder="Select a config entry" v-model="selectedEntry" style="width: 100%">
+  <a-space direction="vertical" style="width: 100%">
+    <a-input :placeholder="$t('config.newConfig')" v-model="newEntryName">
+      <template #addonAfter>
+        <a-button @click="createNewEntry" :block="true" type="text"
+          size="small"><plus-outlined></plus-outlined></a-button>
+      </template>
+    </a-input>
+    <div style="display: flex">
+      <a-select v-model="selectedEntry" style="flex-grow: 1;">
         <a-select-option v-for="(value, key) in configEntries" :key="key" :value="key">{{ key }}</a-select-option>
       </a-select>
-    </a-col>
-  </a-row>
-  <json5-editor :value="configEntries[selectedEntry]" @update:modelValue="updateEntry"></json5-editor>
-  <a-button @click="downloadConfig" type="primary" icon="download" style="margin-top: 10px">Download Config</a-button>
+      <a-button @click="downloadConfig" :title="$t('downloadConfig')"><download-outlined></download-outlined></a-button>
+      <a-button @click="deleteSelectedConfig" :title="$t('deleteConfig')"><delete-outlined></delete-outlined></a-button>
+    </div>
+    <json5-editor :value="configEntries[selectedEntry]" @update:modelValue="updateEntry"></json5-editor>
+  </a-space>
 </template>
 
 <script setup lang="ts">
@@ -19,10 +22,11 @@ import { ref, watch } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
 import JSON5 from 'json5';
 import Json5Editor from '@/components/Json5Editor.vue';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons-vue';
 
 const store = useConfigStore();
 const configEntries = store.configEntries;
-const newEntryName = ref("");
+const newEntryName = ref<string>("");
 const selectedEntry = ref(Object.keys(configEntries)[0]);
 
 watch(() => store.configEntries, () => {
@@ -38,6 +42,10 @@ const createNewEntry = () => {
 
 const updateEntry = (newValue: any) => {
   store.createConfigEntry({ [selectedEntry.value]: newValue });
+}
+
+const deleteSelectedConfig = () => {
+  store.deleteConfigEntry(selectedEntry.value);
 }
 
 const downloadConfig = () => {

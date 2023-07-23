@@ -15,6 +15,11 @@ export const useConfigStore = defineStore('configStore', {
         },
         persistConfigEntries() {
             localStorage.setItem('configEntries', JSON5.stringify(this.configEntries));
-        }
+        },
+        deleteConfigEntry(entryName: string) {
+            const { [entryName]: _, ...remainingEntries } = this.configEntries;
+            this.configEntries = remainingEntries;
+            this.persistConfigEntries();
+        },
     },
 });

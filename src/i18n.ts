@@ -66,6 +66,12 @@ const messages = {
             newConnection: 'New Connection',
         },
         generate: 'Generate',
+
+        config: {
+            newConfig: 'Enter new config name',
+            downloadConfig: 'Download config as .json5 file',
+            deleteConfig: 'Delete the selected config',
+        },
     },
 };
 
