@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
+import { GithubOutlined } from '@ant-design/icons-vue';
 const context = useA1111ContextStore().a1111Context;
 const route = useRoute();
 </script>
@@ -11,6 +12,9 @@ const route = useRoute();
     <header>
       <a-affix :offset-top="0">
         <a-menu class="navigation" mode="horizontal" :selectedKeys="[route.path]">
+          <a-menu-item key="/github">
+            <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
+          </a-menu-item>
           <a-menu-item key="/">
             <RouterLink to="/">{{ $t('nav.connection') }}</RouterLink>
           </a-menu-item>
