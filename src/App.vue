@@ -24,6 +24,9 @@ const route = useRoute();
           <a-menu-item key="/history" :disabled="!context.initialized">
             <RouterLink to="/history">{{ $t('nav.history') }}</RouterLink>
           </a-menu-item>
+          <a-menu-item key="/config">
+            <RouterLink to="/config">{{ $t('nav.config') }}</RouterLink>
+          </a-menu-item>
         </a-menu>
       </a-affix>
     </header>
