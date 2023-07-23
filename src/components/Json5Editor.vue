@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import JSONEditor from 'jsoneditor'
 import JSON5 from 'json5';
 import 'jsoneditor/dist/jsoneditor.css'
@@ -38,6 +38,10 @@ export default defineComponent({
             }
 
             jsoneditor.set(props.value);
+        });
+
+        watch(props.value, (newValue, oldValue) => {
+            jsoneditor.set(newValue);
         });
 
         return {

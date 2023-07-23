@@ -1,11 +1,10 @@
 <template>
   <a-space direction="vertical" style="width: 100%">
-    <a-input :placeholder="$t('config.newConfig')" v-model="newEntryName">
-      <template #addonAfter>
-        <a-button @click="createNewEntry" :block="true" type="text"
-          size="small"><plus-outlined></plus-outlined></a-button>
-      </template>
-    </a-input>
+    <div style="display: flex">
+      <a-input :placeholder="$t('config.newConfig')" v-model="newEntryName" style="flex-grow: 1;">
+      </a-input>
+      <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
+    </div>
     <div style="display: flex">
       <a-select v-model:value="store.selectedConfigName" :options="allConfigOptions" style="flex-grow: 1;">
       </a-select>
