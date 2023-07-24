@@ -40,8 +40,8 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
    - [*DONE*] Provide a progress on UI to show user the current state.
 5. [*DONE*] Connection management.
-6. History view
-   - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
+6. [*DONE*] History view
+   - [*DONE*] Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
 7. Support upscale script
    - Automatically trigger upscale script if the target width/height is too big (after scale ratio)
    - Support whole picture upscale. (Paste the result to a new file?)
