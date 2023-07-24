@@ -53,6 +53,7 @@ const updateEntry = (newValue: IApplicationState) => {
 
 const deleteSelectedConfig = () => {
   console.debug(`Delete config ${store.selectedConfigName}`);
+  
   store.deleteConfigEntry(store.selectedConfigName);
 }
 

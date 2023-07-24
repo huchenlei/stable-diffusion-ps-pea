@@ -20,7 +20,7 @@ import { ReferenceRangeMode } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
 
 const context = useA1111ContextStore().a1111Context;
-const appState = useConfigStore().getCurrentConfig();
+const appState = reactive(_.cloneDeep(useConfigStore().getCurrentConfig()));
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
 // Whether the generation is in progress.
