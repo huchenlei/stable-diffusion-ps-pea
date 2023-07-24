@@ -2,8 +2,8 @@
 import { diff, type Diff } from 'deep-diff';
 import { ApplicationState, type IApplicationState } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
-import { computed } from 'vue';
-import { LeftSquareOutlined, SaveOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue';
+import { LeftSquareOutlined, SaveOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { useAppStateStore } from '@/stores/appStateStore';
 import { message } from 'ant-design-vue';
 
@@ -22,6 +22,8 @@ export default {
     components: {
         LeftSquareOutlined,
         SaveOutlined,
+        CheckOutlined,
+        CloseOutlined,
     },
     setup(props) {
         function formatDiff(diffEntries: Diff<IApplicationState, IApplicationState>[]) {
@@ -62,10 +64,24 @@ export default {
             message.info('State restored from history');
         }
 
+        const configName = ref('');
+        const configStore = useConfigStore();
+        function saveAppStateAsConfig() {
+            if (!configName.value) {
+                message.warn('Config name cannot be empty');
+            } else {
+                configStore.createConfigEntry({ [configName.value]: props.appState });
+                message.info('State saved');
+            }
+            configName.value = '';
+        }
+
         return {
             stateDiff,
+            configName,
             removeDiff,
             sendAppState,
+            saveAppStateAsConfig,
         };
     },
 };
@@ -83,9 +99,20 @@ export default {
                     <a-button @click.stop="sendAppState">
                         <LeftSquareOutlined></LeftSquareOutlined>
                     </a-button>
-                    <a-button @click="">
-                        <SaveOutlined></SaveOutlined>
-                    </a-button>
+                    <a-popconfirm :showCancel="false">
+                        <template #title>
+                            <a-input :placeholder="$t('config.newConfig')" v-model:value="configName">
+                            </a-input>
+                        </template>
+                        <template #okButton>
+                            <a-button size="small" type="primary" @click="saveAppStateAsConfig">
+                                <CheckOutlined></CheckOutlined>
+                            </a-button>
+                        </template>
+                        <a-button @click.stop="() => { }">
+                            <SaveOutlined></SaveOutlined>
+                        </a-button>
+                    </a-popconfirm>
                 </div>
             </div>
         </template>
