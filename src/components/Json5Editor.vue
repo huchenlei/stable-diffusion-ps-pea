@@ -52,7 +52,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <div ref="jsoneditorRef" style="height: 400px;"></div>
+    <div ref="jsoneditorRef" style="height: 80vh;"></div>
 </template>
 
 <style>
