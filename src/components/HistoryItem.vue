@@ -3,6 +3,9 @@ import { diff, type Diff } from 'deep-diff';
 import { ApplicationState, type IApplicationState } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
 import { computed } from 'vue';
+import { LeftSquareOutlined, SaveOutlined } from '@ant-design/icons-vue'
+import { useAppStateStore } from '@/stores/appStateStore';
+import { message } from 'ant-design-vue';
 
 export default {
     name: 'HistoryItem',
@@ -17,6 +20,8 @@ export default {
         }
     },
     components: {
+        LeftSquareOutlined,
+        SaveOutlined,
     },
     setup(props) {
         function formatDiff(diffEntries: Diff<IApplicationState, IApplicationState>[]) {
@@ -51,9 +56,16 @@ export default {
             setValue(props.appState, path, defaultValue);
         }
 
+        const appStateStore = useAppStateStore();
+        function sendAppState() {
+            appStateStore.setAppState(props.appState);
+            message.info('State restored from history');
+        }
+
         return {
             stateDiff,
             removeDiff,
+            sendAppState,
         };
     },
 };
@@ -62,8 +74,20 @@ export default {
 <template>
     <a-collapse-panel>
         <template #header>
-            {{ stateDiff['commonPayload.prompt']?.value || '' }}
-            <a-tag>{{ `${new Date($props.timestamp).toLocaleString()}` }}</a-tag>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <div>
+                    {{ stateDiff['commonPayload.prompt']?.value || '' }}
+                    <a-tag>{{ `${new Date($props.timestamp).toLocaleString()}` }}</a-tag>
+                </div>
+                <div>
+                    <a-button @click.stop="sendAppState">
+                        <LeftSquareOutlined></LeftSquareOutlined>
+                    </a-button>
+                    <a-button @click="">
+                        <SaveOutlined></SaveOutlined>
+                    </a-button>
+                </div>
+            </div>
         </template>
         <a-space style="flex-wrap: wrap;">
             <a-tag v-for="[path, entry] in Object.entries(stateDiff)" closable
