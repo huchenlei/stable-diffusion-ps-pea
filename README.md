@@ -45,6 +45,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 7. Support upscale script
    - Automatically trigger upscale script if the target width/height is too big (after scale ratio)
    - Support whole picture upscale. (Paste the result to a new file?)
+8. Support segment anything.
    
 ### Minior TODOs
 - [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
@@ -53,6 +54,9 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 - Update thumbnail (sd.png)
 - [*DONE*] Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
 - File based config. Add comments in default config file.
+- Correctly handle list diff when diff appState.
+- Add a way to trigger overlay of config directly from generation view.
+- Hide page name text on nav bar by default to save space (only show when hover on icon).
 
 # Development
 ## Setup HTTPS
