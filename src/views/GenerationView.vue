@@ -172,10 +172,12 @@ async function startSelectRefArea() {
 }
 
 async function preparePayload() {
-  useHistoryStore().addHistoryItem({
-    timestamp: Date.now(),
-    appState: _.cloneDeep(appState)
-  });
+  if (generationState.value < GenerationState.kPayloadPreparedState) {
+    useHistoryStore().addHistoryItem({
+      timestamp: Date.now(),
+      appState: _.cloneDeep(appState)
+    });
+  }
 
   try {
     const [image, mask, maskBound] = await photopeaContext.executeTask(async () => {
