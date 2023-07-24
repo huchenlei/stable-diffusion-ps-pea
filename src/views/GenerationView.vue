@@ -17,15 +17,14 @@ import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
 import { ReferenceRangeMode } from '@/Core';
-import { useConfigStore } from '@/stores/configStore';
 import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
+import { useAppStateStore } from '@/stores/appStateStore';
 
 const context = useA1111ContextStore().a1111Context;
-const appState = reactive(_.cloneDeep(useConfigStore().getCurrentConfig()));
-function resetToDefault() {
-  Object.assign(appState, _.cloneDeep(useConfigStore().getCurrentConfig()));
-}
+const appStateStore = useAppStateStore();
+const appState = appStateStore.appState;
+
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
 // Whether the generation is in progress.
@@ -314,7 +313,7 @@ const stepProgress = computed(() => {
 </script>
 <template>
   <div>
-    <a-button shape="circle" class="floating-button" type="primary" @click="resetToDefault" size="large"
+    <a-button shape="circle" class="floating-button" type="primary" @click="appStateStore.resetToDefault" size="large"
       :title="$t('gen.resetToDefault')">
       <template #icon>
         <ReloadOutlined></ReloadOutlined>
