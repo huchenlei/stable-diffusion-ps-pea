@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { GithubOutlined } from '@ant-design/icons-vue';
+import { GithubOutlined, LoginOutlined, PlayCircleOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons-vue';
 const context = useA1111ContextStore().a1111Context;
 const route = useRoute();
 </script>
@@ -16,16 +16,28 @@ const route = useRoute();
             <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
           </a-menu-item>
           <a-menu-item key="/">
-            <RouterLink to="/">{{ $t('nav.connection') }}</RouterLink>
+            <RouterLink to="/">
+              <LoginOutlined></LoginOutlined>
+              {{ $t('nav.connection') }}
+            </RouterLink>
           </a-menu-item>
           <a-menu-item key="/generation" :disabled="!context.initialized">
-            <RouterLink to="/generation">{{ $t('nav.generation') }}</RouterLink>
+            <RouterLink to="/generation">
+              <PlayCircleOutlined></PlayCircleOutlined>
+              {{ $t('nav.generation') }}
+            </RouterLink>
           </a-menu-item>
           <a-menu-item key="/history" :disabled="!context.initialized">
-            <RouterLink to="/history">{{ $t('nav.history') }}</RouterLink>
+            <RouterLink to="/history">
+              <HistoryOutlined></HistoryOutlined>
+              {{ $t('nav.history') }}
+            </RouterLink>
           </a-menu-item>
           <a-menu-item key="/config">
-            <RouterLink to="/config">{{ $t('nav.config') }}</RouterLink>
+            <RouterLink to="/config">
+              <SettingOutlined></SettingOutlined>
+              {{ $t('nav.config') }}
+            </RouterLink>
           </a-menu-item>
         </a-menu>
       </a-affix>
