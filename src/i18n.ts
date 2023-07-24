@@ -79,6 +79,84 @@ const messages = {
             saveConfig: 'Save config',
         },
     },
+    zh: {
+        nav: {
+            connection: '连接',
+            about: '关于',
+            generation: '生成',
+            history: '历史',
+            config: '配置',
+        },
+        gen: {
+            autoGenerationModeHint: '根据所选区域自动选择生成模式。',
+            skip: '跳过',
+            interrupt: '中断',
+            addLoRA: '添加 LoRA',
+            enterPrompt: '输入提示',
+            enterNegativePrompt: '输入负提示',
+            extraNetworks: '额外网络',
+            clearPrompt: '清除当前提示',
+            samplingSteps: '采样步骤',
+            cfg: 'CFG 比例',
+            batchSize: '批处理大小',
+            sampler: '采样器',
+            advancedSettings: '高级设置',
+            prepare: '预览载荷',
+            selectRefArea: '选择参考区域',
+            scaleRatio: '缩放比例',
+            referenceRange: '参考范围',
+
+            inpaintArea: '修复区域',
+            resizeMode: '调整大小模式',
+            inpaintFill: '修复填充',
+            maskMode: '掩码模式',
+            denoisingStrength: '降噪强度',
+
+            inputImage: '输入图像',
+            inputMask: '输入掩码',
+            steps: {
+                kInitialState: '',
+                kSelectRefAreaState: '在画布上选择参考区域',
+                kPayloadPreparedState: '对载荷满意时点击生成',
+                kFinishedState: '选择要保留的结果图像',
+
+                TokSelectRefAreaState: '手动选择参考区域',
+                TokPayloadPreparedState: '在发送之前预览载荷',
+                TokFinishedState: '根据当前设置生成图像',
+            },
+        },
+        cnet: {
+            guidanceRange: '引导范围',
+            lowvram: 'Low VRAM',
+            model: '模型',
+            module: '预处理器',
+            unlinked: '未链接',
+            unitDisabled: 'ControlNet 单元已禁用',
+            unitEnabled: 'ControlNet 单元已启用',
+            controlMode: '控制模式',
+            uploadImage: '上传图像',
+            preprocessorInput: '预处理器输入',
+            preprocessorResult: '预处理器结果',
+        },
+
+        weight: '权重',
+        width: '宽度',
+        height: '高度',
+
+        con: {
+            connect: '连接',
+            connected: '已连接',
+            newConnection: '新连接',
+        },
+        generate: '生成',
+
+        config: {
+            newConfig: '输入新配置名称',
+            downloadConfig: '将配置下载为 .json5 文件',
+            deleteConfig: '删除所选配置',
+            saveConfig: '保存配置',
+        },
+    },
 };
 
 export default createI18n({
