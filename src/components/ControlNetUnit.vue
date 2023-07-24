@@ -282,7 +282,7 @@ export default {
         <a-space direction="vertical" class="cnet-form">
             <a-space>
                 <div v-if="preprocessorInput">
-                    <a-tag>Preprocessor Input</a-tag>
+                    <a-tag>{{ $t('cnet.preprocessorInput') }}</a-tag>
                     <a-image :src="preprocessorInput.dataURL" :preview=false></a-image>
                 </div>
                 <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
@@ -290,7 +290,7 @@ export default {
                     <!-- Disable item rendering -->
                     <template #itemRender="{ file, actions }"></template>
                     <div v-if="unit.image">
-                        <a-tag>Preprocessor Result</a-tag>
+                        <a-tag>{{ $t('cnet.preprocessorResult') }}</a-tag>
                         <a-image :src="unit.image.image" :preview="false"></a-image>
                     </div>
                     <div v-if="!unit.image && isReferenceModel">

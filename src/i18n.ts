@@ -33,6 +33,9 @@ const messages = {
             inpaintFill: 'Inpaint Fill',
             maskMode: 'Mask Mode',
             denoisingStrength: 'Denoising Strength',
+
+            inputImage: 'Input image',
+            inputMask: 'Input mask',
             steps: {
                 kInitialState: '',
                 kSelectRefAreaState: 'Select reference area on canvas',
@@ -54,6 +57,8 @@ const messages = {
             unitEnabled: 'ControlNet unit enabled',
             controlMode: 'Control Mode',
             uploadImage: 'Upload Image',
+            preprocessorInput: 'Preprocessor Input',
+            preprocessorResult: 'Preprocessor Result',
         },
 
         weight: 'Weight',

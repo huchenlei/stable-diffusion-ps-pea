@@ -389,11 +389,11 @@ const stepProgress = computed(() => {
           v-model:value="appState.img2imgPayload.denoising_strength" :min="0" :max="1" :step="0.05"></SliderGroup>
         <a-space v-if="appState.generationMode === GenerationMode.Img2Img">
           <div v-if="inputImage">
-            <a-tag>Input image</a-tag>
+            <a-tag>{{ $t('inputImage') }}</a-tag>
             <a-image :src="inputImage.dataURL"></a-image>
           </div>
           <div v-if="inputMask">
-            <a-tag>Input mask</a-tag>
+            <a-tag>{{ $t('inputMask') }}</a-tag>
             <a-image :src="inputMask.dataURL"></a-image>
           </div>
         </a-space>
