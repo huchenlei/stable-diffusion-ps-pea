@@ -467,7 +467,7 @@ class CommonPayload implements ICommonPayload {
     width: number = 512;
     n_iter: number = 1;
     steps: number = 20;
-    sampler_name: string = '';
+    sampler_name: string = 'Euler a';
     prompt: string = '';
     negative_prompt: string = '';
     seed: number = -1;
