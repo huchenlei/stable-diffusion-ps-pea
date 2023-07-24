@@ -10,7 +10,7 @@
     </div>
     <div style="display: flex">
       <a-select :value="store.selectedConfigName" @update:value="store.updateCurrentConfig" :options="allConfigOptions"
-        style="flex-grow: 1;">
+        show-search :filter-option="filterConfig" style="flex-grow: 1;">
       </a-select>
       <a-button @click="downloadConfig"
         :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
@@ -80,4 +80,8 @@ const downloadConfig = () => {
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
 }
+
+const filterConfig = (input: string, option: any) => {
+  return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
 </script>
