@@ -1,4 +1,7 @@
 <template>
+  <a-divider orientation="left" orientation-margin="0px">
+    {{ $t('config.defaults') }}
+  </a-divider>
   <a-space direction="vertical" style="width: 100%">
     <div style="display: flex">
       <a-input :placeholder="$t('config.newConfig')" v-model:value="newEntryName" style="flex-grow: 1;">
