@@ -8,19 +8,12 @@ const context = useA1111ContextStore().a1111Context;
 const route = useRoute();
 
 const menuItems = reactive([
-  { key: '/', path: '/', icon: LoginOutlined, textKey: 'nav.connection', showText: false, requiresInit: false },
-  { key: '/generation', path: '/generation', icon: PlayCircleOutlined, textKey: 'nav.generation', showText: false, requiresInit: true },
-  { key: '/history', path: '/history', icon: HistoryOutlined, textKey: 'nav.history', showText: false, requiresInit: true },
-  { key: '/config', path: '/config', icon: SettingOutlined, textKey: 'nav.config', showText: false, requiresInit: false },
+  { key: '/', path: '/', icon: LoginOutlined, textKey: 'nav.connection', requiresInit: false },
+  { key: '/generation', path: '/generation', icon: PlayCircleOutlined, textKey: 'nav.generation', requiresInit: true },
+  { key: '/history', path: '/history', icon: HistoryOutlined, textKey: 'nav.history', requiresInit: true },
+  { key: '/config', path: '/config', icon: SettingOutlined, textKey: 'nav.config', requiresInit: false },
 ]);
 
-function handleMouseEnter(item: { showText: boolean }) {
-  item.showText = true;
-}
-
-function handleMouseLeave(item: { showText: boolean }) {
-  item.showText = false;
-}
 </script>
 
 <template>
@@ -32,12 +25,15 @@ function handleMouseLeave(item: { showText: boolean }) {
           <a-menu-item key="/github">
             <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
           </a-menu-item>
-          <a-menu-item v-for="item in menuItems" :key="item.key"
-            @mouseover="handleMouseEnter(item)" @mouseleave="handleMouseLeave(item)">
-            <RouterLink :to="item.path" :class="{ 'disabled-link': !context.initialized && item.requiresInit }">
-              <component :is="item.icon"></component>
-              <span :hidden="!item.showText">{{ $t(item.textKey) }}</span>
-            </RouterLink>
+          <a-menu-item v-for="item in menuItems" :key="item.key">
+            <a-tooltip placement="bottom">
+              <template #title>
+                <span>{{ $t(item.textKey) }}</span>
+              </template>
+              <RouterLink :to="item.path" :class="{ 'disabled-link': !context.initialized && item.requiresInit }">
+                <component :is="item.icon"></component>
+              </RouterLink>
+            </a-tooltip>
           </a-menu-item>
         </a-menu>
       </a-affix>
@@ -48,7 +44,6 @@ function handleMouseLeave(item: { showText: boolean }) {
 
 <style scoped>
 .disabled-link {
-  pointer-events: none;
   opacity: 0.5;
 }
 </style>
