@@ -18,15 +18,16 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Generation progress bar.
 1. Universal extension support
    - Raw text input for extension's script args.
-1. Savable run configuration
-3. Prompt textbox
+1. [*DONE*] Savable run configuration
+   - [*DONE*] Reset button on generation page to reset everything to default
+2. Prompt textbox
    - Auto complete (Self prompt use history and prompt use DB)
    - Templates (Default quality prompt, negative embeddings, etc)
    - Prompt token estimation (75/150/225)
    - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
      - Search bar on LoRA selection
-4. ControlNet support 
+3. ControlNet support 
    - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - [*DONE*] ControlNet layer will be used as ControlNet input
    - [*DONE*] Control type selection
@@ -34,14 +35,14 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Reference support
    - Support openpose editor
    - Preset
-5. Inpaint
+4. Inpaint
    - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
    - [*DONE*] Provide a progress on UI to show user the current state.
-6. [*DONE*] Connection management.
-7. History view
+5. [*DONE*] Connection management.
+6. History view
    - Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
-8. Support upscale script
+7. Support upscale script
    - Automatically trigger upscale script if the target width/height is too big (after scale ratio)
    - Support whole picture upscale. (Paste the result to a new file?)
    
