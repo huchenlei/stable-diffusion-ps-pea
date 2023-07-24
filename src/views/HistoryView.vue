@@ -16,7 +16,7 @@ const currentPageItems = computed(() => {
 </script>
 
 <template>
-  <a-space direction="vertical" style="width: 100%; margin-top: 10px;">
+  <a-space direction="vertical" style="width: 100%;">
     <div class="center-horizontal">
       <a-pagination v-model:current="currentPage" v-model:pageSize="pageSize" :total="totalHistoryItems" />
     </div>

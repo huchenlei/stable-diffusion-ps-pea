@@ -10,7 +10,7 @@ const route = useRoute();
   <!-- Extra layer of div to bypass grid constraint -->
   <div>
     <header>
-      <a-affix :offset-top="0">
+      <a-affix :offset-top="0" style="margin-bottom: 10px;">
         <a-menu class="navigation" mode="horizontal" :selectedKeys="[route.path]">
           <a-menu-item key="/github">
             <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
