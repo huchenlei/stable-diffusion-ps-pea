@@ -151,6 +151,7 @@ export default {
             });
         }
 
+        const preprocessorInProgress = ref<boolean>(false);
         /**
          * Run preprocessor on current selection area or current active layer.
          * This will generate a controlnet layer on Photopea canvas.
@@ -167,6 +168,7 @@ export default {
                 return hashHex;
             }
 
+            preprocessorInProgress.value = true;
             try {
                 const context = useA1111ContextStore().controlnetContext;
                 const timestamp = new Date().getTime().toString();
@@ -211,6 +213,8 @@ export default {
             } catch (e) {
                 console.error(e);
                 $notify(`ControlNet: ${e}`);
+            } finally {
+                preprocessorInProgress.value = false;
             }
         }
 
@@ -248,6 +252,7 @@ export default {
             removeUnit,
             toggleUnitEnabled,
             onModuleChange,
+            preprocessorInProgress,
             runPreprocessor,
             isReferenceModel,
             beforeUploadImage,
@@ -298,7 +303,8 @@ export default {
             </a-space>
 
             <a-space>
-                <a-button @click="runPreprocessor" size="small" :disabled="!previewRunnable">
+                <a-button @click="runPreprocessor" size="small" :disabled="!previewRunnable"
+                    :loading="preprocessorInProgress">
                     <CaretRightOutlined></CaretRightOutlined>
                 </a-button>
                 <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
