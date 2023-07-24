@@ -16,8 +16,8 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Ckpt selection
    - VAE selection.
    - [*DONE*] Generation progress bar.
-1. Universal extension support
-   - Raw text input for extension's script args.
+1. [*DONE*] Universal extension support
+   - [*DONE*] Raw text input for extension's script args.
 1. [*DONE*] Savable run configuration
    - [*DONE*] Reset button on generation page to reset everything to default
 2. Prompt textbox
@@ -27,7 +27,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
      - Search bar on LoRA selection
-3. ControlNet support 
+3. [*DONE*] ControlNet support 
    - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - [*DONE*] ControlNet layer will be used as ControlNet input
    - [*DONE*] Control type selection
@@ -35,7 +35,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
    - [*DONE*] Reference support
    - Support openpose editor
    - Preset
-4. Inpaint
+4. [*DONE*] Inpaint
    - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
    - [*DONE*] Provide a progress on UI to show user the current state.
@@ -52,6 +52,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 - [*DONE*] Update favicon
 - Update thumbnail (sd.png)
 - [*DONE*] Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
+- File based config. Add comments in default config file.
 
 # Development
 ## Setup HTTPS
