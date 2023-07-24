@@ -19,6 +19,7 @@ import _ from 'lodash';
 import { ReferenceRangeMode } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
 import { ReloadOutlined } from '@ant-design/icons-vue';
+import { useHistoryStore } from '@/stores/historyStore';
 
 const context = useA1111ContextStore().a1111Context;
 const appState = reactive(_.cloneDeep(useConfigStore().getCurrentConfig()));
@@ -172,6 +173,11 @@ async function startSelectRefArea() {
 }
 
 async function preparePayload() {
+  useHistoryStore().addHistoryItem({
+    timestamp: Date.now(),
+    appState: _.cloneDeep(appState)
+  });
+
   try {
     const [image, mask, maskBound] = await photopeaContext.executeTask(async () => {
       const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
