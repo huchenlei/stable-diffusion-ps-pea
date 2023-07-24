@@ -11,7 +11,7 @@
       </a-select>
       <a-button @click="downloadConfig"
         :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
-      <a-button @click="deleteSelectedConfig"
+      <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"
         :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
       <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
     </div>
@@ -37,6 +37,7 @@ const allConfigOptions = computed(() => Object.keys(store.configEntries).map(con
 }));
 const newEntryName = ref<string>("");
 const currentConfigContent = ref<IApplicationState | null>(null);
+const isLastConfig = computed(() => Object.keys(store.configEntries).length === 1);
 
 const createNewEntry = () => {
   if (newEntryName.value.trim() !== "") {
@@ -53,8 +54,9 @@ const updateEntry = (newValue: IApplicationState) => {
 
 const deleteSelectedConfig = () => {
   console.debug(`Delete config ${store.selectedConfigName}`);
-  
+
   store.deleteConfigEntry(store.selectedConfigName);
+  store.selectedConfigName = Object.keys(store.configEntries)[0];
 }
 
 const saveConfig = () => {
