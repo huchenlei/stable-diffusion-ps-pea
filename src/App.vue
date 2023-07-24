@@ -32,7 +32,7 @@ function handleMouseLeave(item: { showText: boolean }) {
           <a-menu-item key="/github">
             <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
           </a-menu-item>
-          <a-menu-item v-for="item in menuItems" :key="item.key"F
+          <a-menu-item v-for="item in menuItems" :key="item.key"
             @mouseover="handleMouseEnter(item)" @mouseleave="handleMouseLeave(item)">
             <RouterLink :to="item.path" :class="{ 'disabled-link': !context.initialized && item.requiresInit }">
               <component :is="item.icon"></component>
