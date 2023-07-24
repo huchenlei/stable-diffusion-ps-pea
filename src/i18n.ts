@@ -46,6 +46,8 @@ const messages = {
                 TokPayloadPreparedState: 'Preview payload before sending it',
                 TokFinishedState: 'Generate image based on current setting',
             },
+
+            resetToDefault: 'Reset to current config',
         },
         cnet: {
             guidanceRange: 'Guidance Range',
@@ -124,6 +126,8 @@ const messages = {
                 TokPayloadPreparedState: '在发送之前预览载荷',
                 TokFinishedState: '根据当前设置生成图像',
             },
+
+            resetToDefault: '重置参数到当前配置',
         },
         cnet: {
             guidanceRange: '引导范围',

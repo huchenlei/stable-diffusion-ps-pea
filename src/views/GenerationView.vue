@@ -18,9 +18,13 @@ import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
 import { ReferenceRangeMode } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
+import { ReloadOutlined } from '@ant-design/icons-vue';
 
 const context = useA1111ContextStore().a1111Context;
 const appState = reactive(_.cloneDeep(useConfigStore().getCurrentConfig()));
+function resetToDefault() {
+  Object.assign(appState, _.cloneDeep(useConfigStore().getCurrentConfig()));
+}
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
 // Whether the generation is in progress.
@@ -304,6 +308,13 @@ const stepProgress = computed(() => {
 </script>
 <template>
   <div>
+    <a-button shape="circle" class="floating-button" type="primary" @click="resetToDefault" size="large"
+      :title="$t('gen.resetToDefault')">
+      <template #icon>
+        <ReloadOutlined></ReloadOutlined>
+      </template>
+    </a-button>
+
     <GenerationProgress v-model:active="generationActive"></GenerationProgress>
 
     <a-space direction="vertical" class="root">
@@ -464,5 +475,13 @@ const stepProgress = computed(() => {
 
 .next-step-tag {
   border: none;
+}
+
+.floating-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  /* optional: to ensure button remains on top */
 }
 </style>
