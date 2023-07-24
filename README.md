@@ -56,7 +56,7 @@ Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
 - File based config. Add comments in default config file.
 - Correctly handle list diff when diff appState.
 - Add a way to trigger overlay of config directly from generation view.
-- Hide page name text on nav bar by default to save space (only show when hover on icon).
+- [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
 
 # Development
 ## Setup HTTPS

@@ -2,8 +2,25 @@
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { GithubOutlined, LoginOutlined, PlayCircleOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons-vue';
+import { reactive } from 'vue';
+
 const context = useA1111ContextStore().a1111Context;
 const route = useRoute();
+
+const menuItems = reactive([
+  { key: '/', path: '/', icon: LoginOutlined, textKey: 'nav.connection', showText: false, requiresInit: false },
+  { key: '/generation', path: '/generation', icon: PlayCircleOutlined, textKey: 'nav.generation', showText: false, requiresInit: true },
+  { key: '/history', path: '/history', icon: HistoryOutlined, textKey: 'nav.history', showText: false, requiresInit: true },
+  { key: '/config', path: '/config', icon: SettingOutlined, textKey: 'nav.config', showText: false, requiresInit: false },
+]);
+
+function handleMouseEnter(item: { showText: boolean }) {
+  item.showText = true;
+}
+
+function handleMouseLeave(item: { showText: boolean }) {
+  item.showText = false;
+}
 </script>
 
 <template>
@@ -15,28 +32,11 @@ const route = useRoute();
           <a-menu-item key="/github">
             <a href="https://github.com/huchenlei/stable-diffusion-ps-pea" target="_blank"><github-outlined /></a>
           </a-menu-item>
-          <a-menu-item key="/">
-            <RouterLink to="/">
-              <LoginOutlined></LoginOutlined>
-              {{ $t('nav.connection') }}
-            </RouterLink>
-          </a-menu-item>
-          <a-menu-item key="/generation" :disabled="!context.initialized">
-            <RouterLink to="/generation">
-              <PlayCircleOutlined></PlayCircleOutlined>
-              {{ $t('nav.generation') }}
-            </RouterLink>
-          </a-menu-item>
-          <a-menu-item key="/history" :disabled="!context.initialized">
-            <RouterLink to="/history">
-              <HistoryOutlined></HistoryOutlined>
-              {{ $t('nav.history') }}
-            </RouterLink>
-          </a-menu-item>
-          <a-menu-item key="/config">
-            <RouterLink to="/config">
-              <SettingOutlined></SettingOutlined>
-              {{ $t('nav.config') }}
+          <a-menu-item v-for="item in menuItems" :key="item.key"F
+            @mouseover="handleMouseEnter(item)" @mouseleave="handleMouseLeave(item)">
+            <RouterLink :to="item.path" :class="{ 'disabled-link': !context.initialized && item.requiresInit }">
+              <component :is="item.icon"></component>
+              <span :hidden="!item.showText">{{ $t(item.textKey) }}</span>
             </RouterLink>
           </a-menu-item>
         </a-menu>
@@ -47,7 +47,8 @@ const route = useRoute();
 </template>
 
 <style scoped>
-.class {
-  width: 100%;
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
 }
 </style>
