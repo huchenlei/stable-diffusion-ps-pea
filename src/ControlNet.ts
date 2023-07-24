@@ -221,6 +221,7 @@ export {
     type IControlNetUnit,
     type ModuleDetail,
     type ControlType,
+    type InputMode,
     ControlNetUnit,
     ControlMode,
     ControlNetContext,
