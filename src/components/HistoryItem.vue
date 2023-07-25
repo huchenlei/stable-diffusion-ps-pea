@@ -7,6 +7,7 @@ import { LeftSquareOutlined, SaveOutlined, CheckOutlined, CloseOutlined } from '
 import { useAppStateStore } from '@/stores/appStateStore';
 import { message } from 'ant-design-vue';
 import { stateDiffToAppState, appStateToStateDiff } from '@/Config';
+import router from '@/router';
 
 export default {
     name: 'HistoryItem',
@@ -41,6 +42,7 @@ export default {
         function sendAppState() {
             appStateStore.setAppState(props.appState);
             message.info('State restored from history');
+            router.push('/generation');
         }
 
         const configName = ref('');
