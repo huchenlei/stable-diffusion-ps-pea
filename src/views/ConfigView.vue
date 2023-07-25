@@ -9,8 +9,8 @@
       <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
     </div>
     <div style="display: flex">
-      <a-select :value="store.selectedConfigName" @update:value="store.updateCurrentConfig" :options="allConfigOptions"
-        show-search :filter-option="filterConfig" style="flex-grow: 1;">
+      <a-select :value="store.selectedConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
+        :filter-option="filterConfig" style="flex-grow: 1;">
       </a-select>
       <a-button @click="toggleViewDiff">{{ viewDiff ? 'D' : 'A' }}</a-button>
       <a-button @click="downloadConfig"
@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import { computed, ref, toRaw } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
-import JSON5 from 'json5';
 import Json5Editor from '@/components/Json5Editor.vue';
 import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons-vue';
 import { type IApplicationState } from '@/Core';
@@ -89,10 +88,11 @@ const saveConfig = () => {
 }
 
 const downloadConfig = () => {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON5.stringify(store.getCurrentConfig()));
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
+    JSON.stringify(toRaw(store.getCurrentConfig())));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", store.selectedConfigName + ".json5");
+  downloadAnchorNode.setAttribute("download", store.selectedConfigName + ".json");
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
@@ -111,5 +111,12 @@ const toggleViewDiff = () => {
     currentStateDiffContent.value = appStateToStateDiff(toRaw(currentConfigContent.value));
   }
   viewDiff.value = !viewDiff.value;
+};
+
+const onSelectConfig = (configName: string) => {
+  store.updateCurrentConfig(configName);
+
+  currentConfigContent.value = stateDiffToAppState(store.getCurrentConfig());
+  currentStateDiffContent.value = store.getCurrentConfig();
 };
 </script>
