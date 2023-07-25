@@ -190,6 +190,7 @@ function getSelectionBound() {
     // to see if the selection is actually there.
     const bounds = app.activeDocument.selection.bounds;
     if (!hasSelection()) {
+        alert("No selection!");
         app.echoToOE("");
     } else {
         app.echoToOE(boundsToString(bounds));
