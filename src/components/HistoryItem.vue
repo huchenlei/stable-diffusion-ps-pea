@@ -100,7 +100,7 @@ export default {
         <a-space style="flex-wrap: wrap;">
             <a-tag v-for="diffEntry in stateDiff" closable @close="revertStateChange(diffEntry)">
                 <span class="path">{{ (diffEntry.path || []).join('.') }}</span>:
-                <span v-if="diffEntry.kind === 'E'">{{ diffEntry.rhs }}</span>
+                <span v-if="diffEntry.kind === 'E'" class="item">{{ diffEntry.rhs }}</span>
                 <span v-if="diffEntry.kind === 'A'" class="item">{{ diffEntry.item }}</span>
             </a-tag>
         </a-space>
