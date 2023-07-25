@@ -53,6 +53,7 @@ export default {
             } else {
                 configStore.createConfigEntry({ [configName.value]: stateDiff.value });
                 message.info('State saved');
+                router.push('/config');
             }
             configName.value = '';
         }
