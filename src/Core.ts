@@ -52,7 +52,7 @@ class ApplicationState implements IApplicationState {
     imageScale: number = 1.0;
     referenceRange: [number, number] = [64, 10];
     referenceRangeMode: ReferenceRangeMode = ReferenceRangeMode.kPixel;
-    controlnetUnits: IControlNetUnit[] = [new ControlNetUnit()];
+    controlnetUnits: IControlNetUnit[] = [];
 };
 
 export {
