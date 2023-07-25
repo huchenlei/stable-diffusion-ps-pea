@@ -1,8 +1,7 @@
 <script lang="ts">
-import { revertChange, type Diff } from 'deep-diff';
-import { ApplicationState, type IApplicationState } from '@/Core';
+import { ApplicationState } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
-import { computed, ref, toRaw } from 'vue';
+import { computed, ref } from 'vue';
 import { LeftSquareOutlined, SaveOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { useAppStateStore } from '@/stores/appStateStore';
 import { message } from 'ant-design-vue';
@@ -33,11 +32,6 @@ export default {
             return appStateToStateDiff(props.appState, defaultState);
         });
 
-        // Reset the given path to default value
-        function revertStateChange(change: Diff<any>) {
-            revertChange(props.appState, undefined, change);
-        }
-
         const appStateStore = useAppStateStore();
         function sendAppState() {
             appStateStore.setAppState(props.appState);
@@ -61,7 +55,6 @@ export default {
         return {
             stateDiff,
             configName,
-            revertStateChange,
             sendAppState,
             saveAppStateAsConfig,
         };
@@ -98,7 +91,7 @@ export default {
             </div>
         </template>
         <a-space style="flex-wrap: wrap;">
-            <a-tag v-for="diffEntry in stateDiff" closable @close="revertStateChange(diffEntry)">
+            <a-tag v-for="diffEntry in stateDiff">
                 <span class="path">{{ (diffEntry.path || []).join('.') }}</span>:
                 <span v-if="diffEntry.kind === 'E'" class="item">{{ diffEntry.rhs }}</span>
                 <span v-if="diffEntry.kind === 'A'" class="item">{{ diffEntry.item }}</span>
