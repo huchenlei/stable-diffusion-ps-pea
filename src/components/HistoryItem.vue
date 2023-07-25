@@ -70,7 +70,7 @@ export default {
             if (!configName.value) {
                 message.warn('Config name cannot be empty');
             } else {
-                configStore.createConfigEntry({ [configName.value]: props.appState });
+                // configStore.createConfigEntry({ [configName.value]: props.appState });
                 message.info('State saved');
             }
             configName.value = '';

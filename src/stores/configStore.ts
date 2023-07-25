@@ -1,25 +1,30 @@
 import { defineStore } from 'pinia';
 import JSON5 from 'json5';
-import { type IApplicationState, ApplicationState } from '@/Core';
+import type { StateDiff } from '@/Config';
 
-const DEFAULT_CONFIG = new ApplicationState();
 // Fetch configs from local storage.
-function fetchConfigs() {
+function fetchConfigs(): Record<string, StateDiff> {
     const localConfigString = localStorage.getItem('configEntries');
     if (!localConfigString || localConfigString === '{}') {
-        return { default: DEFAULT_CONFIG };
+        return { default: [] };
     } else {
         return JSON5.parse(localConfigString);
     }
 }
 
+// There are 3 levels of configs:
+// - Default: The base config. All other configs are references of the base config.
+// - Base: The alwayson config in generation.
+// - Addon: The optional come-and-go config that can be easily modified from run
+// to run.
+// Base and addon config should all be delta with reference to Default config.
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
         configEntries: fetchConfigs(),
         selectedConfigName: localStorage.getItem('selectedConfig') || 'default'
     }),
     actions: {
-        createConfigEntry(entry: Record<string, IApplicationState>) {
+        createConfigEntry(entry: Record<string, StateDiff>) {
             this.configEntries = { ...this.configEntries, ...entry };
             this.persistConfigEntries();
         },
@@ -31,11 +36,7 @@ export const useConfigStore = defineStore('configStore', {
             this.configEntries = remainingEntries;
             this.persistConfigEntries();
         },
-        setDefaultConfig() {
-            this.configEntries = { default: DEFAULT_CONFIG };
-            this.persistConfigEntries();
-        },
-        getCurrentConfig(): IApplicationState {
+        getCurrentConfig(): StateDiff {
             return this.configEntries[this.selectedConfigName];
         },
         updateCurrentConfig(configName: string) {
