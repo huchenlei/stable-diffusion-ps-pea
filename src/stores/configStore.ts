@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import JSON5 from 'json5';
 import type { StateDiff } from '@/Config';
+import { toRaw } from 'vue';
 
 // Fetch configs from local storage.
 function fetchConfigs(): Record<string, StateDiff> {
@@ -29,7 +30,7 @@ export const useConfigStore = defineStore('configStore', {
             this.persistConfigEntries();
         },
         persistConfigEntries() {
-            localStorage.setItem('configEntries', JSON5.stringify(this.configEntries));
+            localStorage.setItem('configEntries', JSON5.stringify(toRaw(this.configEntries)));
         },
         deleteConfigEntry(entryName: string) {
             const { [entryName]: _, ...remainingEntries } = this.configEntries;

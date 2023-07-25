@@ -1,11 +1,12 @@
 <script lang="ts">
-import { diff, type Diff } from 'deep-diff';
+import { revertChange, type Diff } from 'deep-diff';
 import { ApplicationState, type IApplicationState } from '@/Core';
 import { useConfigStore } from '@/stores/configStore';
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import { LeftSquareOutlined, SaveOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { useAppStateStore } from '@/stores/appStateStore';
 import { message } from 'ant-design-vue';
+import { stateDiffToAppState, appStateToStateDiff } from '@/Config';
 
 export default {
     name: 'HistoryItem',
@@ -26,36 +27,14 @@ export default {
         CloseOutlined,
     },
     setup(props) {
-        function formatDiff(diffEntries: Diff<IApplicationState, IApplicationState>[]) {
-            return Object.fromEntries(diffEntries.map(diffEntry => {
-                const path = diffEntry.path!.join('.');
-                if (diffEntry.kind !== 'E') {
-                    console.error(`Unexpected diff kind: ${JSON.stringify(diffEntry)}`);
-                    return [path, { value: 'Error', default: 'Error' }];
-                }
-                return [path, {
-                    value: diffEntry.rhs,
-                    default: diffEntry.lhs,
-                }];
-            }));
-        }
-
         const stateDiff = computed(() => {
-            const defaultState = useConfigStore().getCurrentConfig();
-            return formatDiff(diff(defaultState, props.appState) || []);
+            const defaultState = stateDiffToAppState(useConfigStore().getCurrentConfig());
+            return appStateToStateDiff(props.appState, defaultState);
         });
 
         // Reset the given path to default value
-        function removeDiff(path: string, defaultValue: any) {
-            function setValue(obj: any, pathString: string, value: any) {
-                let i;
-                const path = pathString.split('.');
-                for (i = 0; i < path.length - 1; i++)
-                    obj = obj[path[i]];
-
-                obj[path[i]] = value;
-            }
-            setValue(props.appState, path, defaultValue);
+        function revertStateChange(change: Diff<any>) {
+            revertChange(props.appState, undefined, change);
         }
 
         const appStateStore = useAppStateStore();
@@ -70,7 +49,7 @@ export default {
             if (!configName.value) {
                 message.warn('Config name cannot be empty');
             } else {
-                // configStore.createConfigEntry({ [configName.value]: props.appState });
+                configStore.createConfigEntry({ [configName.value]: stateDiff.value });
                 message.info('State saved');
             }
             configName.value = '';
@@ -79,7 +58,7 @@ export default {
         return {
             stateDiff,
             configName,
-            removeDiff,
+            revertStateChange,
             sendAppState,
             saveAppStateAsConfig,
         };
@@ -92,7 +71,6 @@ export default {
         <template #header>
             <div style="display: flex; justify-content: space-between; width: 100%;">
                 <div>
-                    {{ stateDiff['commonPayload.prompt']?.value || '' }}
                     <a-tag>{{ `${new Date($props.timestamp).toLocaleString()}` }}</a-tag>
                 </div>
                 <div>
@@ -117,10 +95,9 @@ export default {
             </div>
         </template>
         <a-space style="flex-wrap: wrap;">
-            <a-tag v-for="[path, entry] in Object.entries(stateDiff)" closable
-                @close="removeDiff(path, (entry as any).default)">
-                <span class="path">{{ path }}</span>:
-                <span class="value">{{ (entry as any).value }}</span>
+            <a-tag v-for="diffEntry in stateDiff" closable @close="revertStateChange(diffEntry)">
+                <span class="path">{{ (diffEntry.path || []).join('.') }}</span>:
+                <span v-if="diffEntry.kind === 'E'">{{ diffEntry.rhs }}</span>
             </a-tag>
         </a-space>
     </a-collapse-panel>
