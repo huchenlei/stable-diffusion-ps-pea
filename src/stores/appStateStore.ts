@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
-import { useConfigStore } from './configStore';
 import _ from 'lodash';
 import type { IApplicationState } from '@/Core';
+import { stateDiffToAppState } from '@/Config';
+import { useConfigStore } from './configStore';
 
 function getCopyOfDefaultState() {
-    return _.cloneDeep(useConfigStore().getCurrentConfig());
+    return stateDiffToAppState(useConfigStore().getCurrentConfig());
 }
 
 export const useAppStateStore = defineStore('appState', {
