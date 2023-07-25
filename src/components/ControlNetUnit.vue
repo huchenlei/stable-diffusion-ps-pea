@@ -71,8 +71,16 @@ export default {
             });
         }
         nextTick(() => {
+            // Restore existing module/model if they are already set before
+            // control type selection.
+            const module = props.unit.module;
+            const model = props.unit.model;
+
             controlType.value = 'All';
             onControlTypeChange(controlType.value);
+
+            if (model) props.unit.model = model;
+            if (module) props.unit.module = module;
         });
 
         const moduleDetail = ref({
