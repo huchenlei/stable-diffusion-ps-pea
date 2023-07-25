@@ -22,7 +22,9 @@ function appStateToStateDiff(
     appState: IApplicationState,
     baseState: IApplicationState = DEFAULT_CONFIG
 ): StateDiff {
-    return diff(baseState, appState) || [];
+    // Remove undefined from conversion.
+    return (diff(baseState, appState) || [])
+        .filter(diffEntry => !(diffEntry.kind === 'D' && diffEntry.lhs === undefined));
 }
 
 export {
