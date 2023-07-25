@@ -100,6 +100,7 @@ export default {
             <a-tag v-for="diffEntry in stateDiff" closable @close="revertStateChange(diffEntry)">
                 <span class="path">{{ (diffEntry.path || []).join('.') }}</span>:
                 <span v-if="diffEntry.kind === 'E'">{{ diffEntry.rhs }}</span>
+                <span v-if="diffEntry.kind === 'A'" class="item">{{ diffEntry.item }}</span>
             </a-tag>
         </a-space>
     </a-collapse-panel>
@@ -108,5 +109,10 @@ export default {
 <style scoped>
 .path {
     font-weight: bold;
+}
+
+.item {
+    text-wrap: wrap;
+    word-break: break-all;
 }
 </style>
