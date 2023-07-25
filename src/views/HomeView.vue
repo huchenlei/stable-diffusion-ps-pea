@@ -86,7 +86,7 @@ function removeConnection(conn: ConnectionItem) {
             </a-list-item-meta>
 
             <template #actions>
-              <a-button v-if="isCurrentConn(conn)" type="primary">{{ $t('connected') }}</a-button>
+              <a-button v-if="isCurrentConn(conn)" type="primary">{{ $t('con.connected') }}</a-button>
               <a-button v-else @click="initializeContext(conn.url)">{{ $t('con.connect') }}</a-button>
               <div @click="removeConnection(conn)">
                 <DeleteOutlined></DeleteOutlined>

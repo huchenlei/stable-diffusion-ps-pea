@@ -12,7 +12,7 @@
       <a-select :value="store.selectedConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
         :filter-option="filterConfig" style="flex-grow: 1;">
       </a-select>
-      <a-button @click="toggleViewDiff">{{ viewDiff ? 'D' : 'A' }}</a-button>
+      <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
       <a-button @click="downloadConfig"
         :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
       <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"

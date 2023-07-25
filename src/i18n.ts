@@ -80,6 +80,7 @@ const messages = {
             deleteConfig: 'Delete the selected config',
             saveConfig: 'Save config',
             defaults: 'Defaults',
+            toggleViewDiff: 'Toggle Diff/All',
         },
     },
     zh: {
