@@ -65,6 +65,7 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
 - Add a way to trigger overlay of config directly from generation view.
 - [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
 - Provide an exit button to reset generation state to kInitial.
+- Improve mask capturing for very large images. Currently the crop is done by exporting the whole image out, and then do the crop in fabric.js. This can be very inefficient if the canvas is large.
 
 # Development
 ## Setup HTTPS
