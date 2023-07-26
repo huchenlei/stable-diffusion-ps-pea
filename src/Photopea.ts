@@ -124,11 +124,14 @@ class PhotopeaContext {
         if (window === window.top) {
             throw Error("Not running in Photopea environment!");
         }
-
+        
         return new Promise((resolve, reject) => {
             const responseDataPieces: any[] = [];
             let hasError = false;
-            function photopeaMessageHandle(event: MessageEvent) {
+            const photopeaMessageHandle = (event: MessageEvent) => {
+                if (event.source !== this.photopeaWindow) {
+                    return;
+                }
                 if (event.data === MESSAGE_END_ACK) {
                     window.removeEventListener("message", photopeaMessageHandle);
                     if (hasError) {
