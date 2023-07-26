@@ -157,7 +157,10 @@ const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
  * where the current selection(mask) is persisted, and user need to do another 
  * selection on canvas to continue.
  */
+const startSelectRefAreaInProgress = ref<boolean>(false);
 async function startSelectRefArea() {
+  if (startSelectRefAreaInProgress.value) return;
+  startSelectRefAreaInProgress.value = true;
   try {
     await photopeaContext.executeTask(async () => {
       inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
@@ -170,10 +173,16 @@ async function startSelectRefArea() {
     console.error(e);
     $notify(`${e}`);
     return false;
+  } finally {
+    startSelectRefAreaInProgress.value = false;
   }
 }
 
+const preparePayloadInProgress = ref<boolean>(false);
 async function preparePayload() {
+  if (preparePayloadInProgress.value) return;
+  preparePayloadInProgress.value = true;
+
   if (generationState.value < GenerationState.kPayloadPreparedState) {
     useHistoryStore().addHistoryItem({
       timestamp: Date.now(),
@@ -231,6 +240,8 @@ async function preparePayload() {
     console.error(e);
     $notify(`${e}`);
     return false;
+  } finally {
+    preparePayloadInProgress.value = false;
   }
 }
 
@@ -354,16 +365,24 @@ const stepProgress = computed(() => {
             </a-tag>
           </a-space>
           <a-row>
-            <a-button class="ref-area-button"
-              :disabled="generationState >= GenerationState.kSelectRefAreaState || appState.generationMode === GenerationMode.Txt2Img"
-              @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
-              @mouseout="removeGenerationStepHighlight">{{
-                $t('gen.selectRefArea') }}</a-button>
-            <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
-              @click="preparePayload" @mouseover="highlightGenerationStep(GenerationState.kPayloadPreparedState)"
-              @mouseout="removeGenerationStepHighlight">{{
-                $t('gen.prepare')
-              }}</a-button>
+            <a-col :span="12">
+              <a-spin :spinning="startSelectRefAreaInProgress">
+                <a-button class="ref-area-button"
+                  :disabled="generationState >= GenerationState.kSelectRefAreaState || appState.generationMode === GenerationMode.Txt2Img"
+                  @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
+                  @mouseout="removeGenerationStepHighlight">{{
+                    $t('gen.selectRefArea') }}</a-button>
+              </a-spin>
+            </a-col>
+            <a-col :span="12">
+              <a-spin :spinning="preparePayloadInProgress">
+                <a-button class="prepare-button" :disabled="generationState >= GenerationState.kPayloadPreparedState"
+                  @click="preparePayload" @mouseover="highlightGenerationStep(GenerationState.kPayloadPreparedState)"
+                  @mouseout="removeGenerationStepHighlight">{{
+                    $t('gen.prepare')
+                  }}</a-button>
+              </a-spin>
+            </a-col>
           </a-row>
           <a-button class="generate" type="primary" @click="generate"
             :disabled="generationState >= GenerationState.kFinishedState"
@@ -461,7 +480,7 @@ const stepProgress = computed(() => {
 
 .prepare-button,
 .ref-area-button {
-  width: 50%;
+  width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
 }
