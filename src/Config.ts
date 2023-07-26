@@ -29,6 +29,7 @@ function appStateToStateDiff(
 
 export {
     type StateDiff,
+    DEFAULT_CONFIG,
     applyStateDiff,
     stateDiffToAppState,
     appStateToStateDiff,

@@ -21,6 +21,7 @@ import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
+import { DEFAULT_CONFIG } from '@/Config';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -269,6 +270,8 @@ async function sendPayload() {
       if (!modelNoPreview(unit.model)) // Only clear image when model has preview.
         unit.image = undefined;
     }
+    appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
+    appState.commonPayload.width = DEFAULT_CONFIG.commonPayload.width;
 
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
