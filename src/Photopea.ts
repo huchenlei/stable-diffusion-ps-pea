@@ -124,7 +124,7 @@ class PhotopeaContext {
         if (window === window.top) {
             throw Error("Not running in Photopea environment!");
         }
-        
+
         return new Promise((resolve, reject) => {
             const responseDataPieces: any[] = [];
             let hasError = false;
@@ -132,6 +132,12 @@ class PhotopeaContext {
                 if (event.source !== this.photopeaWindow) {
                     return;
                 }
+                // Filter out the ping messages
+                if (typeof event.data === 'string' && event.data.includes('MSFAPI#')) {
+                    console.debug('sdp: Ignored ping message');
+                    return;
+                }
+                console.debug(`sdp: Receive frame message ${event.data}`);
                 if (event.data === MESSAGE_END_ACK) {
                     window.removeEventListener("message", photopeaMessageHandle);
                     if (hasError) {
