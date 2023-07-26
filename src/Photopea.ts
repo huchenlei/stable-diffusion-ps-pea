@@ -137,6 +137,11 @@ class PhotopeaContext {
                     console.debug('sdp: Ignored ping message');
                     return;
                 }
+                // Ignore "done" when no data has been received. The "done" can come from
+                // MSFAPI ping.
+                if (event.data === MESSAGE_END_ACK && responseDataPieces.length === 0) {
+                    return;
+                }
                 console.debug(`sdp: Receive frame message ${event.data}`);
                 if (event.data === MESSAGE_END_ACK) {
                     window.removeEventListener("message", photopeaMessageHandle);
