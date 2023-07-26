@@ -64,6 +64,7 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
 - Correctly handle list diff when diff appState.
 - Add a way to trigger overlay of config directly from generation view.
 - [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
+- Provide an exit button to reset generation state to kInitial.
 
 # Development
 ## Setup HTTPS
