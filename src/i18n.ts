@@ -80,6 +80,8 @@ const messages = {
             deleteConfig: 'Delete the selected config',
             saveConfig: 'Save config',
             defaults: 'Defaults',
+            toolbox: 'Toolbox',
+            selectConfig: 'Select configs',
             toggleViewDiff: 'Toggle Diff/All',
         },
     },

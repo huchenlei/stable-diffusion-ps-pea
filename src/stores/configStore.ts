@@ -22,7 +22,8 @@ function fetchConfigs(): Record<string, StateDiff> {
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
         configEntries: fetchConfigs(),
-        selectedConfigName: localStorage.getItem('selectedConfig') || 'default'
+        baseConfigName: localStorage.getItem('baseConfig') || 'default',
+        toolboxConfigNames: (JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]')) as string[],
     }),
     actions: {
         createConfigEntry(entry: Record<string, StateDiff>) {
@@ -38,11 +39,22 @@ export const useConfigStore = defineStore('configStore', {
             this.persistConfigEntries();
         },
         getCurrentConfig(): StateDiff {
-            return this.configEntries[this.selectedConfigName];
+            return this.configEntries[this.baseConfigName];
         },
         updateCurrentConfig(configName: string) {
-            this.selectedConfigName = configName;
-            localStorage.setItem('selectedConfig', configName);
+            this.baseConfigName = configName;
+            localStorage.setItem('baseConfig', configName);
+        },
+        addToToolbox(configName: string) {
+            this.toolboxConfigNames.push(configName);
+            this.persistToolbox();
+        },
+        removeFromToolbox(configName: string) {
+            this.toolboxConfigNames = this.toolboxConfigNames.filter(name => name !== configName);
+            this.persistToolbox();
+        },
+        persistToolbox() {
+            localStorage.setItem('toolboxConfigs', JSON5.stringify(toRaw(this.toolboxConfigNames)));
         },
     },
 });

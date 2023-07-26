@@ -1,5 +1,12 @@
 <template>
-  <a-divider orientation="left" orientation-margin="0px">
+  <a-divider orientation="left" orientation-margin="0px" size="small">
+    {{ $t('config.toolbox') }}
+  </a-divider>
+  <a-select v-model:value="store.toolboxConfigNames" mode="multiple" style="width: 100%"
+    :placeholder="$t('config.selectConfig') + '...'" :options="allConfigOptions">
+  </a-select>
+
+  <a-divider orientation="left" orientation-margin="0px" size="small">
     {{ $t('config.defaults') }}
   </a-divider>
   <a-space direction="vertical" style="width: 100%">
@@ -9,7 +16,7 @@
       <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
     </div>
     <div style="display: flex">
-      <a-select :value="store.selectedConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
+      <a-select :value="store.baseConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
         :filter-option="filterConfig" style="flex-grow: 1;">
       </a-select>
       <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
@@ -53,7 +60,7 @@ const createNewEntry = () => {
   if (newEntryName.value.trim() !== "") {
     console.debug(`Create new config: ${newEntryName.value}`);
     store.createConfigEntry({ [newEntryName.value]: [] });
-    store.selectedConfigName = newEntryName.value;
+    store.baseConfigName = newEntryName.value;
     newEntryName.value = "";
   }
 }
@@ -67,10 +74,10 @@ const updateEntry = (newValue: IApplicationState | StateDiff) => {
 }
 
 const deleteSelectedConfig = () => {
-  console.debug(`Delete config ${store.selectedConfigName}`);
+  console.debug(`Delete config ${store.baseConfigName}`);
 
-  store.deleteConfigEntry(store.selectedConfigName);
-  store.selectedConfigName = Object.keys(store.configEntries)[0];
+  store.deleteConfigEntry(store.baseConfigName);
+  store.baseConfigName = Object.keys(store.configEntries)[0];
 }
 
 const saveConfig = () => {
@@ -81,8 +88,8 @@ const saveConfig = () => {
       currentStateDiffContent.value :
       appStateToStateDiff(currentConfigContent.value);
 
-    store.createConfigEntry({ [store.selectedConfigName]: stateDiff });
-    message.info(`Save config ${store.selectedConfigName}`);    
+    store.createConfigEntry({ [store.baseConfigName]: stateDiff });
+    message.info(`Save config ${store.baseConfigName}`);
   }
   console.debug(`No editor content for saving.`);
 }
@@ -92,7 +99,7 @@ const downloadConfig = () => {
     JSON.stringify(toRaw(store.getCurrentConfig())));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", store.selectedConfigName + ".json");
+  downloadAnchorNode.setAttribute("download", store.baseConfigName + ".json");
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
