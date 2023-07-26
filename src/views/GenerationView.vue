@@ -20,6 +20,7 @@ import { ReferenceRangeMode } from '@/Core';
 import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
+import { cloneNoBlob } from '@/Utils';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -175,7 +176,7 @@ async function preparePayload() {
   if (generationState.value < GenerationState.kPayloadPreparedState) {
     useHistoryStore().addHistoryItem({
       timestamp: Date.now(),
-      appState: _.cloneDeep(appState)
+      appState: cloneNoBlob(appState),
     });
   }
 
