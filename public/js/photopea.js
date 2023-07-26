@@ -320,13 +320,14 @@ function fillSelectionWithBlackInNewLayer(layerName) {
         app.echoToOE('');
         return;
     }
+    // Save the current active layer
+    var originalActiveLayer = app.activeDocument.activeLayer;
+    // Save the current foreground color
+    var originalForegroundColor = app.foregroundColor;
 
     // Create a temp layer.
     const newLayer = app.activeDocument.artLayers.add();
     newLayer.name = layerName;
-
-    // Save the current foreground color
-    var originalForegroundColor = app.foregroundColor;
 
     // Change the foreground color to black
     app.foregroundColor.rgb.red = 0;
