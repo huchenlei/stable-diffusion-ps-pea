@@ -2,8 +2,15 @@
 Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
 
 ## Setup
-Add `--cors-allow-origins https://localhost:5173` to WebUI command line args for local development.
-Add `--cors-allow-origins https://huchenlei.github.io/` for production useage.
+Set following command line arguments in `webui-user.bat`:
+```bat
+set COMMANDLINE_ARGS=--api --cors-allow-origins https://huchenlei.github.io [Rest of ARGS...]
+```
+
+For V1111 users, set following arguments:
+```bat
+set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...]
+```
 
 ## Development plan
 
@@ -68,6 +75,9 @@ Linux/Mac bash
 
 Windows bash
 `openssl req -x509 -nodes -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -subj "//CN=localhost"`
+
+## Setup A1111
+Add `--cors-allow-origins https://localhost:5173` to WebUI command line args for local development.
 
 ## Add dev plugin to photopea plugin store
 I do not make my dev plugin setup public as it might confuse user which plugin to install. So if you are planning to do development of
