@@ -151,6 +151,7 @@ class PhotopeaContext {
                         resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
                     }
                 } else if (event.data === '') {
+                    responseDataPieces.push('error');
                     hasError = true;
                 } else {
                     responseDataPieces.push(event.data);
