@@ -1,16 +1,21 @@
 # stable-diffusion-ps-pea
 Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
 
-## Setup
+## Installation
 Set following command line arguments in `webui-user.bat`:
 ```bat
 set COMMANDLINE_ARGS=--api --cors-allow-origins https://huchenlei.github.io [Rest of ARGS...]
 ```
 
-For V1111 users, set following arguments:
+For SDNext(V1111) users, set following arguments:
 ```bat
 set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...]
 ```
+
+**Step1: Click Window>Plugin**
+![Step1](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/a91df408-76c6-4300-8987-41f7971379a5)
+**Step2: Search for stable-diffusion-ps-pea**
+![install](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/fcfa83c2-652c-4285-a1ef-2975e7ef50ea)
 
 ## Development plan
 
