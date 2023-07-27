@@ -1,4 +1,4 @@
-import { applyChange, diff, type Diff } from "deep-diff";
+import { applyChange, diff, revertChange, type Diff } from "deep-diff";
 import { ApplicationState, type IApplicationState } from "./Core";
 import _ from "lodash";
 
@@ -9,6 +9,12 @@ const DEFAULT_CONFIG = new ApplicationState();
 function applyStateDiff(appState: ApplicationState, stateDiff: StateDiff): void {
     stateDiff.forEach(diffEntry => {
         applyChange(appState, undefined, diffEntry);
+    });
+}
+
+function revertStateDiff(appState: ApplicationState, stateDiff: StateDiff): void {
+    stateDiff.forEach(diffEntry => {
+        revertChange(appState, undefined, diffEntry);
     });
 }
 
@@ -31,6 +37,7 @@ export {
     type StateDiff,
     DEFAULT_CONFIG,
     applyStateDiff,
+    revertStateDiff,
     stateDiffToAppState,
     appStateToStateDiff,
 }

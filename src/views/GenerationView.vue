@@ -21,11 +21,13 @@ import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
-import { DEFAULT_CONFIG } from '@/Config';
+import { DEFAULT_CONFIG, applyStateDiff, revertStateDiff } from '@/Config';
+import { useConfigStore } from '@/stores/configStore';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
 const appState = appStateStore.appState;
+const configStore = useConfigStore();
 
 appState.commonPayload.sampler_name = context.samplers[0].name;
 
@@ -304,6 +306,15 @@ async function generate() {
   removeGenerationStepHighlight();
 }
 
+// Run generation with specified config.
+async function generateWithConfig(configName: string) {
+  const stateDiff = configStore.configEntries[configName];
+  const originalState = _.cloneDeep(appState);
+  applyStateDiff(appState, stateDiff);
+  await generate();
+  Object.assign(appState, originalState);
+}
+
 function onResultImagePicked() {
   resultImageBound.value = undefined;
   resultImages.length = 0;
@@ -388,6 +399,12 @@ const stepProgress = computed(() => {
             :disabled="generationState >= GenerationState.kFinishedState"
             @mouseover="highlightGenerationStep(GenerationState.kFinishedState)"
             @mouseout="removeGenerationStepHighlight">{{ $t('generate') }}</a-button>
+
+          <a-space size="small" style="flex-wrap: wrap; margin-top: 5px;">
+            <a-button v-for="configName in configStore.toolboxConfigNames" @click="generateWithConfig(configName)"
+              type="dashed" :disabled="generationState >= GenerationState.kPayloadPreparedState">{{ configName
+              }}</a-button>
+          </a-space>
         </a-form-item>
         <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound"
           @result-finalized="onResultImagePicked">
