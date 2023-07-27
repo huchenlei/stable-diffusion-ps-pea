@@ -21,15 +21,13 @@ import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
-import { DEFAULT_CONFIG, applyStateDiff, revertStateDiff } from '@/Config';
+import { DEFAULT_CONFIG, applyStateDiff } from '@/Config';
 import { useConfigStore } from '@/stores/configStore';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
 const appState = appStateStore.appState;
 const configStore = useConfigStore();
-
-appState.commonPayload.sampler_name = context.samplers[0].name;
 
 // Whether the generation is in progress.
 const generationActive = ref(false);
