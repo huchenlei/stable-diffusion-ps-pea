@@ -502,6 +502,7 @@ class Img2ImgPayload implements IImg2ImgPayload {
     inpainting_mask_invert: MaskMode = MaskMode.InpaintMasked;
     mask_blur_x: number = 4;
     mask_blur_y: number = 4;
+    mask_blur: number = 4;
     resize_mode: ResizeMode = ResizeMode.Resize;
 };
 

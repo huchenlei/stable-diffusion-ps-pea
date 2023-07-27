@@ -28,6 +28,7 @@ export default {
             updateMaskBlur(value: number) {
                 props.payload.mask_blur_x = value;
                 props.payload.mask_blur_y = value;
+                props.payload.mask_blur = value;
             }
         };
     },

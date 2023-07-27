@@ -1,0 +1,175 @@
+{
+    "default": [
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "prompt",
+            ],
+            "lhs": "",
+            "rhs": "(masterpiece: 1.3), (highres: 1.3), best quality",
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "negative_prompt",
+            ],
+            "lhs": "",
+            "rhs": "(worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, backlight,(ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.331), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (more than 2 nipples:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), bad hands, missing fingers, extra digit, (futa:1.1), bad body, pubic hair, glans, easynegative,more than 2 tits, ng_deepnegative_v1_75t,(big fee:1),more than 2 feet,incorrect feet",
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "sampler_name",
+            ],
+            "lhs": "Euler a",
+            "rhs": "DPM++ 2M",
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "steps",
+            ],
+            "lhs": 20,
+            "rhs": 30,
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "batch_size",
+            ],
+            "lhs": 1,
+            "rhs": 4,
+        }
+    ],
+    "LamaGenFill": [
+        {
+            "kind": "E",
+            "path": [
+                "img2imgPayload",
+                "denoising_strength"
+            ],
+            "lhs": 0.75,
+            "rhs": 1
+        },
+        {
+            "kind": "E",
+            "path": [
+                "img2imgPayload",
+                "inpainting_fill"
+            ],
+            "lhs": 1,
+            "rhs": 3, // Inpaint fill is latent nothing.
+        },
+        {
+            "kind": "E",
+            "path": [
+                "img2imgPayload",
+                "inpaint_full_res"
+            ],
+            "lhs": 0,
+            "rhs": 0, // Make sure inpaint reference range is whole image.
+        },
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 2,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11p_sd15_inpaint [ebff9138]",
+                    "module": "inpaint_only+lama",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 64,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    ],
+    "InpaintOnly": [
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 0,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11p_sd15_inpaint [ebff9138]",
+                    "module": "inpaint_only",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 64,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    ],
+    "TileUpscale2x": [
+        {
+            "kind": "E",
+            "path": ["imageScale"],
+            "lhs": 1,
+            "rhs": 2,
+        },
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 0,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11f1e_sd15_tile [a371b31b]",
+                    "module": "tile_resample",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 1,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    ],
+}
