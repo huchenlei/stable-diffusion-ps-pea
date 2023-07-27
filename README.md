@@ -41,7 +41,7 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
    - [*DONE*] Inpaint support
    - [*DONE*] Reference support
    - Support openpose editor
-   - Preset
+   - [*DONE*] Preset
 4. [*DONE*] Inpaint
    - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
    - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
@@ -58,11 +58,11 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
 - [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
 - [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
 - [*DONE*] Update favicon
-- Update thumbnail (sd.png)
+- [*DONE*] Update thumbnail (sd.png)
 - [*DONE*] Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
 - [*OBSOLETE*] File based config. Add comments in default config file.
-- Correctly handle list diff when diff appState.
-- Add a way to trigger overlay of config directly from generation view.
+- [*DONE*] Correctly handle list diff when diff appState.
+- [*DONE*] Add a way to trigger overlay of config directly from generation view.
 - [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
 - Provide an exit button to reset generation state to kInitial.
 - Improve mask capturing for very large images. Currently the crop is done by exporting the whole image out, and then do the crop in fabric.js. This can be very inefficient if the canvas is large.
