@@ -35,7 +35,7 @@ export default {
             if (unit.enabled) {
                 return;
             }
-            
+
             const currentEnabledCount = _.sum(props.units.map(unit => unit.enabled ? 1 : 0));
             const maxCount = useA1111ContextStore().controlnetContext.setting.control_net_max_models_num;
             if (currentEnabledCount === maxCount) {
@@ -45,10 +45,16 @@ export default {
             }
         }
 
+        function maybeAddDefaultUnit(keys: string[]) {
+            if (props.units.length === 0 && keys.length > 0)
+                addNewUnit();
+        }
+
         return {
             addNewUnit,
             removeUnit,
             enableUnit,
+            maybeAddDefaultUnit,
         };
     },
 };
@@ -56,7 +62,7 @@ export default {
 
 <template>
     <!-- Controlnet extension panel -->
-    <a-collapse :bordered="false">
+    <a-collapse :bordered="false" @change="maybeAddDefaultUnit">
         <a-collapse-panel key="controlnet">
             <template #header>
                 <a-space>

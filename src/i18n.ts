@@ -135,7 +135,7 @@ const messages = {
                 TokFinishedState: '根据当前设置生成图像',
             },
 
-            resetToDefault: '重置参数到当前配置',            
+            resetToDefault: '重置参数到当前配置',
         },
         cnet: {
             guidanceRange: '引导范围',
