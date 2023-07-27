@@ -1,33 +1,35 @@
 <template>
-  <a-divider orientation="left" orientation-margin="0px" size="small">
-    {{ $t('config.toolbox') }}
-  </a-divider>
-  <a-select v-model:value="store.toolboxConfigNames" mode="multiple" style="width: 100%"
-    :placeholder="$t('config.selectConfig') + '...'" :options="allConfigOptions">
-  </a-select>
+  <div v-bind="$attrs">
+    <a-divider orientation="left" orientation-margin="0px" size="small">
+      {{ $t('config.toolbox') }}
+    </a-divider>
+    <a-select :value="store.toolboxConfigNames" @update:value="onToolBoxChange" mode="multiple" style="width: 100%"
+      :placeholder="$t('config.selectConfig') + '...'" :options="allConfigOptions">
+    </a-select>
 
-  <a-divider orientation="left" orientation-margin="0px" size="small">
-    {{ $t('config.defaults') }}
-  </a-divider>
-  <a-space direction="vertical" style="width: 100%">
-    <div style="display: flex">
-      <a-input :placeholder="$t('config.newConfig')" v-model:value="newEntryName" style="flex-grow: 1;">
-      </a-input>
-      <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
-    </div>
-    <div style="display: flex">
-      <a-select :value="store.baseConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
-        :filter-option="filterConfig" style="flex-grow: 1;">
-      </a-select>
-      <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
-      <a-button @click="downloadConfig"
-        :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
-      <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"
-        :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
-      <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
-    </div>
-    <json5-editor :value="editorValue" @update:modelValue="updateEntry"></json5-editor>
-  </a-space>
+    <a-divider orientation="left" orientation-margin="0px" size="small">
+      {{ $t('config.defaults') }}
+    </a-divider>
+    <a-space direction="vertical" style="width: 100%">
+      <div style="display: flex">
+        <a-input :placeholder="$t('config.newConfig')" v-model:value="newEntryName" style="flex-grow: 1;">
+        </a-input>
+        <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
+      </div>
+      <div style="display: flex">
+        <a-select :value="store.baseConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
+          :filter-option="filterConfig" style="flex-grow: 1;">
+        </a-select>
+        <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
+        <a-button @click="downloadConfig"
+          :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
+        <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"
+          :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
+        <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
+      </div>
+      <json5-editor :value="editorValue" @update:modelValue="updateEntry"></json5-editor>
+    </a-space>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -136,5 +138,10 @@ const onSelectConfig = (configName: string) => {
 
   currentAppStateContent.value = stateDiffToAppState(store.getCurrentConfig());
   currentStateDiffContent.value = store.getCurrentConfig();
+};
+
+const onToolBoxChange = (toolboxConfigNames: string[]) => {
+  store.toolboxConfigNames = toolboxConfigNames;
+  store.persistToolbox();
 };
 </script>

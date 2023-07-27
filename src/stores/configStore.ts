@@ -45,14 +45,6 @@ export const useConfigStore = defineStore('configStore', {
             this.baseConfigName = configName;
             localStorage.setItem('baseConfig', configName);
         },
-        addToToolbox(configName: string) {
-            this.toolboxConfigNames.push(configName);
-            this.persistToolbox();
-        },
-        removeFromToolbox(configName: string) {
-            this.toolboxConfigNames = this.toolboxConfigNames.filter(name => name !== configName);
-            this.persistToolbox();
-        },
         persistToolbox() {
             localStorage.setItem('toolboxConfigs', JSON5.stringify(toRaw(this.toolboxConfigNames)));
         },
