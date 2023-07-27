@@ -1,5 +1,5 @@
 <template>
-  <div v-bind="$attrs">
+  <div v-bind="$attrs" id="config-view">
     <a-divider orientation="left" orientation-margin="0px" size="small">
       {{ $t('config.toolbox') }}
     </a-divider>
@@ -21,22 +21,41 @@
           :filter-option="filterConfig" style="flex-grow: 1;">
         </a-select>
         <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
-        <a-button @click="downloadConfig"
-          :title="$t('config.downloadConfig')"><download-outlined></download-outlined></a-button>
         <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"
           :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
         <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
       </div>
+      <a-row>
+        <a-col :span="12">
+          <a-button @click="downloadConfig" :title="$t('config.downloadConfig')"
+            style="width: 100%;"><download-outlined></download-outlined>
+            {{ $t('config.download') }}</a-button>
+        </a-col>
+        <a-col :span="12">
+          <a-upload accept="application/json" :beforeUpload="uploadConfig" :showUploadList="false"
+            style="display: block;">
+            <a-button :title="$t('config.uploadConfig')" style="width: 100%;"><upload-outlined></upload-outlined> {{
+              $t('config.upload')
+            }}</a-button>
+          </a-upload>
+        </a-col>
+      </a-row>
       <json5-editor :value="editorValue" @update:modelValue="updateEntry"></json5-editor>
     </a-space>
   </div>
 </template>
+<style>
+#config-view .ant-upload {
+  display: block !important;
+  width: 100%;
+}
+</style>
 
 <script setup lang="ts">
 import { computed, ref, toRaw } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
 import Json5Editor from '@/components/Json5Editor.vue';
-import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons-vue';
 import { type IApplicationState } from '@/Core';
 import { message } from 'ant-design-vue';
 import { type StateDiff, stateDiffToAppState, appStateToStateDiff } from '@/Config';
@@ -108,7 +127,7 @@ const saveConfig = () => {
 
 const downloadConfig = () => {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
-    JSON.stringify(toRaw(store.getCurrentConfig())));
+    JSON.stringify(toRaw(store.configEntries)));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
   downloadAnchorNode.setAttribute("download", store.baseConfigName + ".json");
@@ -116,6 +135,25 @@ const downloadConfig = () => {
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
 }
+
+function readJson(file: Blob): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        resolve(JSON.parse(e.target!.result! as string));
+      } catch (ex: any) {
+        reject(ex);
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+const uploadConfig = async (file: Blob) => {
+  store.createConfigEntry(await readJson(file) as Record<string, StateDiff>);
+  return false; // Return false to prevent default upload behaviour.
+};
 
 const filterConfig = (input: string, option: any) => {
   return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;

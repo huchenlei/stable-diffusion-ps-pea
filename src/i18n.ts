@@ -76,7 +76,10 @@ const messages = {
 
         config: {
             newConfig: 'Enter new config name',
-            downloadConfig: 'Download config as .json5 file',
+            download: 'Download',
+            upload: 'Upload',
+            downloadConfig: 'Download config as .json file',
+            uploadConfig: 'Merge config with uploaded json file',
             deleteConfig: 'Delete the selected config',
             saveConfig: 'Save config',
             defaults: 'Defaults',
