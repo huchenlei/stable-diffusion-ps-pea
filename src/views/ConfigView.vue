@@ -47,11 +47,15 @@ const allConfigOptions = computed(() => Object.keys(store.configEntries).map(con
   };
 }));
 const newEntryName = ref<string>("");
-const currentConfigContent = ref<IApplicationState>(stateDiffToAppState(store.getCurrentConfig()));
+const currentAppStateContent = ref<IApplicationState>(stateDiffToAppState(store.getCurrentConfig()));
 const currentStateDiffContent = ref<StateDiff>(store.getCurrentConfig());
+
+let appStateContentBuffer = currentAppStateContent.value;
+let stateDiffContentBuffer = currentStateDiffContent.value;
+
 const viewDiff = ref<boolean>(false);
 const editorValue = computed(() => {
-  return viewDiff.value ? currentStateDiffContent.value : currentConfigContent.value;
+  return viewDiff.value ? currentStateDiffContent.value : currentAppStateContent.value;
 });
 
 const isLastConfig = computed(() => Object.keys(store.configEntries).length === 1);
@@ -67,10 +71,15 @@ const createNewEntry = () => {
 
 const updateEntry = (newValue: IApplicationState | StateDiff) => {
   if (viewDiff.value) {
-    currentStateDiffContent.value = newValue as StateDiff;
+    stateDiffContentBuffer = newValue as StateDiff;
   } else {
-    currentConfigContent.value = newValue as IApplicationState;
+    appStateContentBuffer = newValue as IApplicationState;
   }
+}
+
+const flushContentBuffer = () => {
+  currentStateDiffContent.value = stateDiffContentBuffer;
+  currentAppStateContent.value = appStateContentBuffer;
 }
 
 const deleteSelectedConfig = () => {
@@ -81,12 +90,13 @@ const deleteSelectedConfig = () => {
 }
 
 const saveConfig = () => {
-  if (currentConfigContent.value) {
-    console.debug(`Save config ${JSON.stringify(currentConfigContent.value)}`);
+  flushContentBuffer();
+  if (currentAppStateContent.value) {
+    console.debug(`Save config ${JSON.stringify(currentAppStateContent.value)}`);
 
     const stateDiff = viewDiff.value ?
       currentStateDiffContent.value :
-      appStateToStateDiff(currentConfigContent.value);
+      appStateToStateDiff(currentAppStateContent.value);
 
     store.createConfigEntry({ [store.baseConfigName]: stateDiff });
     message.info(`Save config ${store.baseConfigName}`);
@@ -110,12 +120,13 @@ const filterConfig = (input: string, option: any) => {
 };
 
 const toggleViewDiff = () => {
+  flushContentBuffer();
   if (viewDiff.value) {
     // Diff => AppState
-    currentConfigContent.value = stateDiffToAppState(toRaw(currentStateDiffContent.value));
+    currentAppStateContent.value = stateDiffToAppState(toRaw(currentStateDiffContent.value));
   } else {
     // AppState => Diff
-    currentStateDiffContent.value = appStateToStateDiff(toRaw(currentConfigContent.value));
+    currentStateDiffContent.value = appStateToStateDiff(toRaw(currentAppStateContent.value));
   }
   viewDiff.value = !viewDiff.value;
 };
@@ -123,7 +134,7 @@ const toggleViewDiff = () => {
 const onSelectConfig = (configName: string) => {
   store.updateCurrentConfig(configName);
 
-  currentConfigContent.value = stateDiffToAppState(store.getCurrentConfig());
+  currentAppStateContent.value = stateDiffToAppState(store.getCurrentConfig());
   currentStateDiffContent.value = store.getCurrentConfig();
 };
 </script>
