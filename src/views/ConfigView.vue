@@ -58,6 +58,7 @@
 import { computed, ref, toRaw } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
 import Json5Editor from '@/components/Json5Editor.vue';
+import JSON5 from 'json5';
 import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import { type IApplicationState } from '@/Core';
 import { message } from 'ant-design-vue';
@@ -136,10 +137,10 @@ const activateConfig = () => {
 
 const downloadConfig = () => {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
-    JSON.stringify(toRaw(store.configEntries)));
+    JSON5.stringify(toRaw(store.configEntries)));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", "configs.json");
+  downloadAnchorNode.setAttribute("download", "configs.json5");
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
@@ -150,7 +151,7 @@ function readJson(file: Blob): Promise<Object> {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        resolve(JSON.parse(e.target!.result! as string));
+        resolve(JSON5.parse(e.target!.result! as string));
       } catch (ex: any) {
         reject(ex);
       }
