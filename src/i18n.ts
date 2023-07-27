@@ -82,6 +82,7 @@ const messages = {
             uploadConfig: 'Merge config with uploaded json file',
             deleteConfig: 'Delete the selected config',
             saveConfig: 'Save config',
+            activateConfig: 'Activate config',
             defaults: 'Defaults',
             toolbox: 'Toolbox',
             selectConfig: 'Select configs',

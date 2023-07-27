@@ -8,7 +8,7 @@
     </a-select>
 
     <a-divider orientation="left" orientation-margin="0px" size="small">
-      {{ $t('config.defaults') }}
+      {{ $t('config.defaults') }}: ({{ store.baseConfigName }})
     </a-divider>
     <a-space direction="vertical" style="width: 100%">
       <div style="display: flex">
@@ -17,13 +17,16 @@
         <a-button @click="createNewEntry"><plus-outlined></plus-outlined></a-button>
       </div>
       <div style="display: flex">
-        <a-select :value="store.baseConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
+        <a-select :value="editorConfigName" @update:value="onSelectConfig" :options="allConfigOptions" show-search
           :filter-option="filterConfig" style="flex-grow: 1;">
         </a-select>
         <a-button @click="toggleViewDiff" :title="$t('config.toggleViewDiff')">{{ viewDiff ? 'D' : 'A' }}</a-button>
         <a-button @click="deleteSelectedConfig" :disabled="isLastConfig"
           :title="$t('config.deleteConfig')"><delete-outlined></delete-outlined></a-button>
         <a-button @click="saveConfig" :title="$t('config.saveConfig')"><save-outlined></save-outlined></a-button>
+        <a-button @click="activateConfig" :title="$t('config.activateConfig')"
+          type="primary"><check-outlined></check-outlined>
+        </a-button>
       </div>
       <a-row>
         <a-col :span="12">
@@ -55,7 +58,7 @@
 import { computed, ref, toRaw } from 'vue';
 import { useConfigStore } from '@/stores/configStore';
 import Json5Editor from '@/components/Json5Editor.vue';
-import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined, UploadOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import { type IApplicationState } from '@/Core';
 import { message } from 'ant-design-vue';
 import { type StateDiff, stateDiffToAppState, appStateToStateDiff } from '@/Config';
@@ -70,6 +73,7 @@ const allConfigOptions = computed(() => Object.keys(store.configEntries).map(con
 const newEntryName = ref<string>("");
 const currentAppStateContent = ref<IApplicationState>(stateDiffToAppState(store.getCurrentConfig()));
 const currentStateDiffContent = ref<StateDiff>(store.getCurrentConfig());
+const editorConfigName = ref<string>(store.baseConfigName);
 
 let appStateContentBuffer = currentAppStateContent.value;
 let stateDiffContentBuffer = currentStateDiffContent.value;
@@ -125,6 +129,11 @@ const saveConfig = () => {
   console.debug(`No editor content for saving.`);
 }
 
+const activateConfig = () => {
+  flushContentBuffer();
+  store.updateCurrentConfig(editorConfigName.value);
+}
+
 const downloadConfig = () => {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
     JSON.stringify(toRaw(store.configEntries)));
@@ -172,10 +181,13 @@ const toggleViewDiff = () => {
 };
 
 const onSelectConfig = (configName: string) => {
-  store.updateCurrentConfig(configName);
+  editorConfigName.value = configName;
 
-  currentAppStateContent.value = stateDiffToAppState(store.getCurrentConfig());
-  currentStateDiffContent.value = store.getCurrentConfig();
+  currentAppStateContent.value = stateDiffToAppState(store.configEntries[configName]);
+  currentStateDiffContent.value = store.configEntries[configName];
+
+  appStateContentBuffer = currentAppStateContent.value;
+  stateDiffContentBuffer = currentStateDiffContent.value;
 };
 
 const onToolBoxChange = (toolboxConfigNames: string[]) => {
