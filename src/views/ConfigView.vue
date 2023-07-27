@@ -123,8 +123,8 @@ const saveConfig = () => {
       currentStateDiffContent.value :
       appStateToStateDiff(currentAppStateContent.value);
 
-    store.createConfigEntry({ [store.baseConfigName]: stateDiff });
-    message.info(`Save config ${store.baseConfigName}`);
+    store.createConfigEntry({ [editorConfigName.value]: stateDiff });
+    message.info(`Save config ${editorConfigName.value}`);
   }
   console.debug(`No editor content for saving.`);
 }
