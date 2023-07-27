@@ -7,6 +7,7 @@ import { useAppStateStore } from '@/stores/appStateStore';
 import { message } from 'ant-design-vue';
 import { stateDiffToAppState, appStateToStateDiff } from '@/Config';
 import router from '@/router';
+import _ from 'lodash';
 
 export default {
     name: 'HistoryItem',
@@ -45,7 +46,7 @@ export default {
             if (!configName.value) {
                 message.warn('Config name cannot be empty');
             } else {
-                configStore.createConfigEntry({ [configName.value]: stateDiff.value });
+                configStore.createConfigEntry({ [configName.value]: _.cloneDeep(stateDiff.value) });
                 message.info('State saved');
                 router.push('/config');
             }
