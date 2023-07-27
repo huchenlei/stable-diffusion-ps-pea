@@ -130,7 +130,7 @@ const downloadConfig = () => {
     JSON.stringify(toRaw(store.configEntries)));
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", store.baseConfigName + ".json");
+  downloadAnchorNode.setAttribute("download", "configs.json");
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
