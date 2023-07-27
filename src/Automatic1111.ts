@@ -496,7 +496,7 @@ class Img2ImgPayload implements IImg2ImgPayload {
     mask: string | undefined = undefined;
     denoising_strength: number = 0.75;
     initial_noise_multiplier: number = 1.0;
-    inpaint_full_res: InpaintArea = InpaintArea.OnlyMasked;
+    inpaint_full_res: InpaintArea = InpaintArea.WholePicture;
     inpaint_full_res_padding: number = 32;
     inpainting_fill: InpaintFill = InpaintFill.Original;
     inpainting_mask_invert: MaskMode = MaskMode.InpaintMasked;

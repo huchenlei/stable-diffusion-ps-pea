@@ -283,7 +283,8 @@ async function sendPayload() {
     }
     appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
     appState.commonPayload.width = DEFAULT_CONFIG.commonPayload.width;
-
+    delete appState.commonPayload.alwayson_scripts['ControlNet'];
+    
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
     console.error(e);
