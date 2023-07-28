@@ -37,20 +37,25 @@ export default {
     setup(props, { emit }) {
         const visible = ref<boolean>(false);
         const currentNetworkType = ref<string>(NetworkType.LoRA);
+        const searchKeyword = ref<string>('');
 
         const loraImages = computed(() => {
             const context = useA1111ContextStore().a1111Context;
-            return props.loras.map(lora => {
-                return { imageURL: context.loraPreviewURL(lora.name), name: lora.name };
-            });
+            return props.loras
+                .map(lora => {
+                    return { imageURL: context.loraPreviewURL(lora.name), name: lora.name };
+                })
+                .filter(item => item.name.toLowerCase().includes(searchKeyword.value.toLowerCase()));
         });
 
         const embeddingImages = computed(() => {
             const context = useA1111ContextStore().a1111Context;
-            return props.embeddings.map(entry => {
-                const [name, _] = entry;
-                return { imageURL: context.embeddingPreviewURL(name), name };
-            });
+            return props.embeddings
+                .map(entry => {
+                    const [name, _] = entry;
+                    return { imageURL: context.embeddingPreviewURL(name), name };
+                })
+                .filter(item => item.name.toLowerCase().includes(searchKeyword.value.toLowerCase()));
         });
 
         const onAddLoRA = (item: ImageItem) => {
@@ -73,6 +78,7 @@ export default {
             visible,
             NetworkType,
             currentNetworkType,
+            searchKeyword,
             afterVisibleChange,
             showDrawer,
             loraImages,
@@ -90,17 +96,19 @@ export default {
     </a-button>
 
     <a-drawer v-model:visible="visible" title="Extra Networks" placement="right" @after-visible-change="afterVisibleChange">
-        <a-radio-group v-model:value="currentNetworkType" button-style="solid">
-            <a-radio-button
-                v-for="network in [NetworkType.LoRA, NetworkType.Embedding]"
-                :value="network">{{ network }}</a-radio-button>
-        </a-radio-group>
+        <a-space direction="vertical">
+            <a-radio-group v-model:value="currentNetworkType" button-style="solid">
+                <a-radio-button v-for="network in [NetworkType.LoRA, NetworkType.Embedding]" :value="network">{{ network
+                }}</a-radio-button>
+            </a-radio-group>
+            <a-input v-model:value="searchKeyword" style="width: 100%" :placeholder="$t('gen.search') + '...'" />
 
-        <ImagePicker :hidden="currentNetworkType !== NetworkType.LoRA" :images="loraImages" @item-clicked="onAddLoRA">
-        </ImagePicker>
+            <ImagePicker :hidden="currentNetworkType !== NetworkType.LoRA" :images="loraImages" @item-clicked="onAddLoRA">
+            </ImagePicker>
 
-        <ImagePicker :hidden="currentNetworkType !== NetworkType.Embedding" :images="embeddingImages"
-            @item-clicked="onAddRawPrompt">
-        </ImagePicker>
+            <ImagePicker :hidden="currentNetworkType !== NetworkType.Embedding" :images="embeddingImages"
+                @item-clicked="onAddRawPrompt">
+            </ImagePicker>
+        </a-space>
     </a-drawer>
 </template>

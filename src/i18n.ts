@@ -27,6 +27,7 @@ const messages = {
             selectRefArea: 'Select Ref Area',
             scaleRatio: 'Scale Ratio',
             referenceRange: 'Reference Range',
+            search: 'Search',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',

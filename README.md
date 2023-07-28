@@ -38,7 +38,7 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
    - Prompt token estimation (75/150/225)
    - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
      - Automatically detect LoRA trigger words
-     - Search bar on LoRA selection
+     - [*DONE*] Search bar on LoRA selection
 3. [*DONE*] ControlNet support 
    - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
    - [*DONE*] ControlNet layer will be used as ControlNet input
@@ -69,7 +69,7 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
 - [*DONE*] Correctly handle list diff when diff appState.
 - [*DONE*] Add a way to trigger overlay of config directly from generation view.
 - [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
-- Provide an exit button to reset generation state to kInitial.
+- [*DONE*] Provide an exit button to reset generation state to kInitial.
 - Improve mask capturing for very large images. Currently the crop is done by exporting the whole image out, and then do the crop in fabric.js. This can be very inefficient if the canvas is large.
 
 # Development
