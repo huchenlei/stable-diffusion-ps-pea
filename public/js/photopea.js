@@ -144,7 +144,7 @@ function exportMaskFromSelection(format) {
     // to see if the selection is actually there.
     if (!hasSelection()) {
         alert("No selection!");
-        app.echoToOE("");
+        app.echoToOE("error");
         return;
     }
 
@@ -188,11 +188,11 @@ function boundsToString(bounds) {
 function getSelectionBound() {
     // Note: app.activeDocument.selection seems always exists. Checking bounds
     // to see if the selection is actually there.
-    const bounds = app.activeDocument.selection.bounds;
     if (!hasSelection()) {
         alert("No selection!");
-        app.echoToOE("");
+        app.echoToOE("error");
     } else {
+        const bounds = app.activeDocument.selection.bounds;
         app.echoToOE(boundsToString(bounds));
     }
 }
@@ -214,7 +214,7 @@ function exportControlNetInputImage(format) {
         activeLayer.visible = false;
     } else {
         alert('No selection / active layer.');
-        app.echoToOE('');
+        app.echoToOE("error");
     }
 }
 
@@ -228,7 +228,7 @@ function getControlNetSelectionBound() {
             app.activeDocument.activeLayer.bounds
         ));
     } else {
-        app.echoToOE('');
+        app.echoToOE("error");
     }
 }
 
@@ -311,7 +311,7 @@ function exportLayersWithNames(layerNames, format) {
 function fillSelectionWithBlackInNewLayer(layerName) {
     if (!hasSelection()) {
         alert("No selection!");
-        app.echoToOE('');
+        app.echoToOE("error");
         return;
     }
     // Save the current active layer

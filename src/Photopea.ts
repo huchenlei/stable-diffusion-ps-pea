@@ -9,6 +9,7 @@ interface Task {
 };
 
 const MESSAGE_END_ACK = "done";
+const MESSAGE_ERROR = "error";
 class PhotopeaContext {
     photopeaWindow: Window;
     // The content is a JS file that defines many useful photopea operations.
@@ -140,6 +141,7 @@ class PhotopeaContext {
                 // Ignore "done" when no data has been received. The "done" can come from
                 // MSFAPI ping.
                 if (event.data === MESSAGE_END_ACK && responseDataPieces.length === 0) {
+                    console.debug('sdp: no data on receiving done');
                     return;
                 }
                 console.debug(`sdp: Receive frame message ${event.data}`);
@@ -150,8 +152,8 @@ class PhotopeaContext {
                     } else {
                         resolve(responseDataPieces.length === 1 ? responseDataPieces[0] : responseDataPieces);
                     }
-                } else if (event.data === '') {
-                    responseDataPieces.push('error');
+                } else if (event.data === MESSAGE_ERROR) {
+                    responseDataPieces.push(event.data);
                     hasError = true;
                 } else {
                     responseDataPieces.push(event.data);
