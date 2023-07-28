@@ -236,27 +236,21 @@ function fillLayerWithBlack(layer) {
     // Save the current active layer
     var originalActiveLayer = app.activeDocument.activeLayer;
 
-    // Save the current foreground color
-    var originalForegroundColor = app.foregroundColor;
-
     // Make the layer passed to the function the active layer
     app.activeDocument.activeLayer = layer;
 
-    // Change the foreground color to black
-    app.foregroundColor.rgb.red = 0;
-    app.foregroundColor.rgb.green = 0;
-    app.foregroundColor.rgb.blue = 0;
+    const blackColor = new SolidColor();
+    blackColor.rgb.red = 0;
+    blackColor.rgb.green = 0;
+    blackColor.rgb.blue = 0;
 
-    // Select all and fill with the foreground color
+    // Select all and fill with black.
     app.activeDocument.selection.selectAll();
-    app.activeDocument.selection.fill(app.foregroundColor);
+    app.activeDocument.selection.fill(blackColor);
     app.activeDocument.selection.deselect();
 
     // Restore the original active layer
     app.activeDocument.activeLayer = originalActiveLayer;
-
-    // Restore the original foreground color
-    app.foregroundColor = originalForegroundColor;
 }
 
 function createControlNetFolderIfNotExist() {
@@ -322,27 +316,22 @@ function fillSelectionWithBlackInNewLayer(layerName) {
     }
     // Save the current active layer
     var originalActiveLayer = app.activeDocument.activeLayer;
-    // Save the current foreground color
-    var originalForegroundColor = app.foregroundColor;
 
     // Create a temp layer.
     const newLayer = app.activeDocument.artLayers.add();
     newLayer.name = layerName;
 
-    // Change the foreground color to black
-    app.foregroundColor.rgb.red = 0;
-    app.foregroundColor.rgb.green = 0;
-    app.foregroundColor.rgb.blue = 0;
+    const blackColor = new SolidColor();
+    blackColor.rgb.red = 0;
+    blackColor.rgb.green = 0;
+    blackColor.rgb.blue = 0;
 
     // Fill with the foreground color and deselect.
-    app.activeDocument.selection.fill(app.foregroundColor);
+    app.activeDocument.selection.fill(blackColor);
     app.activeDocument.selection.deselect();
 
     // Restore the original active layer
     app.activeDocument.activeLayer = originalActiveLayer;
-
-    // Restore the original foreground color
-    app.foregroundColor = originalForegroundColor;
 
     app.echoToOE('success');
 }
