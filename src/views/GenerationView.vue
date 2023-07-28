@@ -11,7 +11,7 @@ import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
-import { type IControlNetUnit, modelNoPreview } from '@/ControlNet';
+import { type IControlNetUnit } from '@/ControlNet';
 import SliderGroup from '@/components/SliderGroup.vue';
 import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
