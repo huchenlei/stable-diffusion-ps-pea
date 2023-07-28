@@ -23,6 +23,7 @@ import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
 import { DEFAULT_CONFIG, applyStateDiff } from '@/Config';
 import { useConfigStore } from '@/stores/configStore';
+import { CloseOutlined } from '@ant-design/icons-vue';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -275,24 +276,34 @@ async function sendPayload() {
         .map((image: string) => `data:image/png;base64,${image}`)
     );
 
-    inputImageBuffer.value = undefined;
-    inputMaskBuffer.value = undefined;
-    inputImage.value = undefined;
-    inputMask.value = undefined;
-    for (const unit of appState.controlnetUnits) {
-      // Only clear image when layer is linked.
-      if (unit.linkedLayerName)
-        unit.image = undefined;
-    }
-    appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
-    appState.commonPayload.width = DEFAULT_CONFIG.commonPayload.width;
-    delete appState.commonPayload.alwayson_scripts['ControlNet'];
-
+    resetPayload();
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
     console.error(e);
     $notify(`${e}`);
   }
+}
+
+// Reset intermediant values stores in the payload and in the generation view.
+function resetPayload() {
+  inputImageBuffer.value = undefined;
+  inputMaskBuffer.value = undefined;
+  inputImage.value = undefined;
+  inputMask.value = undefined;
+  for (const unit of appState.controlnetUnits) {
+    // Only clear image when layer is linked.
+    if (unit.linkedLayerName)
+      unit.image = undefined;
+  }
+  appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
+  appState.commonPayload.width = DEFAULT_CONFIG.commonPayload.width;
+  delete appState.commonPayload.alwayson_scripts['ControlNet'];
+}
+
+// Reset generation state to kInitial. Abandon current intermediant values.
+function resetGenerationState() {
+  resetPayload();
+  generationState.value = GenerationState.kInitialState;
 }
 
 async function generate() {
@@ -377,6 +388,11 @@ const stepProgress = computed(() => {
               {{ $t(`gen.steps.${hoveredStep === undefined ? '' : 'To'}${GenerationState[stepProgress]}`) }}
             </a-tag>
           </a-space>
+          <a-button type="danger" :ghost="true" size="small"
+            v-if="generationState > GenerationState.kInitialState && generationState < GenerationState.kFinishedState"
+            @click="resetGenerationState">
+            <CloseOutlined></CloseOutlined>
+          </a-button>
           <a-row>
             <a-col :span="12">
               <a-spin :spinning="startSelectRefAreaInProgress">
