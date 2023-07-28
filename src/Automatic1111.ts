@@ -457,6 +457,7 @@ interface IImg2ImgPayload {
     inpainting_mask_invert: MaskMode;
     mask_blur_x: number;
     mask_blur_y: number;
+    mask_blur: number;
     resize_mode: ResizeMode;
 };
 
