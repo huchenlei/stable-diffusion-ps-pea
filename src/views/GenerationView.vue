@@ -108,7 +108,7 @@ const samplerOptions = computed(() => {
 
 async function setControlNetInputs(maskBound: PhotopeaBound): Promise<void> {
   for (const unit of appState.controlnetUnits) {
-    if (modelNoPreview(unit.model)) {
+    if (!unit.linkedLayerName) {
       continue;
     }
     const mapBuffer = await photopeaContext.invokeAsTask(
@@ -128,12 +128,13 @@ function fillExtensionsArgs() {
       args: toRaw(appState.controlnetUnits)
         .filter(unit => unit.enabled)
         .map(unit => {
+          const linkedWithLayer = !!unit.linkedLayerName;
           const payloadUnit = Object.fromEntries(
             Object.entries(unit)
               .filter(([key]) => key !== 'linkedLayerName')
           ) as any as IControlNetUnit;
 
-          if (!modelNoPreview(unit.model))
+          if (linkedWithLayer)
             payloadUnit.module = 'none';
 
           return payloadUnit;
@@ -279,7 +280,8 @@ async function sendPayload() {
     inputImage.value = undefined;
     inputMask.value = undefined;
     for (const unit of appState.controlnetUnits) {
-      if (!modelNoPreview(unit.model)) // Only clear image when model has preview.
+      // Only clear image when layer is linked.
+      if (unit.linkedLayerName)
         unit.image = undefined;
     }
     appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
