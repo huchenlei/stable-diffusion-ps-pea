@@ -25,7 +25,7 @@
                 "sampler_name",
             ],
             "lhs": "Euler a",
-            "rhs": "DPM++ 2M",
+            "rhs": "DPM++ 2M Karras",
         },
         {
             "kind": "E",
