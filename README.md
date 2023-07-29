@@ -72,7 +72,8 @@ Clicking the checkmark will activate the current selected config as default.
 toolbox button. This is where you can define you customized workflow.
 ![toolbox](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/ae67f328-42e9-4425-8b8e-8d75b1574853)
 
-Configs are defined as the delta to apply on top of the current UI states. Here are some examples I wrote:
+Configs are defined as the delta to apply on top of the current UI states. Here are some examples I wrote and you can download `config_sharing/huchenlei_configs.json5` and upload it in config panel to get access to them.
+
 **LamaGenFill:** Use ControlNet's `inpaint_only+lama` to achieve similar effect of adobe's generative fill, and magic eraser. We accept JSON5 as config format, so you can actually add comment in config file.
 ```json5
 "LamaGenFill": [
@@ -134,8 +135,55 @@ Configs are defined as the delta to apply on top of the current UI states. Here 
         }
     ],
 ```
+Generative Fill using `LamaGenFill` workflow:
+![GenFill1](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/4ae79838-ddeb-452a-a052-2b414381e709)
+![GenFill2](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/f8406fcd-c7a6-4e81-9aeb-290e21755123)
+Magic Eraser using `LamaGenFill` workflow:
+![Eraser1](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/da087193-a343-43fb-acc8-366e8d1d4b78)
+![Eraser2](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/cd1e335e-1513-45bf-8cda-7df789e995dc)
 
-
+**TileUpscale2x**
+As previously demoed about scale ratio, this workflow is used to fix hand/face, and add details to the selected region.
+```json
+"TileUpscale2x": [
+        {
+            "kind": "E",
+            "path": ["imageScale"],
+            "lhs": 1,
+            "rhs": 2,
+        },
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 0,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11f1e_sd15_tile [a371b31b]",
+                    "module": "tile_resample",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 1,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    ],
+```
+Here is a video demo using it: https://www.loom.com/share/fb11c0206d7045469b82fe9d6342bd15
 
 ## Development plan
 
