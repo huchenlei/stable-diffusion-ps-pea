@@ -5,6 +5,7 @@ import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { PayloadImage, cropImage } from '../ImageUtil';
 import SDModelSelection from '@/components/SDModelSelection.vue';
+import VaeSelection from '@/components/VaeSelection.vue';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import Img2ImgPayloadDisplay from '@/components/Img2ImgPayloadDisplay.vue';
 import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
@@ -479,6 +480,7 @@ const stepProgress = computed(() => {
         <a-collapse :bordered="false">
           <a-collapse-panel :header="$t('gen.advancedSettings')">
             <a-space direction="vertical">
+              <VaeSelection></VaeSelection>
               <a-row style="display: flex; align-items: center;">
                 <a-tag style="border: none; flex: 0 0 auto;">{{ $t('gen.sampler') }}</a-tag>
                 <a-select style="flex: 1 1 auto;" ref="select" v-model:value="appState.commonPayload.sampler_name"

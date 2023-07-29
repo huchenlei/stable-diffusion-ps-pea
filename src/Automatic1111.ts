@@ -541,6 +541,7 @@ export {
     type IEmbedding,
     type ISampler,
     type IStableDiffusionModel,
+    type IStableDiffusionVAE,
     type IProgress,
     type ICommonPayload,
     type IImg2ImgPayload,

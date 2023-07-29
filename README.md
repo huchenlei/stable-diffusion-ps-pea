@@ -199,8 +199,9 @@ extensions, users can still invoke the extensions they want by setting entries o
    - [*DONE*] Sending inputs to A1111 API
    - [*DONE*] Render the returned image on photopea canvas
    - [*DONE*] Ckpt selection
-   - VAE selection.
+   - [*DONE*] VAE selection.
    - [*DONE*] Generation progress bar.
+   - Seed input
 1. [*DONE*] Universal extension support
    - [*DONE*] Raw text input for extension's script args.
 1. [*DONE*] Savable run configuration
