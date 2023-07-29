@@ -185,6 +185,11 @@ As previously demoed about scale ratio, this workflow is used to fix hand/face, 
 ```
 Here is a video demo using it: https://www.loom.com/share/fb11c0206d7045469b82fe9d6342bd15
 
+Overall, the config system gives users full capability on A1111 API. Even the plugin does not build UI support for some
+extensions, users can still invoke the extensions they want by setting entries of `alwayson_scripts`.
+
+**Interfacing with A1111**: Optionally you can use https://github.com/yankooliveira/sd-webui-photopea-embed to send images between photopea and A1111.
+
 ## Development plan
 
 1. Basic UI setting for image generation
