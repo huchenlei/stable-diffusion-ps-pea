@@ -8,7 +8,7 @@
 
 Stable Diffusion plugin for Photopea based on A1111 API.
 
-English · [中文](./README.zh.md) · [Changelog](./CHANGELOG.md) · [Report Bug](issues-url) · [Request Feature](issues-url)
+[Changelog](./CHANGELOG.md) · [Report Bug](issues-url) · [Request Feature](issues-url)
 
 <!-- SHIELD GROUP -->
 [![Discord][discord-shield]][discord-url]
