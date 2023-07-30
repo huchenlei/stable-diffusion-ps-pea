@@ -1,5 +1,20 @@
-# stable-diffusion-ps-pea
-Stable Diffusion plugin for Photoshop/Photopea based on A1111 API.
+<a name="readme-top"></a>
+
+<div align="center">
+
+<img width="160" src="https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/b015ba09-3fee-42e6-b907-b957ec1a0e60">
+
+<h1 align="center">Stable Diffusion Photopea</h1>
+
+Stable Diffusion plugin for Photopea based on A1111 API.
+
+English · [中文](./README.zh.md) · [Changelog](./CHANGELOG.md) · [Report Bug](issues-url) · [Request Feature](issues-url)
+
+<!-- SHIELD GROUP -->
+[![Discord][discord-shield]][discord-url]
+
+</div>
+
 
 ## Installation
 **Step1: Setup backend service**
@@ -190,62 +205,6 @@ extensions, users can still invoke the extensions they want by setting entries o
 
 **Interfacing with A1111**: Optionally you can use https://github.com/yankooliveira/sd-webui-photopea-embed to send images between photopea and A1111.
 
-## Development plan
-
-1. Basic UI setting for image generation
-   - [*DONE*] We should not distinguish txt2img and img2img. (Maybe txt2img in some advanced settings?). Fill on an empty selection should trigger txt2img, otherwise img2img.
-   - [*DONE*] Prompt input, various configuration input UI.
-   - [*DONE*] Get input from current photopea selection (Capture the selected content)
-   - [*DONE*] Sending inputs to A1111 API
-   - [*DONE*] Render the returned image on photopea canvas
-   - [*DONE*] Ckpt selection
-   - [*DONE*] VAE selection.
-   - [*DONE*] Generation progress bar.
-   - Seed input
-1. [*DONE*] Universal extension support
-   - [*DONE*] Raw text input for extension's script args.
-1. [*DONE*] Savable run configuration
-   - [*DONE*] Reset button on generation page to reset everything to default
-2. Prompt textbox
-   - Auto complete (Self prompt use history and prompt use DB)
-   - Templates (Default quality prompt, negative embeddings, etc)
-   - Prompt token estimation (75/150/225)
-   - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)
-     - Automatically detect LoRA trigger words
-     - [*DONE*] Search bar on LoRA selection
-3. [*DONE*] ControlNet support 
-   - [*DONE*] Select a layer, choose a preprocessor can convert it to ControlNet layer.
-   - [*DONE*] ControlNet layer will be used as ControlNet input
-   - [*DONE*] Control type selection
-   - [*DONE*] Inpaint support
-   - [*DONE*] Reference support
-   - Support openpose editor
-   - [*DONE*] Preset
-4. [*DONE*] Inpaint
-   - [*DONE*] Create a selection and hit generative fill will by default will trigger inpaint with reference to a reasonable context (512x512?).
-   - [*DONE*] Provide another button (choose custom inpaint reference area besides inpaint button to let user specify another selection)
-   - [*DONE*] Provide a progress on UI to show user the current state.
-5. [*DONE*] Connection management.
-6. [*DONE*] History view
-   - [*DONE*] Each run's config should be saved. Can either fully restore state, or partial restore (only prompt / only ControlNet state) 
-7. Support upscale script
-   - Automatically trigger upscale script if the target width/height is too big (after scale ratio)
-   - Support whole picture upscale. (Paste the result to a new file?)
-8. Support segment anything.
-   
-### Minior TODOs
-- [*DONE*] Fix display of ControlNet unit header (close button should be at end of row)
-- [*DONE*] Make step of SliderGroup log-based, i.e. 1, 2, 4, 8
-- [*DONE*] Update favicon
-- [*DONE*] Update thumbnail (sd.png)
-- [*DONE*] Lock result selection panel after clicking on an item. If clicking very fast task send tophotopea still will timeout.
-- [*OBSOLETE*] File based config. Add comments in default config file.
-- [*DONE*] Correctly handle list diff when diff appState.
-- [*DONE*] Add a way to trigger overlay of config directly from generation view.
-- [*DONE*] Hide page name text on nav bar by default to save space (only show when hover on icon).
-- [*DONE*] Provide an exit button to reset generation state to kInitial.
-- Improve mask capturing for very large images. Currently the crop is done by exporting the whole image out, and then do the crop in fabric.js. This can be very inefficient if the canvas is large.
-
 # Development
 ## Setup HTTPS
 The dev server needs to run under HTTPS because the plugin runs in an iframe that is embedded in an HTTPS environment. 
@@ -353,3 +312,7 @@ npm run test:unit -- --headless # for headless testing
 ```sh
 npm run lint
 ```
+
+[discord-shield]: https://img.shields.io/discord/1131685009258987581?style=for-the-badge&logo=discord
+[discord-url]: https://discord.gg/GkaWcUat7R
+[issue-url]: https://github.com/huchenlei/stable-diffusion-ps-pea/issues

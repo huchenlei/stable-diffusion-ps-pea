@@ -42,7 +42,7 @@ const messages = {
                 kInitialState: '',
                 kSelectRefAreaState: 'Select reference area on canvas',
                 kPayloadPreparedState: 'Click generate when satisfied with payload',
-                kFinishedState: 'Pick the result image(s) to keep',
+                kFinishedState: 'Pick the result image(s) to keep. Ctrl+click to select multiple images.',
 
                 TokSelectRefAreaState: 'Manually select reference area',
                 TokPayloadPreparedState: 'Preview payload before sending it',
