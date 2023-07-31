@@ -1,11 +1,18 @@
 import Fuse from 'fuse.js';
+import _ from 'lodash';
 import Papa from 'papaparse';
 
+enum TagSource {
+    kDanbooru,
+    kE621,
+};
+
 interface Tag {
-    tag: string;
+    name: string;
     category: number;
     count: number;
     aliases: string[];
+    source: TagSource;
 }
 
 async function fetchCSV(url: string): Promise<string> {
@@ -18,18 +25,19 @@ async function fetchCSV(url: string): Promise<string> {
     return await response.text();
 }
 
-async function parseTagCSV(csvText: string): Promise<Tag[]> {
+function parseTagCSV(csvText: string, tagSource: TagSource): Tag[] {
     const results = Papa.parse(csvText, {
         header: false,
-        dynamicTyping: true,
+        dynamicTyping: false,
     });
 
     // Convert the parsed data to an array of Tag objects
     const tags: Tag[] = results.data.map((row: any) => ({
-        tag: row[0],
-        category: row[1],
-        count: row[2],
-        aliases: row[3] ? row[3].split(',') : [],
+        name: row[0],
+        category: parseInt(row[1], 10),
+        count: parseInt(row[2], 10),
+        aliases: row[3] && _.isString(row[3]) ? row[3].split(',') : [],
+        source: tagSource,
     }));
     return tags;
 }
@@ -42,7 +50,71 @@ interface IFuse<T> {
     search: (text: string, options: { limit: number } | undefined) => IFuseResult<T>[];
 };
 
-class TagCompleteManager {
+class TrieNode<T> {
+    children: { [key: string]: TrieNode<T> };
+    isEndOfWord: boolean;
+    leaf: T | null;
+
+    constructor() {
+        this.children = {};
+        this.isEndOfWord = false;
+        this.leaf = null;
+    }
+}
+
+class Trie<T> {
+    root: TrieNode<T>;
+
+    constructor() {
+        this.root = new TrieNode<T>();
+    }
+
+    // Insert a word into the Trie
+    insert(word: string, leaf: T): void {
+        let currentNode = this.root;
+        for (let i = 0; i < word.length; i++) {
+            const ch = word[i];
+            let node = currentNode.children[ch];
+            if (!node) {
+                node = new TrieNode<T>();
+                currentNode.children[ch] = node;
+            }
+            currentNode = node;
+        }
+        currentNode.isEndOfWord = true;
+        currentNode.leaf = leaf;
+    }
+
+    // Perform a search starting with a given prefix
+    search(prefix: string): [string, T][] {
+        let currentNode = this.root;
+        for (let i = 0; i < prefix.length; i++) {
+            const ch = prefix[i];
+            const node = currentNode.children[ch];
+            if (!node) {
+                return [];
+            }
+            currentNode = node;
+        }
+        return this._getAllWordsFromNode(prefix, currentNode);
+    }
+
+    // Helper method to return all words that start with a given prefix
+    private _getAllWordsFromNode(prefix: string, node: TrieNode<T>): [string, T][] {
+        const words: [string, T][] = [];
+        if (node.isEndOfWord) {
+            words.push([prefix, node.leaf!]);
+        }
+        for (let ch in node.children) {
+            const childNode = node.children[ch];
+            words.push(...this._getAllWordsFromNode(prefix + ch, childNode));
+        }
+        return words;
+    }
+}
+
+// Tag complete using Fuse.js. Too slow to be practical.
+class FuzzyTagCompleteManager {
     fuse: IFuse<Tag>;
 
     constructor(tags: Tag[]) {
@@ -61,9 +133,29 @@ class TagCompleteManager {
     }
 };
 
+class TagCompleteManager {
+    trie: Trie<Tag>;
+
+    constructor(tags: Tag[]) {
+        this.trie = new Trie();
+        for (const tag of tags) {
+            this.trie.insert(tag.name, tag);
+            for (const alias of tag.aliases) {
+                this.trie.insert(alias, tag);
+            }
+        }
+    }
+
+    public completeTag(text: string, limit: number = 10): [string, Tag][] {
+        const results = this.trie.search(text).sort(([_1, t1], [_2, t2]) => t2.count - t1.count);
+        return _.take(results, limit);
+    }
+};
+
 
 export {
     type Tag,
+    TagSource,
     TagCompleteManager,
     fetchCSV,
     parseTagCSV,

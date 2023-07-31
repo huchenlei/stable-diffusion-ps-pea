@@ -1,9 +1,11 @@
 <script lang="ts">
-import { computed, } from 'vue';
+import { computed, ref, } from 'vue';
 import { CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { DeleteOutlined } from '@ant-design/icons-vue';
 import ExtraNetworks from './ExtraNetworks.vue';
+import type { Tag } from '@/TagComplete';
+import { useTagStore } from '@/stores/tagStore';
 
 export default {
     name: 'PromptInput',
@@ -33,11 +35,35 @@ export default {
             props.payload.negative_prompt = '';
         }
 
+        const autoCompleteOptions = ref<{ value: string, tag: Tag }[]>([]);
+        const autoCompleteInputElement = ref<any>(null);
+        async function handleSearch(value: string) {
+            if (!value || !autoCompleteInputElement.value) return;
+
+            const inputElement = (autoCompleteInputElement.value.resizableTextArea.textArea as HTMLTextAreaElement);
+            const cursorPosition = inputElement.selectionStart;
+            const inputValue = inputElement.value;
+            const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
+            const wordBeforeCursor = words[words.length - 1];
+
+            const tagStore = useTagStore();
+            if (!tagStore.tags.length) {
+                await tagStore.initStore();
+            }
+            const matchingTags = tagStore.tagCompleteManager.completeTag(wordBeforeCursor);
+            autoCompleteOptions.value = matchingTags.map(([name, tag]) => {
+                return { value: tag.name, tag };
+            });
+        }
+
         return {
             loras,
             embeddings,
             addPrompt,
             clearPrompt,
+            autoCompleteOptions,
+            handleSearch,
+            autoCompleteInputElement,
         };
     },
 };
@@ -45,8 +71,11 @@ export default {
 
 <template>
     <a-space direction="vertical" class="input-container">
-        <a-textarea v-model:value="payload.prompt" :placeholder="$t('gen.enterPrompt') + '...'"
-            :autoSize="{ minRows: 1, maxRows: 6 }" />
+        <a-auto-complete v-model:value="payload.prompt" :options="autoCompleteOptions" @search="handleSearch">
+            <a-textarea ref="autoCompleteInputElement" :placeholder="$t('gen.enterPrompt') + '...'"
+                :autoSize="{ minRows: 1, maxRows: 6 }" />
+        </a-auto-complete>
+
         <a-textarea v-model:value="payload.negative_prompt" :placeholder="$t('gen.enterNegativePrompt') + '...'"
             :autoSize="{ minRows: 1, maxRows: 6 }" />
 
