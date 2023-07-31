@@ -43,8 +43,11 @@ export default {
         const autoCompleteOptions = ref<{ value: string, tag: Tag }[]>([]);
         const autoCompleteInputElement = ref<any>(null);
         let timeout: number | null = null;
-        function handleSearch(value: string) {
-            if (!value || !autoCompleteInputElement.value) return;
+        function handleSearch(value: string) {            
+            if (!value || !autoCompleteInputElement.value) {
+                autoCompleteOptions.value = [];
+                return;
+            }
 
             // Clear the previous timer if it exists
             if (timeout) clearTimeout(timeout);
@@ -56,12 +59,16 @@ export default {
                 const inputValue = inputElement.value;
                 const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
                 const wordBeforeCursor = words[words.length - 1];
+                if (wordBeforeCursor.length === 0) {
+                    autoCompleteOptions.value = [];
+                    return;
+                }
 
                 const matchingTags = tagStore.tagCompleteManager.completeTag(wordBeforeCursor);
                 autoCompleteOptions.value = matchingTags.map(([name, tag]) => {
                     return { value: name, tag };
                 });
-            }, 200) as any as number;
+            }, 300) as any as number;
         }
 
         return {
