@@ -5,6 +5,7 @@ export const useTagStore = defineStore('tags', {
     state: () => ({
         tags: [] as Tag[],
         tagCompleteManager: {} as TagCompleteManager,
+        loading: true,
     }),
 
     actions: {
@@ -18,6 +19,7 @@ export const useTagStore = defineStore('tags', {
             this.tags = parseTagCSV(danbooruData, TagSource.kDanbooru)
                 .concat(parseTagCSV(e621Data, TagSource.kE621));
             this.tagCompleteManager = new TagCompleteManager(this.tags);
+            this.loading = false;
         }
     },
 });

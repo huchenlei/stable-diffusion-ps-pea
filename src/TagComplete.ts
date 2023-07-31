@@ -36,7 +36,7 @@ function parseTagCSV(csvText: string, tagSource: TagSource): Tag[] {
         name: row[0],
         category: parseInt(row[1], 10),
         count: parseInt(row[2], 10),
-        aliases: row[3] && _.isString(row[3]) ? row[3].split(',') : [],
+        aliases: row[3] ? row[3].split(',') : [],
         source: tagSource,
     }));
     return tags;
@@ -59,6 +59,35 @@ class TrieNode<T> {
         this.children = {};
         this.isEndOfWord = false;
         this.leaf = null;
+    }
+}
+
+interface WithPriority {
+    priority: number;
+}
+
+class PriorityQueue<T extends WithPriority> {
+    private _items: T[];
+    private _limit: number;
+
+    constructor(limit: number) {
+        this._items = [];
+        this._limit = limit;
+    }
+
+    enqueue(item: T) {
+        if (this._items.length < this._limit) {
+            this._items.push(item);
+            this._items.sort((a, b) => b.priority - a.priority);
+        } else if (item.priority > this._items[this._items.length - 1].priority) {
+            this._items.pop();
+            this._items.push(item);
+            this._items.sort((a, b) => b.priority - a.priority);
+        }
+    }
+
+    getItems(): T[] {
+        return this._items;
     }
 }
 
@@ -86,7 +115,7 @@ class Trie<T> {
     }
 
     // Perform a search starting with a given prefix
-    search(prefix: string): [string, T][] {
+    search(prefix: string, limit: number, getPriority: (t: T) => number): [string, T][] {
         let currentNode = this.root;
         for (let i = 0; i < prefix.length; i++) {
             const ch = prefix[i];
@@ -96,20 +125,27 @@ class Trie<T> {
             }
             currentNode = node;
         }
-        return this._getAllWordsFromNode(prefix, currentNode);
+        let queue = new PriorityQueue<{ priority: number, value: [string, T] }>(limit);
+        this._getAllWordsFromNode(prefix, currentNode, queue, getPriority);
+        return queue.getItems().map(item => item.value);
     }
 
     // Helper method to return all words that start with a given prefix
-    private _getAllWordsFromNode(prefix: string, node: TrieNode<T>): [string, T][] {
-        const words: [string, T][] = [];
+    private _getAllWordsFromNode(
+        prefix: string, node: TrieNode<T>,
+        queue: PriorityQueue<{ priority: number, value: [string, T] }>,
+        getPriority: (t: T) => number
+    ) {
         if (node.isEndOfWord) {
-            words.push([prefix, node.leaf!]);
+            queue.enqueue({
+                priority: getPriority(node.leaf!),
+                value: [prefix, node.leaf!],
+            });
         }
         for (let ch in node.children) {
             const childNode = node.children[ch];
-            words.push(...this._getAllWordsFromNode(prefix + ch, childNode));
+            this._getAllWordsFromNode(prefix + ch, childNode, queue, getPriority);
         }
-        return words;
     }
 }
 
@@ -147,8 +183,7 @@ class TagCompleteManager {
     }
 
     public completeTag(text: string, limit: number = 10): [string, Tag][] {
-        const results = this.trie.search(text).sort(([_1, t1], [_2, t2]) => t2.count - t1.count);
-        return _.take(results, limit);
+        return this.trie.search(text, limit, tag => tag.count);
     }
 };
 
@@ -157,6 +192,7 @@ export {
     type Tag,
     TagSource,
     TagCompleteManager,
+    FuzzyTagCompleteManager,
     fetchCSV,
     parseTagCSV,
 };

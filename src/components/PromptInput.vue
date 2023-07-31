@@ -35,25 +35,33 @@ export default {
             props.payload.negative_prompt = '';
         }
 
+        const tagStore = useTagStore();
+        if (!tagStore.tags.length) {
+            tagStore.initStore(); // Non-blocking
+        }
+
         const autoCompleteOptions = ref<{ value: string, tag: Tag }[]>([]);
         const autoCompleteInputElement = ref<any>(null);
-        async function handleSearch(value: string) {
+        let timeout: number | null = null;
+        function handleSearch(value: string) {
             if (!value || !autoCompleteInputElement.value) return;
 
-            const inputElement = (autoCompleteInputElement.value.resizableTextArea.textArea as HTMLTextAreaElement);
-            const cursorPosition = inputElement.selectionStart;
-            const inputValue = inputElement.value;
-            const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
-            const wordBeforeCursor = words[words.length - 1];
+            // Clear the previous timer if it exists
+            if (timeout) clearTimeout(timeout);
 
-            const tagStore = useTagStore();
-            if (!tagStore.tags.length) {
-                await tagStore.initStore();
-            }
-            const matchingTags = tagStore.tagCompleteManager.completeTag(wordBeforeCursor);
-            autoCompleteOptions.value = matchingTags.map(([name, tag]) => {
-                return { value: tag.name, tag };
-            });
+            // Start a new timer
+            timeout = setTimeout(() => {
+                const inputElement = (autoCompleteInputElement.value.resizableTextArea.textArea as HTMLTextAreaElement);
+                const cursorPosition = inputElement.selectionStart;
+                const inputValue = inputElement.value;
+                const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
+                const wordBeforeCursor = words[words.length - 1];
+
+                const matchingTags = tagStore.tagCompleteManager.completeTag(wordBeforeCursor);
+                autoCompleteOptions.value = matchingTags.map(([name, tag]) => {
+                    return { value: name, tag };
+                });
+            }, 200) as any as number;
         }
 
         return {
@@ -64,6 +72,7 @@ export default {
             autoCompleteOptions,
             handleSearch,
             autoCompleteInputElement,
+            tagStore,
         };
     },
 };
@@ -71,11 +80,12 @@ export default {
 
 <template>
     <a-space direction="vertical" class="input-container">
-        <a-auto-complete v-model:value="payload.prompt" :options="autoCompleteOptions" @search="handleSearch">
-            <a-textarea ref="autoCompleteInputElement" :placeholder="$t('gen.enterPrompt') + '...'"
-                :autoSize="{ minRows: 1, maxRows: 6 }" />
-        </a-auto-complete>
-
+        <a-spin :spinning="tagStore.loading">
+            <a-auto-complete v-model:value="payload.prompt" :options="autoCompleteOptions" @search="handleSearch">
+                <a-textarea ref="autoCompleteInputElement" :placeholder="$t('gen.enterPrompt') + '...'"
+                    :autoSize="{ minRows: 1, maxRows: 6 }" />
+            </a-auto-complete>
+        </a-spin>
         <a-textarea v-model:value="payload.negative_prompt" :placeholder="$t('gen.enterNegativePrompt') + '...'"
             :autoSize="{ minRows: 1, maxRows: 6 }" />
 
