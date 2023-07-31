@@ -15,7 +15,7 @@
 1. [*DONE*] Savable run configuration
    - [*DONE*] Reset button on generation page to reset everything to default
 2. Prompt textbox
-   - Auto complete (Self prompt use history and prompt use DB)
+   - [*DONE*] Auto complete (Self prompt use history and prompt use DB)
    - Templates (Default quality prompt, negative embeddings, etc)
    - Prompt token estimation (75/150/225)
    - [*DONE*] LoRA selection (LoRA should be selected instead of being put into prompt ideally)

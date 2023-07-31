@@ -147,7 +147,7 @@ export default {
                 @select="handleSelect">
                 <template #option="{ value, tag }">
                     <div style="display: flex; justify-content: space-between;">
-                        <span>{{ value === tag.name ? value : `${value}→${tag.name}` }}</span>
+                        <span>{{ value === tag.name ? value : `${value} → ${tag.name}` }}</span>
                         <span>{{ formatNumber(tag.count) }}</span>
                     </div>
                 </template>
