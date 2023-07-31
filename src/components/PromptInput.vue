@@ -113,6 +113,16 @@ export default {
             }
         }
 
+        function formatNumber(num: number): string {
+            if (num >= 1e6) {
+                return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+            }
+            if (num >= 1e3) {
+                return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'K';
+            }
+            return num.toString();
+        }
+
         return {
             loras,
             embeddings,
@@ -124,6 +134,7 @@ export default {
             handleTabPress,
             autoCompleteInputElement,
             tagStore,
+            formatNumber,
         };
     },
 };
@@ -134,6 +145,13 @@ export default {
         <a-spin :spinning="tagStore.loading">
             <a-auto-complete v-model:value="payload.prompt" :options="autoCompleteOptions" @search="handleSearch"
                 @select="handleSelect">
+                <template #option="{ value, tag }">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>{{ value === tag.name ? value : `${value}→${tag.name}` }}</span>
+                        <span>{{ formatNumber(tag.count) }}</span>
+                    </div>
+                </template>
+
                 <a-textarea ref="autoCompleteInputElement" :placeholder="$t('gen.enterPrompt') + '...'"
                     @keydown.tab.stop="handleTabPress" :autoSize="{ minRows: 1, maxRows: 6 }" />
             </a-auto-complete>
