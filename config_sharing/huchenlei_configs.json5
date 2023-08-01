@@ -40,7 +40,7 @@
             "kind": "E",
             "path": [
                 "commonPayload",
-                "batch_size",
+                "n_iter",
             ],
             "lhs": 1,
             "rhs": 4,
@@ -159,12 +159,12 @@
                     "input_mode": 0,
                     "low_vram": false,
                     "model": "control_v11f1e_sd15_tile [a371b31b]",
-                    "module": "tile_resample",
+                    "module": "tile_colorfix",
                     "output_dir": "",
                     "pixel_perfect": false,
                     "processor_res": 512,
                     "resize_mode": 1,
-                    "threshold_a": 1,
+                    "threshold_a": 3,
                     "threshold_b": 64,
                     "weight": 1,
                     "linkedLayerName": ""

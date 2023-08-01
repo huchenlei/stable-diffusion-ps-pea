@@ -21,6 +21,7 @@ const messages = {
             samplingSteps: 'Sampling Steps',
             cfg: 'CFG Scale',
             batchSize: 'Batch Size',
+            batchCount: 'Batch Count',
             vae: 'VAE',
             sampler: 'Sampler',
             advancedSettings: 'Advanced settings',

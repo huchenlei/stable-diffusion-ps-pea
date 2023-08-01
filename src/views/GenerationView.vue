@@ -448,7 +448,7 @@ const stepProgress = computed(() => {
           </div>
         </a-form-item>
         <a-form-item>
-          <SliderGroup :label="$t('gen.batchSize')" v-model:value="appState.commonPayload.batch_size" :min="1" :max="64"
+          <SliderGroup :label="$t('gen.batchCount')" v-model:value="appState.commonPayload.n_iter" :min="1" :max="64"
             :log-scale="true">
           </SliderGroup>
         </a-form-item>
@@ -486,6 +486,9 @@ const stepProgress = computed(() => {
                 <a-select style="flex: 1 1 auto;" ref="select" v-model:value="appState.commonPayload.sampler_name"
                   :options="samplerOptions"></a-select>
               </a-row>
+              <SliderGroup :label="$t('gen.batchSize')" v-model:value="appState.commonPayload.batch_size" :min="1"
+                :max="8" :log-scale="true">
+              </SliderGroup>
               <a-input-number :addonBefore="$t('width')" addonAfter="px" v-model:value="appState.commonPayload.width"
                 :min="64" :max="2048" />
               <a-input-number :addonBefore="$t('height')" addonAfter="px" v-model:value="appState.commonPayload.height"
