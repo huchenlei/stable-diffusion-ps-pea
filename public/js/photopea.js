@@ -145,9 +145,10 @@ function cropSelectedRegion(maskBlur) {
     const layer = doc.activeLayer;
 
     layer.rasterize(RasterizeType.ENTIRELAYER);
-    doc.selection.expand(maskBlur);
-    doc.selection.feather(maskBlur);
-
+    if (maskBlur) {
+        doc.selection.expand(maskBlur);
+        doc.selection.feather(maskBlur);
+    }
     // Clear everything outside selection.
     doc.selection.invert();
     doc.selection.clear();

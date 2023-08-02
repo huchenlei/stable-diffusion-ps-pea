@@ -24,6 +24,10 @@ export default {
             type: Number,
             required: false,
         },
+        maskBlur: {
+            type: Number,
+            required: false,
+        },
     },
     components: {
         ImagePicker,
@@ -84,7 +88,8 @@ export default {
                 await deselectResultImage();
                 for (const image of selectedResultImages) {
                     await selectResultImage(image, /* layerName= */'ResultLayer');
-                    await photopeaContext.invoke('cropSelectedRegion', /* maskBlur=*/ 4);
+                    console.log("sdp: Mask blur" + props.maskBlur);
+                    await photopeaContext.invoke('cropSelectedRegion', /* maskBlur=*/ props.maskBlur || 0);
                 }
                 await photopeaContext.invoke('deselect');
             });
