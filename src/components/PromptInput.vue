@@ -59,16 +59,21 @@ export default {
                 const inputValue = inputElement.value;
                 const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
                 const wordBeforeCursor = words[words.length - 1];
-                if (wordBeforeCursor.length === 0) {
+                const tagCandidate = wordBeforeCursor
+                    .replace(" ", "_")
+                    .replace("\\(", "(")
+                    .replace("\\)", ")");
+
+                if (tagCandidate.length === 0) {
                     autoCompleteOptions.value = [];
                     return;
                 }
 
-                const matchingTags = tagStore.tagCompleteManager.completeTag(wordBeforeCursor);
+                const matchingTags = tagStore.tagCompleteManager.completeTag(tagCandidate);
                 autoCompleteOptions.value = matchingTags.map(([name, tag]) => {
                     return { value: name, tag };
                 });
-            }, 300) as any as number;
+            }, 200) as any as number;
         }
 
         function handleSelect(value: string, option: { value: string, tag: Tag }) {
