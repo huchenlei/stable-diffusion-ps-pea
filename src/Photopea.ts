@@ -189,17 +189,25 @@ class PhotopeaContext {
         const layerCount = await this.invoke('pasteImageAsNewLayer', imageURL) as number;
         console.debug(`sdp: Adding new layer. Num of top layers: ${layerCount}`);
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            let invokeInProgress = false;
             const waitTranslate = setInterval(async () => {
-                const status = await this.invoke(
-                    'translateIfNewLayerAdded', layerCount, left, top, width, height, layerName);
-                if (status === 'success') {
+                try {
+                    if (invokeInProgress) return;
+                    invokeInProgress = true;
+                    const status = await this.invoke(
+                        'translateIfNewLayerAdded', layerCount, left, top, width, height, layerName);
+                    if (status === 'success') {
+                        console.debug(`sdp: New layer added. Done post process`);
+                        clearInterval(waitTranslate);
+                        resolve(true);
+                        return;
+                    }
+                    console.debug(`sdp: New layer not fully added. Continue waiting.`);
+                } catch (e) {
                     clearInterval(waitTranslate);
-                    console.debug(`sdp: New layer added. Done post process`);
-                    resolve(true);
-                    return;
+                    reject(e);
                 }
-                console.debug(`sdp: New layer not fully added. Continue waiting.`);
             }, 50);
         });
     }
