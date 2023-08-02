@@ -126,7 +126,7 @@ function translateIfNewLayerAdded(layerCount, bounds, scaleX, scaleY, layerName)
     const height = bounds[3] - bounds[1];
     const centerX = doc.width / 2;
     const centerY = doc.height / 2;
-    
+
     const imageLeft = centerX - width / 2;
     const imageTop = centerY - height / 2;
 
@@ -151,7 +151,12 @@ function cropSelectedRegion(maskBlur) {
     // Clear everything outside selection.
     doc.selection.invert();
     doc.selection.clear();
-    doc.selection.deselect();
+    app.echoToOE("success");
+}
+
+function deselect() {
+    app.activeDocument.selection.deselect();
+    app.echoToOE("success");
 }
 
 // Creates a black and white mask based on the current selection in the active document.

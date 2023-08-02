@@ -69,7 +69,7 @@ export default {
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
             await photopeaContext.pasteImageOnPhotopea(
-                imageItem.imageURL, props.bound! as PhotopeaBound, 
+                imageItem.imageURL, props.bound! as PhotopeaBound,
                 props.scaleRatio!, props.scaleRatio!, layerName
             );
         }
@@ -84,7 +84,9 @@ export default {
                 await deselectResultImage();
                 for (const image of selectedResultImages) {
                     await selectResultImage(image, /* layerName= */'ResultLayer');
+                    await photopeaContext.invoke('cropSelectedRegion', /* maskBlur=*/ 4);
                 }
+                await photopeaContext.invoke('deselect');
             });
             photopeaInProgress.value = false;
             finalizeSelection();
