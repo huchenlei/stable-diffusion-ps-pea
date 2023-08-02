@@ -250,9 +250,23 @@ function base64ArrayBuffer(arrayBuffer: ArrayBuffer): string {
     return base64
 }
 
+function getImageDimensions(imageURL: string): Promise<{ width: number; height: number; }> {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => { // using arrow function to keep 'this' context as 'img'
+            resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => {
+            reject(new Error('Failed to load image'));
+        };
+        img.src = imageURL;
+    });
+}
+
 export {
     PayloadImage,
     applyMask,
     cropImage,
+    getImageDimensions,
     base64ArrayBuffer,
 }

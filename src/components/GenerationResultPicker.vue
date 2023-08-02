@@ -69,7 +69,9 @@ export default {
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
             await photopeaContext.pasteImageOnPhotopea(
-                imageItem.imageURL, props.bound! as PhotopeaBound, props.scaleRatio!, layerName);
+                imageItem.imageURL, props.bound! as PhotopeaBound, 
+                props.scaleRatio!, props.scaleRatio!, layerName
+            );
         }
         function finalizeSelection() {
             selectedResultImages.length = 0;

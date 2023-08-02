@@ -183,7 +183,7 @@ class PhotopeaContext {
 
     // Thread unsafe. Need be called within a task.
     public async pasteImageOnPhotopea(
-        imageURL: string, bound: PhotopeaBound, scaleRatio: number,
+        imageURL: string, bound: PhotopeaBound, scaleX: number, scaleY: number = scaleX,
         layerName: string = 'image'
     ) {
         const layerCount = Number(await this.invoke('pasteImageAsNewLayer', imageURL));
@@ -196,7 +196,7 @@ class PhotopeaContext {
                     if (invokeInProgress) return;
                     invokeInProgress = true;
                     const status = await this.invoke(
-                        'translateIfNewLayerAdded', layerCount, bound, scaleRatio, layerName);
+                        'translateIfNewLayerAdded', layerCount, bound, scaleX, scaleY, layerName);
                     if (status === 'success') {
                         console.debug(`sdp: New layer added. Done post process`);
                         clearInterval(waitTranslate);
