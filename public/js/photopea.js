@@ -308,7 +308,18 @@ function exportLayersWithNames(layerNames, format) {
     exportSelectedLayerOnly(format, layerSelector);
 }
 
-function fillSelectionWithBlackInNewLayer(layerName) {
+function selectBound(bound) {
+    const doc = app.activeDocument;
+    const bounds = [
+        [bound[0], bound[1]], 
+        [bound[2], bound[1]], 
+        [bound[2], bound[3]], 
+        [bound[0], bound[3]],
+    ];
+    doc.selection.select(bounds, SelectionType.REPLACE, 0, false);
+}
+
+function createRefRangePlaceholder(bound, layerName) {
     if (!hasSelection()) {
         alert("No selection!");
         app.echoToOE("error");
@@ -320,13 +331,15 @@ function fillSelectionWithBlackInNewLayer(layerName) {
     // Create a temp layer.
     const newLayer = app.activeDocument.artLayers.add();
     newLayer.name = layerName;
+    newLayer.opacity = 30;
 
     const blackColor = new SolidColor();
     blackColor.rgb.red = 0;
     blackColor.rgb.green = 0;
     blackColor.rgb.blue = 0;
 
-    // Fill with the foreground color and deselect.
+    // Fill with the foreground color
+    selectBound(bound);
     app.activeDocument.selection.fill(blackColor);
     app.activeDocument.selection.deselect();
 
