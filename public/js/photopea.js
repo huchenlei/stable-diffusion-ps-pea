@@ -151,6 +151,7 @@ function cropSelectedRegion(maskBlur) {
     // Clear everything outside selection.
     doc.selection.invert();
     doc.selection.clear();
+    doc.selection.invert();
     app.echoToOE("success");
 }
 
