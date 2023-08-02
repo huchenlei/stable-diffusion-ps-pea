@@ -1,5 +1,5 @@
 <script lang="ts">
-import { photopeaContext } from '@/Photopea';
+import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
@@ -18,6 +18,10 @@ export default {
         },
         bound: {
             type: Array<number>,
+            required: false,
+        },
+        scaleRatio: {
+            type: Number,
             required: false,
         },
     },
@@ -64,11 +68,8 @@ export default {
         }
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
-            const [left, top, right, bottom] = props.bound!;
-            const width = right - left;
-            const height = bottom - top;
             await photopeaContext.pasteImageOnPhotopea(
-                imageItem.imageURL, left, top, width, height, layerName);
+                imageItem.imageURL, props.bound! as PhotopeaBound, props.scaleRatio!, layerName);
         }
         function finalizeSelection() {
             selectedResultImages.length = 0;

@@ -210,7 +210,7 @@ export default {
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
 
                 await photopeaContext.executeTask(async () => {
-                    await photopeaContext.pasteImageOnPhotopea(detectedMap, image.left, image.top, image.width, image.height);
+                    await photopeaContext.pasteImageOnPhotopea(detectedMap, bounds, /* scaleRatio= */1.0);
                     const previousLayerName = props.unit.linkedLayerName;
                     props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
                     await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);

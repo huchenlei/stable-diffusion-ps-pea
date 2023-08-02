@@ -106,36 +106,52 @@ function pasteImageAsNewLayer(base64image) {
 }
 
 // Translate the newly added layer if the new layer has been added.
-function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, height, layerName) {
+// Note: we cannot get layer bounds when a selection is active. So the resize and
+// translation are all based on payload calculations.
+function translateIfNewLayerAdded(layerCount, bounds, scaleRatio, layerName) {
     if (app.activeDocument.layers.length === layerCount) {
         app.echoToOE("fail");
         return;
     }
 
-    // Deselect first, otherwise we are going to translate the selected area,
-    // intead of the whole layer.
-    if (hasSelection()) {
-        app.activeDocument.selection.deselect();
-    }
-
-    const layer = app.activeDocument.activeLayer;
-    if (width && height) {
-        const bounds = layer.bounds;
-        const currentWidth = bounds[2].value - bounds[0].value;
-        const currentHeight = bounds[3].value - bounds[1].value;
-
-        layer.resize(
-            (width / currentWidth) * 100,
-            (height / currentHeight) * 100,
-            AnchorPosition.MIDDLECENTER
-        );
-    }
-    layer.translate(
-        leftOffset - layer.bounds[0].value,
-        topOffset - layer.bounds[1].value
+    const doc = app.activeDocument;
+    const layer = doc.activeLayer;
+    layer.resize(
+        (1 / scaleRatio) * 100,
+        (1 / scaleRatio) * 100,
+        AnchorPosition.MIDDLECENTER
     );
+
+    const width = bounds[2] - bounds[0];
+    const height = bounds[3] - bounds[1];
+    const centerX = doc.width / 2;
+    const centerY = doc.height / 2;
+    
+    const imageLeft = centerX - width / 2;
+    const imageTop = centerY - height / 2;
+
+    layer.translate(
+        bounds[0] - imageLeft,
+        bounds[1] - imageTop
+    );
+
     layer.name = layerName;
     app.echoToOE("success");
+}
+
+// Delete everything outside the selected region.
+function cropSelectedRegion(maskBlur) {
+    const doc = app.activeDocument;
+    const layer = doc.activeLayer;
+
+    layer.rasterize(RasterizeType.ENTIRELAYER);
+    doc.selection.expand(maskBlur);
+    doc.selection.feather(maskBlur);
+
+    // Clear everything outside selection.
+    doc.selection.invert();
+    doc.selection.clear();
+    doc.selection.deselect();
 }
 
 // Creates a black and white mask based on the current selection in the active document.
@@ -311,9 +327,9 @@ function exportLayersWithNames(layerNames, format) {
 function selectBound(bound) {
     const doc = app.activeDocument;
     const bounds = [
-        [bound[0], bound[1]], 
-        [bound[2], bound[1]], 
-        [bound[2], bound[3]], 
+        [bound[0], bound[1]],
+        [bound[2], bound[1]],
+        [bound[2], bound[3]],
         [bound[0], bound[3]],
     ];
     doc.selection.select(bounds, SelectionType.REPLACE, 0, false);

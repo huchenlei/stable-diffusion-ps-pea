@@ -36,6 +36,7 @@ const generationActive = ref(false);
 
 // The bounding box to put the result image in.
 const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
+const resultImageScaleRatio = ref<number | undefined>(undefined);
 
 const inputImageBuffer = ref<ArrayBuffer | undefined>(undefined);
 const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
@@ -203,6 +204,7 @@ async function preparePayload() {
         if (appState.generationMode === GenerationMode.Img2Img)
           expandSelectionBound(resultImageBound.value);
       }
+      resultImageScaleRatio.value = appState.imageScale;
 
       inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
       inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
@@ -227,8 +229,6 @@ async function preparePayload() {
 
     inputImage.value = image;
     inputMask.value = mask;
-
-    console.debug(`sdp: Result image bound: ${resultImageBound.value}`);
 
     const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
     if (isImg2Img) {
@@ -423,7 +423,7 @@ const stepProgress = computed(() => {
               }}</a-button>
           </a-space>
         </a-form-item>
-        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound"
+        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :scaleRatio="resultImageScaleRatio"
           @result-finalized="onResultImagePicked">
         </GenerationResultPicker>
         <a-form-item>
