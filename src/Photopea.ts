@@ -182,10 +182,7 @@ class PhotopeaContext {
     }
 
     // Thread unsafe. Need be called within a task.
-    public async pasteImageOnPhotopea(
-        imageURL: string, bound: PhotopeaBound, scaleX: number, scaleY: number = scaleX,
-        layerName: string = 'image'
-    ) {
+    public async pasteImageOnPhotopea(imageURL: string, bound: PhotopeaBound,layerName: string = 'image') {
         const layerCount = Number(await this.invoke('pasteImageAsNewLayer', imageURL));
         console.debug(`sdp: Adding new layer. Num of top layers: ${layerCount}`);
 
@@ -196,7 +193,7 @@ class PhotopeaContext {
                     if (invokeInProgress) return;
                     invokeInProgress = true;
                     const status = await this.invoke(
-                        'translateIfNewLayerAdded', layerCount, bound, scaleX, scaleY, layerName);
+                        'translateIfNewLayerAdded', layerCount, bound, layerName);
                     if (status === 'success') {
                         console.debug(`sdp: New layer added. Done post process`);
                         clearInterval(waitTranslate);
@@ -214,9 +211,17 @@ class PhotopeaContext {
 };
 
 type PhotopeaBound = [number, number, number, number];
+function boundWidth(bound: PhotopeaBound) {
+    return bound[2] - bound[0];
+}
+function boundHeight(bound: PhotopeaBound) {
+    return bound[3] - bound[1];
+}
 
 const photopeaContext = new PhotopeaContext();
 export {
     type PhotopeaBound,
-    photopeaContext
+    boundWidth,
+    boundHeight,
+    photopeaContext,
 };

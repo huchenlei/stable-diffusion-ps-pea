@@ -108,7 +108,7 @@ function pasteImageAsNewLayer(base64image) {
 // Translate the newly added layer if the new layer has been added.
 // Note: we cannot get layer bounds when a selection is active. So the resize and
 // translation are all based on payload calculations.
-function translateIfNewLayerAdded(layerCount, bounds, scaleX, scaleY, layerName) {
+function translateIfNewLayerAdded(layerCount, bounds, layerName) {
     if (app.activeDocument.layers.length === layerCount) {
         app.echoToOE("fail");
         return;
@@ -116,11 +116,6 @@ function translateIfNewLayerAdded(layerCount, bounds, scaleX, scaleY, layerName)
 
     const doc = app.activeDocument;
     const layer = doc.activeLayer;
-    layer.resize(
-        (1 / scaleX) * 100,
-        (1 / scaleY) * 100,
-        AnchorPosition.MIDDLECENTER
-    );
 
     const width = bounds[2] - bounds[0];
     const height = bounds[3] - bounds[1];

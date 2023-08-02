@@ -197,30 +197,36 @@ async function preparePayload() {
 
   try {
     const [image, mask] = await photopeaContext.executeTask(async () => {
+      let bound: PhotopeaBound;
       if (generationState.value === GenerationState.kSelectRefAreaState) {
         // Remove the temp layer on canvas.
         await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
+        bound = resultImageBound.value!;
       } else {
-        resultImageBound.value = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+        bound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+        // Note: After expansion, there might be selection on region outside canvas.
+        // We should use `image.bound` which is clampped against canvas to for the real
+        // selection bound.
         if (appState.generationMode === GenerationMode.Img2Img)
-          expandSelectionBound(resultImageBound.value);
+          expandSelectionBound(bound);
       }
 
       inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
       inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
       const [image, mask] = await Promise.all([
-        cropImage(inputImageBuffer.value, resultImageBound.value!),
-        cropImage(inputMaskBuffer.value, resultImageBound.value!),
+        cropImage(inputImageBuffer.value, bound),
+        cropImage(inputMaskBuffer.value, bound),
       ]);
       return [image, mask];
     });
 
+    resultImageBound.value = image.bound;
     resultImageScaleRatio.value = appState.imageScale;
     if (appState.generationMode === GenerationMode.Img2Img) {
       resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
     }
 
-    await setControlNetInputs(resultImageBound.value!);
+    await setControlNetInputs(image.bound);
     // Handling extension
     fillExtensionsArgs();
 

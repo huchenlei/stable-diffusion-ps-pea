@@ -5,8 +5,8 @@ import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined, UploadOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref, nextTick } from 'vue';
-import { photopeaContext, type PhotopeaBound } from '@/Photopea';
-import { PayloadImage, cropImage, getImageDimensions } from '@/ImageUtil';
+import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
+import { PayloadImage, cropImage, resizeImage } from '@/ImageUtil';
 import { useI18n } from 'vue-i18n';
 
 interface ModuleOption {
@@ -208,14 +208,11 @@ export default {
                     throw (data as ControlNetError).detail;
 
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
-                const dims = await getImageDimensions(detectedMap);
-                const width = bounds[2] - bounds[0];
-                const height = bounds[3] - bounds[1];
-                const scaleX = dims.width / width;
-                const scaleY = dims.height / height;
-
                 await photopeaContext.executeTask(async () => {
-                    await photopeaContext.pasteImageOnPhotopea(detectedMap, bounds, scaleX, scaleY);
+                    await photopeaContext.pasteImageOnPhotopea(
+                        await resizeImage(detectedMap, boundWidth(bounds), boundHeight(bounds)), 
+                        bounds
+                    );
                     const previousLayerName = props.unit.linkedLayerName;
                     props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
                     await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);

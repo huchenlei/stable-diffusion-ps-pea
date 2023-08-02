@@ -1,8 +1,9 @@
 <script lang="ts">
-import { photopeaContext, type PhotopeaBound } from '@/Photopea';
+import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
+import { resizeImage } from '@/ImageUtil';
 
 interface ImageItem {
     imageURL: string;
@@ -72,9 +73,10 @@ export default {
         }
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
+            const bound = props.bound! as PhotopeaBound;
             await photopeaContext.pasteImageOnPhotopea(
-                imageItem.imageURL, props.bound! as PhotopeaBound,
-                props.scaleRatio!, props.scaleRatio!, layerName
+                await resizeImage(imageItem.imageURL, boundWidth(bound), boundHeight(bound)),
+                bound, layerName
             );
         }
         function finalizeSelection() {
