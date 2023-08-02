@@ -1,8 +1,9 @@
 <script lang="ts">
-import { photopeaContext } from '@/Photopea';
+import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
+import { resizeImage } from '@/ImageUtil';
 
 interface ImageItem {
     imageURL: string;
@@ -18,6 +19,10 @@ export default {
         },
         bound: {
             type: Array<number>,
+            required: false,
+        },
+        maskBlur: {
+            type: Number,
             required: false,
         },
     },
@@ -64,11 +69,11 @@ export default {
         }
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
-            const [left, top, right, bottom] = props.bound!;
-            const width = right - left;
-            const height = bottom - top;
+            const bound = props.bound! as PhotopeaBound;
             await photopeaContext.pasteImageOnPhotopea(
-                imageItem.imageURL, left, top, width, height, layerName);
+                await resizeImage(imageItem.imageURL, boundWidth(bound), boundHeight(bound)),
+                bound, layerName
+            );
         }
         function finalizeSelection() {
             selectedResultImages.length = 0;
@@ -81,7 +86,10 @@ export default {
                 await deselectResultImage();
                 for (const image of selectedResultImages) {
                     await selectResultImage(image, /* layerName= */'ResultLayer');
+                    console.log("sdp: Mask blur" + props.maskBlur);
+                    await photopeaContext.invoke('cropSelectedRegion', /* maskBlur=*/ props.maskBlur || 0);
                 }
+                await photopeaContext.invoke('deselect');
             });
             photopeaInProgress.value = false;
             finalizeSelection();

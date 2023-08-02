@@ -106,35 +106,53 @@ function pasteImageAsNewLayer(base64image) {
 }
 
 // Translate the newly added layer if the new layer has been added.
-function translateIfNewLayerAdded(layerCount, leftOffset, topOffset, width, height, layerName) {
+// Note: we cannot get layer bounds when a selection is active. So the resize and
+// translation are all based on payload calculations.
+function translateIfNewLayerAdded(layerCount, bounds, layerName) {
     if (app.activeDocument.layers.length === layerCount) {
         app.echoToOE("fail");
         return;
     }
 
-    // Deselect first, otherwise we are going to translate the selected area,
-    // intead of the whole layer.
-    if (hasSelection()) {
-        app.activeDocument.selection.deselect();
-    }
+    const doc = app.activeDocument;
+    const layer = doc.activeLayer;
 
-    const layer = app.activeDocument.activeLayer;
-    if (width && height) {
-        const bounds = layer.bounds;
-        const currentWidth = bounds[2].value - bounds[0].value;
-        const currentHeight = bounds[3].value - bounds[1].value;
+    const width = bounds[2] - bounds[0];
+    const height = bounds[3] - bounds[1];
+    const centerX = doc.width / 2;
+    const centerY = doc.height / 2;
 
-        layer.resize(
-            (width / currentWidth) * 100,
-            (height / currentHeight) * 100,
-            AnchorPosition.MIDDLECENTER
-        );
-    }
+    const imageLeft = centerX - width / 2;
+    const imageTop = centerY - height / 2;
+
     layer.translate(
-        leftOffset - layer.bounds[0].value,
-        topOffset - layer.bounds[1].value
+        bounds[0] - imageLeft,
+        bounds[1] - imageTop
     );
+
     layer.name = layerName;
+    app.echoToOE("success");
+}
+
+// Delete everything outside the selected region.
+function cropSelectedRegion(maskBlur) {
+    const doc = app.activeDocument;
+    const layer = doc.activeLayer;
+
+    layer.rasterize(RasterizeType.ENTIRELAYER);
+    if (maskBlur) {
+        doc.selection.expand(maskBlur);
+        doc.selection.feather(maskBlur);
+    }
+    // Clear everything outside selection.
+    doc.selection.invert();
+    doc.selection.clear();
+    doc.selection.invert();
+    app.echoToOE("success");
+}
+
+function deselect() {
+    app.activeDocument.selection.deselect();
     app.echoToOE("success");
 }
 
@@ -308,7 +326,18 @@ function exportLayersWithNames(layerNames, format) {
     exportSelectedLayerOnly(format, layerSelector);
 }
 
-function fillSelectionWithBlackInNewLayer(layerName) {
+function selectBound(bound) {
+    const doc = app.activeDocument;
+    const bounds = [
+        [bound[0], bound[1]],
+        [bound[2], bound[1]],
+        [bound[2], bound[3]],
+        [bound[0], bound[3]],
+    ];
+    doc.selection.select(bounds, SelectionType.REPLACE, 0, false);
+}
+
+function createRefRangePlaceholder(bound, layerName) {
     if (!hasSelection()) {
         alert("No selection!");
         app.echoToOE("error");
@@ -320,13 +349,15 @@ function fillSelectionWithBlackInNewLayer(layerName) {
     // Create a temp layer.
     const newLayer = app.activeDocument.artLayers.add();
     newLayer.name = layerName;
+    newLayer.opacity = 30;
 
     const blackColor = new SolidColor();
     blackColor.rgb.red = 0;
     blackColor.rgb.green = 0;
     blackColor.rgb.blue = 0;
 
-    // Fill with the foreground color and deselect.
+    // Fill with the foreground color
+    selectBound(bound);
     app.activeDocument.selection.fill(blackColor);
     app.activeDocument.selection.deselect();
 

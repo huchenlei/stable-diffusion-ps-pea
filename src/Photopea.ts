@@ -182,33 +182,46 @@ class PhotopeaContext {
     }
 
     // Thread unsafe. Need be called within a task.
-    public async pasteImageOnPhotopea(
-        imageURL: string, left: number, top: number, width: number, height: number,
-        layerName: string = 'image'
-    ) {
-        const layerCount = await this.invoke('pasteImageAsNewLayer', imageURL) as number;
+    public async pasteImageOnPhotopea(imageURL: string, bound: PhotopeaBound,layerName: string = 'image') {
+        const layerCount = Number(await this.invoke('pasteImageAsNewLayer', imageURL));
         console.debug(`sdp: Adding new layer. Num of top layers: ${layerCount}`);
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            let invokeInProgress = false;
             const waitTranslate = setInterval(async () => {
-                const status = await this.invoke(
-                    'translateIfNewLayerAdded', layerCount, left, top, width, height, layerName);
-                if (status === 'success') {
+                try {
+                    if (invokeInProgress) return;
+                    invokeInProgress = true;
+                    const status = await this.invoke(
+                        'translateIfNewLayerAdded', layerCount, bound, layerName);
+                    if (status === 'success') {
+                        console.debug(`sdp: New layer added. Done post process`);
+                        clearInterval(waitTranslate);
+                        resolve(true);
+                        return;
+                    }
+                    console.debug(`sdp: New layer not fully added. Continue waiting.`);
+                } catch (e) {
                     clearInterval(waitTranslate);
-                    console.debug(`sdp: New layer added. Done post process`);
-                    resolve(true);
-                    return;
+                    reject(e);
                 }
-                console.debug(`sdp: New layer not fully added. Continue waiting.`);
             }, 50);
         });
     }
 };
 
 type PhotopeaBound = [number, number, number, number];
+function boundWidth(bound: PhotopeaBound) {
+    return bound[2] - bound[0];
+}
+function boundHeight(bound: PhotopeaBound) {
+    return bound[3] - bound[1];
+}
 
 const photopeaContext = new PhotopeaContext();
 export {
     type PhotopeaBound,
-    photopeaContext
+    boundWidth,
+    boundHeight,
+    photopeaContext,
 };

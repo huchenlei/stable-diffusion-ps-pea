@@ -250,9 +250,55 @@ function base64ArrayBuffer(arrayBuffer: ArrayBuffer): string {
     return base64
 }
 
+function getImageDimensions(imageURL: string): Promise<{ width: number; height: number; }> {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => { // using arrow function to keep 'this' context as 'img'
+            resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => {
+            reject(new Error('Failed to load image'));
+        };
+        img.src = imageURL;
+    });
+}
+
+async function resizeImage(imageURL: string, targetWidth: number, targetHeight: number): Promise<string> {
+    // Create a new fabric canvas
+    const canvas = new fabric.StaticCanvas(null, {
+        width: targetWidth,
+        height: targetHeight,
+    });
+
+    return new Promise((resolve, reject) => {
+        fabric.Image.fromURL(imageURL, (image) => {
+            // Scale factors for width and height
+            const scaleX = targetWidth / image.width!;
+            const scaleY = targetHeight / image.height!;
+
+            // Set scale for width and height separately
+            image.scaleX = scaleX;
+            image.scaleY = scaleY;
+
+            canvas.add(image);
+            canvas.renderAll();
+
+            // Create the resized image
+            const resizedBase64Image = canvas.toDataURL({
+                format: 'png',
+                quality: 1
+            });
+
+            resolve(resizedBase64Image);
+        });
+    });
+}
+
 export {
     PayloadImage,
     applyMask,
     cropImage,
+    getImageDimensions,
+    resizeImage,
     base64ArrayBuffer,
 }

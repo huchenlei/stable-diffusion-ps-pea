@@ -36,6 +36,7 @@ const generationActive = ref(false);
 
 // The bounding box to put the result image in.
 const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
+const resultImageMaskBlur = ref<number | undefined>(undefined);
 
 const inputImageBuffer = ref<ArrayBuffer | undefined>(undefined);
 const inputMaskBuffer = ref<ArrayBuffer | undefined>(undefined);
@@ -160,15 +161,15 @@ const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
  * where the current selection(mask) is persisted, and user need to do another 
  * selection on canvas to continue.
  */
-const startSelectRefAreaInProgress = ref<boolean>(false);
-async function startSelectRefArea() {
-  if (startSelectRefAreaInProgress.value) return;
-  startSelectRefAreaInProgress.value = true;
+const selectRefAreaInProgress = ref<boolean>(false);
+async function selectRefArea() {
+  if (selectRefAreaInProgress.value) return;
+  selectRefAreaInProgress.value = true;
   try {
     await photopeaContext.executeTask(async () => {
-      inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-      inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
-      await photopeaContext.invoke('fillSelectionWithBlackInNewLayer', /* layerName= */"TempMaskLayer");
+      const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+      resultImageBound.value = maskBound;
+      await photopeaContext.invoke('createRefRangePlaceholder', maskBound,  /* layerName= */"TempMaskLayer");
       generationState.value = GenerationState.kSelectRefAreaState;
     });
     return true;
@@ -177,7 +178,7 @@ async function startSelectRefArea() {
     $notify(`${e}`);
     return false;
   } finally {
-    startSelectRefAreaInProgress.value = false;
+    selectRefAreaInProgress.value = false;
   }
 }
 
@@ -194,27 +195,36 @@ async function preparePayload() {
   }
 
   try {
-    const [image, mask, maskBound] = await photopeaContext.executeTask(async () => {
-      const maskBound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
-
+    const [image, mask] = await photopeaContext.executeTask(async () => {
+      let bound: PhotopeaBound;
       if (generationState.value === GenerationState.kSelectRefAreaState) {
         // Remove the temp layer on canvas.
         await photopeaContext.invoke('removeTopLevelLayer', /* layerName= */"TempMaskLayer");
+        bound = resultImageBound.value!;
       } else {
-        inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
-        inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
+        bound = JSON.parse(await photopeaContext.invoke('getSelectionBound') as string) as PhotopeaBound;
+        // Note: After expansion, there might be selection on region outside canvas.
+        // We should use `image.bound` which is clampped against canvas to for the real
+        // selection bound.
         if (appState.generationMode === GenerationMode.Img2Img)
-          expandSelectionBound(maskBound);
+          expandSelectionBound(bound);
       }
 
+      inputImageBuffer.value = await photopeaContext.invoke('exportAllLayers', /* format= */'PNG') as ArrayBuffer;
+      inputMaskBuffer.value = await photopeaContext.invoke('exportMaskFromSelection', /* format= */'PNG') as ArrayBuffer;
       const [image, mask] = await Promise.all([
-        cropImage(inputImageBuffer.value!, maskBound),
-        cropImage(inputMaskBuffer.value!, maskBound),
+        cropImage(inputImageBuffer.value, bound),
+        cropImage(inputMaskBuffer.value, bound),
       ]);
-      return [image, mask, maskBound];
+      return [image, mask];
     });
 
-    await setControlNetInputs(maskBound!);
+    resultImageBound.value = image.bound;
+    if (appState.generationMode === GenerationMode.Img2Img) {
+      resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
+    }
+
+    await setControlNetInputs(image.bound);
     // Handling extension
     fillExtensionsArgs();
 
@@ -228,9 +238,6 @@ async function preparePayload() {
 
     inputImage.value = image;
     inputMask.value = mask;
-
-    resultImageBound.value = image.bound;
-    console.debug(`sdp: Result image bound: ${resultImageBound.value}`);
 
     const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
     if (isImg2Img) {
@@ -331,6 +338,7 @@ async function generateWithConfig(configName: string) {
 
 function onResultImagePicked() {
   resultImageBound.value = undefined;
+  resultImageMaskBlur.value = undefined;
   resultImages.length = 0;
   generationState.value = GenerationState.kInitialState;
 }
@@ -396,10 +404,10 @@ const stepProgress = computed(() => {
           </a-button>
           <a-row>
             <a-col :span="12">
-              <a-spin :spinning="startSelectRefAreaInProgress">
+              <a-spin :spinning="selectRefAreaInProgress">
                 <a-button class="ref-area-button"
                   :disabled="generationState >= GenerationState.kSelectRefAreaState || appState.generationMode === GenerationMode.Txt2Img"
-                  @click="startSelectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
+                  @click="selectRefArea" @mouseover="highlightGenerationStep(GenerationState.kSelectRefAreaState)"
                   @mouseout="removeGenerationStepHighlight">{{
                     $t('gen.selectRefArea') }}</a-button>
               </a-spin>
@@ -425,7 +433,7 @@ const stepProgress = computed(() => {
               }}</a-button>
           </a-space>
         </a-form-item>
-        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound"
+        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
           @result-finalized="onResultImagePicked">
         </GenerationResultPicker>
         <a-form-item>
