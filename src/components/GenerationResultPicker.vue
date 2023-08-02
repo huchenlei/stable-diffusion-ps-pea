@@ -21,10 +21,6 @@ export default {
             type: Array<number>,
             required: false,
         },
-        scaleRatio: {
-            type: Number,
-            required: false,
-        },
         maskBlur: {
             type: Number,
             required: false,

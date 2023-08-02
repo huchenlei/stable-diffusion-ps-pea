@@ -36,7 +36,6 @@ const generationActive = ref(false);
 
 // The bounding box to put the result image in.
 const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
-const resultImageScaleRatio = ref<number | undefined>(undefined);
 const resultImageMaskBlur = ref<number | undefined>(undefined);
 
 const inputImageBuffer = ref<ArrayBuffer | undefined>(undefined);
@@ -221,7 +220,6 @@ async function preparePayload() {
     });
 
     resultImageBound.value = image.bound;
-    resultImageScaleRatio.value = appState.imageScale;
     if (appState.generationMode === GenerationMode.Img2Img) {
       resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
     }
@@ -340,7 +338,6 @@ async function generateWithConfig(configName: string) {
 
 function onResultImagePicked() {
   resultImageBound.value = undefined;
-  resultImageScaleRatio.value = undefined;
   resultImageMaskBlur.value = undefined;
   resultImages.length = 0;
   generationState.value = GenerationState.kInitialState;
@@ -436,8 +433,7 @@ const stepProgress = computed(() => {
               }}</a-button>
           </a-space>
         </a-form-item>
-        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :scaleRatio="resultImageScaleRatio"
-          :maskBlur="resultImageMaskBlur"
+        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
           @result-finalized="onResultImagePicked">
         </GenerationResultPicker>
         <a-form-item>
