@@ -6,6 +6,7 @@ import { DeleteOutlined } from '@ant-design/icons-vue';
 import ExtraNetworks from './ExtraNetworks.vue';
 import type { Tag } from '@/TagComplete';
 import { useTagStore } from '@/stores/tagStore';
+import Tagger from './Tagger.vue';
 
 export default {
     name: 'PromptInput',
@@ -17,6 +18,7 @@ export default {
     },
     components: {
         ExtraNetworks,
+        Tagger,
         DeleteOutlined,
     },
     emits: ['update:promptValue'],
@@ -166,6 +168,8 @@ export default {
 
         <a-space>
             <ExtraNetworks :loras="loras" :embeddings="embeddings" @add:prompt="addPrompt"></ExtraNetworks>
+            <Tagger></Tagger>
+
             <a-button @click="clearPrompt" :danger="true" type="primary" :title="$t('gen.clearPrompt')">
                 <DeleteOutlined></DeleteOutlined>
             </a-button>
