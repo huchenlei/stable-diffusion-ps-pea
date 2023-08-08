@@ -79,11 +79,13 @@ export default {
         function updatePrompt() {
             emit('update:prompt', prompt.value);
             message.info('Prompt Updated', 1);
+            visible.value = false;
         }
 
         function appendPrompt() {
             emit('append:prompt', prompt.value);
             message.info('Prompt Updated', 1);
+            visible.value = false;
         }
 
         return {
