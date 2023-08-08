@@ -1,7 +1,9 @@
 <script lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { TagsOutlined, UploadOutlined } from '@ant-design/icons-vue';
+import SliderGroup from './SliderGroup.vue';
+import { message } from 'ant-design-vue';
 
 export default {
     name: 'Tagger',
@@ -9,6 +11,7 @@ export default {
     components: {
         TagsOutlined,
         UploadOutlined,
+        SliderGroup,
     },
     emits: ['update:prompt', 'append:prompt'],
     setup(props, { emit }) {
@@ -22,16 +25,24 @@ export default {
                 };
             });
         });
+        const imageURL = ref<string>('');
         const interrogator = ref<string>(
             interrogatorOptions.value.length > 0 ?
                 interrogatorOptions.value[0].value : ''
         );
+        const threshold = ref<number>(0.35);
+        const tags = ref<Record<string, number>>({});
+
+        const sortedTags = computed(() => {
+            const entries = Object.entries(tags.value);
+            entries.sort((a, b) => b[1] - a[1]);
+            return entries.filter(([tag, weight]) => weight >= threshold.value);
+        });
 
         const showDrawer = () => {
             visible.value = true;
         };
 
-        const imageURL = ref<string>('');
         function beforeUploadImage(file: Blob) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -42,6 +53,25 @@ export default {
             return false;
         }
 
+        watch(imageURL, async function (newValue: string, oldValue: string) {
+            const res = await fetch(context.interrogateURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image: newValue,
+                    model: interrogator.value,
+                    threshold: threshold.value,
+                }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                tags.value = data.caption;
+            } else {
+                message.error(data.detail);
+            }
+        });
+
         return {
             context,
             interrogator,
@@ -49,7 +79,9 @@ export default {
             visible,
             showDrawer,
             imageURL,
+            threshold,
             beforeUploadImage,
+            sortedTags,
         };
     },
 };
@@ -64,7 +96,7 @@ export default {
         <a-space direction="vertical" style="width: 100%;">
             <a-select v-model:value="interrogator" :options="interrogatorOptions" style="width: 100%;">
             </a-select>
-
+            <SliderGroup v-model:value="threshold" :min="0" :max="1" :label="$t('threshold')" :step="0.01"></SliderGroup>
             <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
                 class="image-upload">
                 <!-- Disable item rendering -->
@@ -77,6 +109,10 @@ export default {
                     <div class="ant-upload-text">{{ $t('cnet.uploadImage') }}</div>
                 </div>
             </a-upload>
+
+            <div>
+                <a-tag v-for="[tag, weight] in sortedTags">{{ tag }}: {{ weight.toFixed(2) }}</a-tag>
+            </div>
         </a-space>
     </a-drawer>
 </template>
@@ -98,4 +134,5 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}</style>
+}
+</style>

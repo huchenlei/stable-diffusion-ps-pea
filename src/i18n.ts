@@ -76,6 +76,7 @@ const messages = {
             newConnection: 'New Connection',
         },
         generate: 'Generate',
+        threshold: 'Threshold',
 
         config: {
             newConfig: 'Enter new config name',
