@@ -7,7 +7,6 @@ import { message } from 'ant-design-vue';
 
 export default {
     name: 'Tagger',
-    props: {},
     components: {
         TagsOutlined,
         UploadOutlined,
