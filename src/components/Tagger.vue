@@ -32,6 +32,7 @@ export default {
         );
         const threshold = ref<number>(0.35);
         const tags = ref<Record<string, number>>({});
+        const loading = ref<boolean>(false);
 
         const sortedTags = computed(() => {
             const entries = Object.entries(tags.value);
@@ -58,21 +59,26 @@ export default {
         }
 
         watch(imageURL, async function (newValue: string, oldValue: string) {
-            const res = await fetch(context.interrogateURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    image: newValue,
-                    model: interrogator.value,
-                    threshold: threshold.value,
-                }),
-            });
-            const data = await res.json();
+            loading.value = true;
+            try {
+                const res = await fetch(context.interrogateURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: newValue,
+                        model: interrogator.value,
+                        threshold: threshold.value,
+                    }),
+                });
+                const data = await res.json();
 
-            if (res.ok) {
-                tags.value = data.caption;
-            } else {
-                message.error(data.detail);
+                if (res.ok) {
+                    tags.value = data.caption;
+                } else {
+                    message.error(data.detail);
+                }
+            } finally {
+                loading.value = false;
             }
         });
 
@@ -100,6 +106,7 @@ export default {
             sortedTags,
             updatePrompt,
             appendPrompt,
+            loading,
         };
     },
 };
@@ -115,18 +122,20 @@ export default {
             <a-select v-model:value="interrogator" :options="interrogatorOptions" style="width: 100%;">
             </a-select>
             <SliderGroup v-model:value="threshold" :min="0" :max="1" :label="$t('threshold')" :step="0.01"></SliderGroup>
-            <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
-                class="image-upload">
-                <!-- Disable item rendering -->
-                <template #itemRender="{ file, actions }"></template>
-                <div v-if="imageURL" class="image-item">
-                    <a-image :src="imageURL" :preview="false"></a-image>
-                </div>
-                <div v-else class="image-item">
-                    <UploadOutlined></UploadOutlined>
-                    <div class="ant-upload-text">{{ $t('cnet.uploadImage') }}</div>
-                </div>
-            </a-upload>
+            <a-spin :spinning="loading">
+                <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
+                    class="image-upload">
+                    <!-- Disable item rendering -->
+                    <template #itemRender="{ file, actions }"></template>
+                    <div v-if="imageURL" class="image-item">
+                        <a-image :src="imageURL" :preview="false"></a-image>
+                    </div>
+                    <div v-else class="image-item">
+                        <UploadOutlined></UploadOutlined>
+                        <div class="ant-upload-text">{{ $t('cnet.uploadImage') }}</div>
+                    </div>
+                </a-upload>
+            </a-spin>
             <a-space v-show="sortedTags.length > 0">
                 <a-button @click="updatePrompt">{{ $t('tagger.overwritePrompt') }}</a-button>
                 <a-button @click="appendPrompt">{{ $t('tagger.appendPrompt') }}</a-button>

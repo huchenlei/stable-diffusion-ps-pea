@@ -30,6 +30,7 @@ const messages = {
             scaleRatio: 'Scale Ratio',
             referenceRange: 'Reference Range',
             search: 'Search',
+            tagger: 'Tagger',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
