@@ -30,6 +30,7 @@ const messages = {
             scaleRatio: 'Scale Ratio',
             referenceRange: 'Reference Range',
             search: 'Search',
+            tagger: 'Tagger',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
@@ -65,6 +66,10 @@ const messages = {
             preprocessorInput: 'Preprocessor Input',
             preprocessorResult: 'Preprocessor Result',
         },
+        tagger: {
+            overwritePrompt: 'Overwrite Prompt',
+            appendPrompt: 'Append Prompt',
+        },
 
         weight: 'Weight',
         width: 'Width',
@@ -76,6 +81,7 @@ const messages = {
             newConnection: 'New Connection',
         },
         generate: 'Generate',
+        threshold: 'Threshold',
 
         config: {
             newConfig: 'Enter new config name',

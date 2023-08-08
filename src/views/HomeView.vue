@@ -49,6 +49,14 @@ async function initializeContext(url: string) {
       console.warn(msg);
       $notify(msg);
     }
+    try {
+      await store.taggerContext.initialize(url);
+    } catch (e) {
+      const msg = `Failed to connect to Tagger: ${e}`;
+      console.warn(msg);
+      $notify(msg);
+    }
+
     router.push('/generation');
   } catch (e) {
     const msg = `Connection Failed: ${e}`;
