@@ -134,16 +134,23 @@ function translateIfNewLayerAdded(layerCount, bounds, layerName) {
     app.echoToOE("success");
 }
 
+function applyMaskBlur(maskBlur) {
+    if (!hasSelection()) {
+        alert("No selection!");
+        app.echoToOE("error");
+    }
+    const doc = app.activeDocument;
+    doc.selection.expand(maskBlur);
+    doc.selection.feather(maskBlur);
+    app.echoToOE("success");
+}
+
 // Delete everything outside the selected region.
-function cropSelectedRegion(maskBlur) {
+function cropSelectedRegion() {
     const doc = app.activeDocument;
     const layer = doc.activeLayer;
 
     layer.rasterize(RasterizeType.ENTIRELAYER);
-    if (maskBlur) {
-        doc.selection.expand(maskBlur);
-        doc.selection.feather(maskBlur);
-    }
     // Clear everything outside selection.
     doc.selection.invert();
     doc.selection.clear();

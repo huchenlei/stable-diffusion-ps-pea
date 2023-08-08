@@ -84,10 +84,13 @@ export default {
             photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
                 await deselectResultImage();
+                console.log("sdp: Mask blur" + props.maskBlur);
+                if (props.maskBlur) {
+                    await photopeaContext.invoke('applyMaskBlur', props.maskBlur);
+                }
                 for (const image of selectedResultImages) {
                     await selectResultImage(image, /* layerName= */'ResultLayer');
-                    console.log("sdp: Mask blur" + props.maskBlur);
-                    await photopeaContext.invoke('cropSelectedRegion', /* maskBlur=*/ props.maskBlur || 0);
+                    await photopeaContext.invoke('cropSelectedRegion');
                 }
                 await photopeaContext.invoke('deselect');
             });
