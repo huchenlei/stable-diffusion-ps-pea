@@ -65,6 +65,10 @@ const messages = {
             preprocessorInput: 'Preprocessor Input',
             preprocessorResult: 'Preprocessor Result',
         },
+        tagger: {
+            overwritePrompt: 'Overwrite Prompt',
+            appendPrompt: 'Append Prompt',
+        },
 
         weight: 'Weight',
         width: 'Width',

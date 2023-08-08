@@ -168,7 +168,8 @@ export default {
 
         <a-space>
             <ExtraNetworks :loras="loras" :embeddings="embeddings" @add:prompt="addPrompt"></ExtraNetworks>
-            <Tagger></Tagger>
+            <Tagger @update:prompt="newPrompt => $props.payload.prompt = newPrompt"
+                @append:prompt="newPrompt => $props.payload.prompt += newPrompt"></Tagger>
 
             <a-button @click="clearPrompt" :danger="true" type="primary" :title="$t('gen.clearPrompt')">
                 <DeleteOutlined></DeleteOutlined>

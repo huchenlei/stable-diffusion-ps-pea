@@ -39,6 +39,10 @@ export default {
             return entries.filter(([tag, weight]) => weight >= threshold.value);
         });
 
+        const prompt = computed(() => {
+            return sortedTags.value.map(([tag, weight]) => tag).join(', ');
+        });
+
         const showDrawer = () => {
             visible.value = true;
         };
@@ -72,6 +76,16 @@ export default {
             }
         });
 
+        function updatePrompt() {
+            emit('update:prompt', prompt.value);
+            message.info('Prompt Updated', 1);
+        }
+
+        function appendPrompt() {
+            emit('append:prompt', prompt.value);
+            message.info('Prompt Updated', 1);
+        }
+
         return {
             context,
             interrogator,
@@ -82,6 +96,8 @@ export default {
             threshold,
             beforeUploadImage,
             sortedTags,
+            updatePrompt,
+            appendPrompt,
         };
     },
 };
@@ -109,7 +125,10 @@ export default {
                     <div class="ant-upload-text">{{ $t('cnet.uploadImage') }}</div>
                 </div>
             </a-upload>
-
+            <a-space v-show="sortedTags.length > 0">
+                <a-button @click="updatePrompt">{{ $t('tagger.overwritePrompt') }}</a-button>
+                <a-button @click="appendPrompt">{{ $t('tagger.appendPrompt') }}</a-button>
+            </a-space>
             <div>
                 <a-tag v-for="[tag, weight] in sortedTags">{{ tag }}: {{ weight.toFixed(2) }}</a-tag>
             </div>
