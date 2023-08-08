@@ -219,11 +219,6 @@ async function preparePayload() {
       return [image, mask];
     });
 
-    resultImageBound.value = image.bound;
-    if (appState.generationMode === GenerationMode.Img2Img) {
-      resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
-    }
-
     await setControlNetInputs(image.bound);
     // Handling extension
     fillExtensionsArgs();
@@ -240,9 +235,15 @@ async function preparePayload() {
     inputMask.value = mask;
 
     const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
+    const isInpaint = !mask.isSolidColor;
     if (isImg2Img) {
       appState.img2imgPayload.init_images = [image.dataURL];
-      appState.img2imgPayload.mask = mask.dataURL;
+      appState.img2imgPayload.mask = isInpaint ? mask.dataURL : undefined;
+    }
+
+    resultImageBound.value = image.bound;
+    if (isImg2Img && isInpaint) {
+      resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
     }
 
     generationState.value = GenerationState.kPayloadPreparedState;
@@ -298,6 +299,10 @@ function resetPayload() {
   inputMaskBuffer.value = undefined;
   inputImage.value = undefined;
   inputMask.value = undefined;
+
+  resultImageBound.value = undefined;
+  resultImageMaskBlur.value = undefined;
+  
   for (const unit of appState.controlnetUnits) {
     // Only clear image when layer is linked.
     if (unit.linkedLayerName)
