@@ -1,14 +1,14 @@
 <script lang="ts">
 import { computed, ref } from 'vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { TagsOutlined } from '@ant-design/icons-vue';
-import ImagePicker from './ImagePicker.vue';
+import { TagsOutlined, UploadOutlined } from '@ant-design/icons-vue';
 
 export default {
     name: 'Tagger',
     props: {},
     components: {
         TagsOutlined,
+        UploadOutlined,
     },
     emits: ['update:prompt', 'append:prompt'],
     setup(props, { emit }) {
@@ -31,8 +31,15 @@ export default {
             visible.value = true;
         };
 
-        function beforeUplaodImage() {
-            
+        const imageURL = ref<string>('');
+        function beforeUploadImage(file: Blob) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageURL.value = e.target!.result! as string;
+            };
+            reader.readAsDataURL(file);
+            // Return false to prevent the default upload behavior
+            return false;
         }
 
         return {
@@ -41,7 +48,8 @@ export default {
             interrogatorOptions,
             visible,
             showDrawer,
-            beforeUplaodImage,
+            imageURL,
+            beforeUploadImage,
         };
     },
 };
@@ -53,24 +61,41 @@ export default {
     </a-button>
 
     <a-drawer v-model:visible="visible" title="Tagger" placement="right">
-        <a-space direction="vertical">
-            <a-select v-model:value="interrogator" :options="interrogatorOptions">
+        <a-space direction="vertical" style="width: 100%;">
+            <a-select v-model:value="interrogator" :options="interrogatorOptions" style="width: 100%;">
             </a-select>
 
-            <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1">
+            <a-upload list-type="picture" accept="image/*" :beforeUpload="beforeUploadImage" :max-count="1"
+                class="image-upload">
                 <!-- Disable item rendering -->
                 <template #itemRender="{ file, actions }"></template>
-                <div v-if="unit.image">
-                    <a-tag>{{ $t('cnet.preprocessorResult') }}</a-tag>
-                    <a-image :src="unit.image.image" :preview="false"></a-image>
+                <div v-if="imageURL" class="image-item">
+                    <a-image :src="imageURL" :preview="false"></a-image>
                 </div>
-                <div v-if="!unit.image">
-                    <a-button>
-                        <UploadOutlined></UploadOutlined>
-                        {{ $t('cnet.uploadImage') }}
-                    </a-button>
+                <div v-else class="image-item">
+                    <UploadOutlined></UploadOutlined>
+                    <div class="ant-upload-text">{{ $t('cnet.uploadImage') }}</div>
                 </div>
             </a-upload>
         </a-space>
     </a-drawer>
 </template>
+
+<style>
+.image-upload,
+.image-upload>div,
+.image-upload>div>span {
+    width: 100%;
+}
+
+.image-item {
+    width: 100%;
+    /* width / height */
+    aspect-ratio: 1 / 1;
+    border: 3px solid #4b4b4b;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}</style>
