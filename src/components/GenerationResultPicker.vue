@@ -2,7 +2,7 @@
 import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
-import { CloseOutlined, CheckOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined, CheckOutlined, RedoOutlined } from '@ant-design/icons-vue';
 import { resizeImage } from '@/ImageUtil';
 
 interface ImageItem {
@@ -30,8 +30,9 @@ export default {
         ImagePicker,
         CloseOutlined,
         CheckOutlined,
+        RedoOutlined,
     },
-    emits: ['result-finalized'],
+    emits: ['result-finalized', 'generate-more'],
     setup(props, { emit }) {
         const resultImageItems = computed(() => {
             return props.imageURLs.map((url, index) => {
@@ -108,6 +109,10 @@ export default {
             finalizeSelection();
         }
 
+        function generateMoreImages() {
+            emit('generate-more');
+        }
+
         const ctrlPressed = ref(false);
         onMounted(() => {
             function onKeydown(e: KeyboardEvent) {
@@ -126,11 +131,15 @@ export default {
 
         watch(props.imageURLs, async (newValue, oldValue) => {
             if (newValue.length > 0) {
-                const imageItem = resultImageItems.value[0];
-                await photopeaContext.executeTask(async () => {
-                    await selectResultImage(imageItem);
-                });
-                selectedResultImages.push(imageItem);
+                const imageItem = resultImageItems.value[resultImageItems.value.length - 1];
+                if (selectedResultImages.length === 0) {
+                    await photopeaContext.executeTask(async () => {
+                        await selectResultImage(imageItem);
+                        selectedResultImages.push(imageItem);
+                    });
+                } else {
+                    await switchResultImage(imageItem);
+                }
             }
         });
 
@@ -143,6 +152,7 @@ export default {
             switchResultImage,
             discardResultImages,
             pickSelectedResultImages,
+            generateMoreImages,
         };
     },
 };
@@ -154,19 +164,21 @@ export default {
             :displayNames="false"></ImagePicker>
     </a-spin>
     <a-row v-if="resultImageItems.length > 0">
-        <a-button :danger="true" class="discard-result" @click="discardResultImages">
+        <a-button :danger="true" class="button" @click="discardResultImages">
             <CloseOutlined></CloseOutlined>
         </a-button>
-        <a-button class="pick-result" @click="pickSelectedResultImages">
+        <a-button class="button" @click="generateMoreImages">
+            <RedoOutlined></RedoOutlined>
+        </a-button>
+        <a-button class="button" @click="pickSelectedResultImages">
             <CheckOutlined></CheckOutlined>
         </a-button>
     </a-row>
 </template>
 
 <style scoped>
-.pick-result,
-.discard-result {
-    width: 50%;
+button {
+    width: 33.3%;
 }
 </style>
 

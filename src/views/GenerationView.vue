@@ -277,7 +277,6 @@ async function sendPayload() {
     });
     const data = await response.json();
 
-    resultImages.length = 0; // Clear array content.
     const controlNetCount = _.sum(appState.controlnetUnits.map(unit => unit.enabled ? 1 : 0));
     resultImages.push(...
       // Remove controlnet maps from image results.
@@ -285,7 +284,6 @@ async function sendPayload() {
         .map((image: string) => `data:image/png;base64,${image}`)
     );
 
-    resetPayload();
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
     console.error(e);
@@ -323,7 +321,7 @@ async function generate() {
   if (generationState.value !== GenerationState.kPayloadPreparedState) {
     const success = await preparePayload();
     if (!success) {
-      return false;
+      return;
     }
   }
   await sendPayload();
@@ -342,10 +340,8 @@ async function generateWithConfig(configName: string) {
 }
 
 function onResultImagePicked() {
-  resultImageBound.value = undefined;
-  resultImageMaskBlur.value = undefined;
   resultImages.length = 0;
-  generationState.value = GenerationState.kInitialState;
+  resetGenerationState();
 }
 
 const hoveredStep = ref<GenerationState | undefined>(undefined);
@@ -439,7 +435,7 @@ const stepProgress = computed(() => {
           </a-space>
         </a-form-item>
         <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
-          @result-finalized="onResultImagePicked">
+          @result-finalized="onResultImagePicked" @generate-more="sendPayload">
         </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"
