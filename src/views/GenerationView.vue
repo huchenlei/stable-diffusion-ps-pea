@@ -238,14 +238,14 @@ async function preparePayload() {
     inputMask.value = mask;
 
     const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
-    const isInpaint = !mask.isSolidColor;
+    const isInpaint = isImg2Img && !mask.isSolidColor;
     if (isImg2Img) {
       appState.img2imgPayload.init_images = [image.dataURL];
       appState.img2imgPayload.mask = isInpaint ? mask.dataURL : undefined;
     }
 
     resultImageBound.value = image.bound;
-    if (isImg2Img && isInpaint) {
+    if (isInpaint) {
       resultImageMaskBlur.value = appState.img2imgPayload.mask_blur;
     }
 
