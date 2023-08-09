@@ -167,7 +167,7 @@ export default {
         <a-button :danger="true" class="button" @click="discardResultImages">
             <CloseOutlined></CloseOutlined>
         </a-button>
-        <a-button class="button" @click="generateMoreImages">
+        <a-button class="button" @click="generateMoreImages" :title="$t('gen.generateMore')">
             <RedoOutlined></RedoOutlined>
         </a-button>
         <a-button class="button" @click="pickSelectedResultImages">

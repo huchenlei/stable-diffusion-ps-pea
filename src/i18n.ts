@@ -31,6 +31,7 @@ const messages = {
             referenceRange: 'Reference Range',
             search: 'Search',
             tagger: 'Tagger',
+            generateMore: 'Generate more images with same settings',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
