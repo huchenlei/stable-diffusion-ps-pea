@@ -1,4 +1,4 @@
-import { ResizeMode } from '@/Automatic1111';
+import { ResizeMode } from './Automatic1111';
 import _ from 'lodash';
 
 enum ControlMode {
