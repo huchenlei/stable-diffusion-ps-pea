@@ -174,10 +174,6 @@ class ControlNetContext {
         }
         this.control_types = filteredControlTypes;
     }
-
-    private mapModuleAlias() {
-
-    }
 };
 
 // ControlNet Models that preprocessor cannot be run separately.
