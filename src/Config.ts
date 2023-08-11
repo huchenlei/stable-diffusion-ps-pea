@@ -8,14 +8,15 @@ const DEFAULT_CONFIG = new ApplicationState();
 
 function applyStateDiff(appState: ApplicationState, stateDiff: StateDiff): void {
     stateDiff.forEach(diffEntry => {
+        // Append controlnet units to appState instead of overwriting existing
+        // units.
+        if (_.isEqual(diffEntry.path, ['controlnetUnits']) &&
+            diffEntry.kind === 'A') {
+            diffEntry.index += appState.controlnetUnits.length;
+        }
         applyChange(appState, undefined, diffEntry);
     });
-}
-
-function revertStateDiff(appState: ApplicationState, stateDiff: StateDiff): void {
-    stateDiff.forEach(diffEntry => {
-        revertChange(appState, undefined, diffEntry);
-    });
+    appState.controlnetUnits = appState.controlnetUnits.filter(u => !!u);
 }
 
 function stateDiffToAppState(stateDiff: StateDiff): IApplicationState {
@@ -37,7 +38,6 @@ export {
     type StateDiff,
     DEFAULT_CONFIG,
     applyStateDiff,
-    revertStateDiff,
     stateDiffToAppState,
     appStateToStateDiff,
 }
