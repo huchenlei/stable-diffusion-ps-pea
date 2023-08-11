@@ -1,4 +1,4 @@
-import { applyChange, diff, revertChange, type Diff } from "deep-diff";
+import { applyChange, diff, type Diff } from "deep-diff";
 import { ApplicationState, type IApplicationState } from "./Core";
 import _ from "lodash";
 
