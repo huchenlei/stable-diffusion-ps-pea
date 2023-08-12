@@ -11,10 +11,13 @@ function applyStateDiff(appState: ApplicationState, stateDiff: StateDiff): void 
         // Append controlnet units to appState instead of overwriting existing
         // units.
         if (_.isEqual(diffEntry.path, ['controlnetUnits']) &&
-            diffEntry.kind === 'A') {
-            diffEntry.index += appState.controlnetUnits.length;
+            diffEntry.kind === 'A' && diffEntry.item.kind === 'N') {
+            const indexShiftedEnetry = _.cloneDeep(diffEntry);
+            indexShiftedEnetry.index += appState.controlnetUnits.length;
+            applyChange(appState, undefined, indexShiftedEnetry);
+        } else {
+            applyChange(appState, undefined, diffEntry);
         }
-        applyChange(appState, undefined, diffEntry);
     });
     appState.controlnetUnits = appState.controlnetUnits.filter(u => !!u);
 }
