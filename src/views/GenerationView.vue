@@ -33,6 +33,10 @@ const configStore = useConfigStore();
 
 // Whether the generation is in progress.
 const generationActive = ref(false);
+// The generation config used for the generation. This is used when the user
+// clicks `generate more` buttons to make sure that the same final payload
+// are sent to A1111.
+const generationConfig = ref<string | null>(null);
 
 // The bounding box to put the result image in.
 const resultImageBound = ref<PhotopeaBound | undefined>(undefined);
@@ -314,6 +318,7 @@ function resetPayload() {
 // Reset generation state to kInitial. Abandon current intermediant values.
 function resetGenerationState() {
   resetPayload();
+  generationConfig.value = null;
   generationState.value = GenerationState.kInitialState;
 }
 
@@ -332,6 +337,8 @@ async function generate() {
 
 // Run generation with specified config.
 async function generateWithConfig(configName: string) {
+  generationConfig.value = configName;
+
   const stateDiff = configStore.configEntries[configName];
   const originalState = _.cloneDeep(appState);
   applyStateDiff(appState, stateDiff);
@@ -340,7 +347,15 @@ async function generateWithConfig(configName: string) {
   applyStateDiff(appState, undoDiff);
 }
 
-function onResultImagePicked() {
+async function generateMore() {
+  if (generationConfig.value !== null) {
+    generateWithConfig(generationConfig.value);
+  } else {
+    generate();
+  }
+}
+
+function onResultImagePicked() {  
   resultImages.length = 0;
   resetGenerationState();
 }
@@ -436,7 +451,7 @@ const stepProgress = computed(() => {
           </a-space>
         </a-form-item>
         <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
-          @result-finalized="onResultImagePicked" @generate-more="sendPayload">
+          @result-finalized="onResultImagePicked" @generate-more="generateMore">
         </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"
