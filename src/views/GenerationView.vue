@@ -22,7 +22,7 @@ import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
-import { DEFAULT_CONFIG, applyStateDiff } from '@/Config';
+import { DEFAULT_CONFIG, applyStateDiff, appStateToStateDiff } from '@/Config';
 import { useConfigStore } from '@/stores/configStore';
 import { CloseOutlined } from '@ant-design/icons-vue';
 
@@ -300,7 +300,7 @@ function resetPayload() {
 
   resultImageBound.value = undefined;
   resultImageMaskBlur.value = undefined;
-  
+
   for (const unit of appState.controlnetUnits) {
     // Only clear image when layer is linked.
     if (unit.linkedLayerName)
@@ -335,8 +335,9 @@ async function generateWithConfig(configName: string) {
   const stateDiff = configStore.configEntries[configName];
   const originalState = _.cloneDeep(appState);
   applyStateDiff(appState, stateDiff);
+  const undoDiff = appStateToStateDiff(/* toState */ originalState, /* fromState */ appState);
   await generate();
-  Object.assign(appState, originalState);
+  applyStateDiff(appState, undoDiff);
 }
 
 function onResultImagePicked() {
