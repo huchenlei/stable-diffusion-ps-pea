@@ -323,7 +323,7 @@ function resetGenerationState() {
 }
 
 async function generate() {
-  if (generationState.value !== GenerationState.kPayloadPreparedState) {
+  if (generationState.value < GenerationState.kPayloadPreparedState) {
     const success = await preparePayload();
     if (!success) {
       return;
