@@ -164,11 +164,11 @@ export default {
             :displayNames="false"></ImagePicker>
     </a-spin>
     <a-row v-if="resultImageItems.length > 0">
-        <a-button :danger="true" class="button" @click="discardResultImages">
-            <CloseOutlined></CloseOutlined>
-        </a-button>
         <a-button class="button" @click="generateMoreImages" :title="$t('gen.generateMore')">
             <RedoOutlined></RedoOutlined>
+        </a-button>
+        <a-button :danger="true" class="button" @click="discardResultImages">
+            <CloseOutlined></CloseOutlined>
         </a-button>
         <a-button class="button" @click="pickSelectedResultImages">
             <CheckOutlined></CheckOutlined>
