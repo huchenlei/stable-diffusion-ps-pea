@@ -32,7 +32,7 @@ export default {
         CheckOutlined,
         RedoOutlined,
     },
-    emits: ['result-finalized', 'generate-more'],
+    emits: ['result-finalized', 'generate-more', 'generate-more-variants'],
     setup(props, { emit }) {
         const resultImageItems = computed(() => {
             return props.imageURLs.map((url, index) => {
@@ -112,6 +112,10 @@ export default {
         function generateMoreImages() {
             emit('generate-more');
         }
+        
+        function generateMoreVariants() {
+            emit('generate-more-variants');
+        }
 
         const ctrlPressed = ref(false);
         onMounted(() => {
@@ -153,6 +157,7 @@ export default {
             discardResultImages,
             pickSelectedResultImages,
             generateMoreImages,
+            generateMoreVariants,
         };
     },
 };
@@ -164,6 +169,9 @@ export default {
             :displayNames="false"></ImagePicker>
     </a-spin>
     <a-row v-if="resultImageItems.length > 0">
+        <a-button class="button" @click="generateMoreVariants" :title="$t('gen.generateMoreVariants')">
+            <img src="icons/dice.svg" alt="dice" width="14" height="14">
+        </a-button>
         <a-button class="button" @click="generateMoreImages" :title="$t('gen.generateMore')">
             <RedoOutlined></RedoOutlined>
         </a-button>
@@ -178,7 +186,7 @@ export default {
 
 <style scoped>
 button {
-    width: 33.3%;
+    width: 25%;
 }
 </style>
 
