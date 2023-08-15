@@ -32,6 +32,7 @@ const messages = {
             search: 'Search',
             tagger: 'Tagger',
             generateMore: 'Generate more images with same settings',
+            generateMoreVariants: 'Generate more with variation seed',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',

@@ -33,6 +33,9 @@ interface IApplicationState {
     referenceRange: [number, number];
     referenceRangeMode: ReferenceRangeMode;
 
+    // Subseed strength. The subseed strength used when clicking `generate with more variants`
+    subseedStrength: number;
+
     // Extensions
     // ControlNet
     controlnetUnits: IControlNetUnit[];
@@ -52,6 +55,7 @@ class ApplicationState implements IApplicationState {
     imageScale: number = 1.0;
     referenceRange: [number, number] = [64, 10];
     referenceRangeMode: ReferenceRangeMode = ReferenceRangeMode.kPixel;
+    subseedStrength: number = 0.15;
     controlnetUnits: IControlNetUnit[] = [];
 };
 
