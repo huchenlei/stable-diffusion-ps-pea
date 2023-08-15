@@ -4,8 +4,9 @@ import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
 import { CloseOutlined, CheckOutlined, RedoOutlined } from '@ant-design/icons-vue';
 import { resizeImage } from '@/ImageUtil';
+import type { IGeneratedImage } from '@/Automatic1111';
 
-interface ImageItem {
+interface ImageItem extends IGeneratedImage {
     imageURL: string;
     name: string;
 };
@@ -13,8 +14,8 @@ interface ImageItem {
 export default {
     name: 'GenerationResultPicker',
     props: {
-        imageURLs: {
-            type: Array<string>,
+        images: {
+            type: Array<IGeneratedImage>,
             required: true,
         },
         bound: {
@@ -35,10 +36,11 @@ export default {
     emits: ['result-finalized', 'generate-more', 'generate-more-variants'],
     setup(props, { emit }) {
         const resultImageItems = computed(() => {
-            return props.imageURLs.map((url, index) => {
+            return props.images.map((image, index) => {
                 return {
-                    imageURL: url,
+                    imageURL: image.url,
                     name: `result-${index}`,
+                    ...image,
                 };
             });
         });
@@ -112,9 +114,11 @@ export default {
         function generateMoreImages() {
             emit('generate-more');
         }
-        
+
         function generateMoreVariants() {
-            emit('generate-more-variants');
+            // The active image displayed on canvas.
+            const displayedImage = selectedResultImages[selectedResultImages.length - 1];
+            emit('generate-more-variants', displayedImage);
         }
 
         const ctrlPressed = ref(false);
@@ -133,7 +137,7 @@ export default {
             window.addEventListener('keyup', onKeyup);
         });
 
-        watch(props.imageURLs, async (newValue, oldValue) => {
+        watch(props.images, async (newValue, oldValue) => {
             if (newValue.length > 0) {
                 const imageItem = resultImageItems.value[resultImageItems.value.length - 1];
                 if (selectedResultImages.length === 0) {
@@ -149,7 +153,6 @@ export default {
 
         return {
             resultImageItems,
-            selectedResultImages,
             selectedResultImageNames,
             photopeaInProgress,
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, toRaw } from 'vue';
-import { GenerationMode } from '../Automatic1111';
+import { GenerationMode, type IGeneratedImage, type IGenerationInfo, type IGenerationResult } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { photopeaContext, type PhotopeaBound } from '../Photopea';
 import { PayloadImage, cropImage } from '../ImageUtil';
@@ -17,12 +17,12 @@ import SliderGroup from '@/components/SliderGroup.vue';
 import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
-import { ReferenceRangeMode } from '@/Core';
+import { ApplicationState, ReferenceRangeMode } from '@/Core';
 import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
 import { cloneNoBlob } from '@/Utils';
-import { DEFAULT_CONFIG, applyStateDiff, appStateToStateDiff } from '@/Config';
+import { DEFAULT_CONFIG, applyStateDiff, appStateToStateDiff, type StateDiff } from '@/Config';
 import { useConfigStore } from '@/stores/configStore';
 import { CloseOutlined } from '@ant-design/icons-vue';
 
@@ -101,8 +101,7 @@ enum GenerationState {
 
 const generationState = ref(GenerationState.kInitialState);
 
-// Image URLs of generated images.
-const resultImages: string[] = reactive([]);
+const resultImages: IGeneratedImage[] = reactive([]);
 
 const samplerOptions = computed(() => {
   return context.samplers.map(sampler => {
@@ -279,15 +278,23 @@ async function sendPayload() {
         ...extraPayload,
       }),
     });
-    const data = await response.json();
+    const result = await response.json() as IGenerationResult;
 
     const controlNetCount = _.sum(appState.controlnetUnits.map(unit => unit.enabled ? 1 : 0));
-    resultImages.push(...
-      // Remove controlnet maps from image results.
-      (controlNetCount > 0 ? data['images'].slice(0, -controlNetCount) : data['images'])
-        .map((image: string) => `data:image/png;base64,${image}`)
-    );
+    // Remove controlnet maps from image results.
+    const imageURLs = (controlNetCount > 0 ? result.images.slice(0, -controlNetCount) : result.images)
+      .map((image: string) => `data:image/png;base64,${image}`);
 
+    const info = JSON.parse(result.info) as IGenerationInfo;
+
+    resultImages.push(
+      ..._.zip(
+        imageURLs, info.all_prompts, info.all_negative_prompts,
+        info.all_seeds, info.all_subseeds,
+      ).map(([url, prompt, negative_prompt, seed, subseed]) => {
+        return { url, prompt, negative_prompt, seed, subseed } as IGeneratedImage
+      })
+    );
     generationState.value = GenerationState.kFinishedState;
   } catch (e) {
     console.error(e);
@@ -338,8 +345,14 @@ async function generate() {
 // Run generation with specified config.
 async function generateWithConfig(configName: string) {
   generationConfig.value = configName;
+  await _generateWithStateDiff(_getConfigStateDiff(configName));
+}
 
-  const stateDiff = configStore.configEntries[configName];
+function _getConfigStateDiff(configName: string | null): StateDiff {
+  return configName ? configStore.configEntries[configName] : [];
+}
+
+async function _generateWithStateDiff(stateDiff: StateDiff) {
   const originalState = _.cloneDeep(appState);
   applyStateDiff(appState, stateDiff);
   const undoDiff = appStateToStateDiff(/* toState */ originalState, /* fromState */ appState);
@@ -348,14 +361,22 @@ async function generateWithConfig(configName: string) {
 }
 
 async function generateMore() {
-  if (generationConfig.value !== null) {
-    generateWithConfig(generationConfig.value);
-  } else {
-    generate();
-  }
+  await _generateWithStateDiff(_getConfigStateDiff(generationConfig.value));
 }
 
-function onResultImagePicked() {  
+async function generateMoreVariants(image: IGeneratedImage) {
+  const varState = new ApplicationState();
+  varState.commonPayload.seed = image.seed;
+  // TODO: Move this hardcoded value to config.
+  varState.commonPayload.seed_enable_extras = true;
+  varState.commonPayload.subseed_strength = 0.2;
+  varState.commonPayload.subseed = -1;
+  const stateDiff = appStateToStateDiff(varState);
+  
+  await _generateWithStateDiff(_getConfigStateDiff(generationConfig.value).concat(stateDiff));
+}
+
+function onResultImagePicked() {
   resultImages.length = 0;
   resetGenerationState();
 }
@@ -450,8 +471,9 @@ const stepProgress = computed(() => {
               }}</a-button>
           </a-space>
         </a-form-item>
-        <GenerationResultPicker :imageURLs="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
-          @result-finalized="onResultImagePicked" @generate-more="generateMore">
+        <GenerationResultPicker :images="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
+          @result-finalized="onResultImagePicked" @generate-more="generateMore"
+          @generate-more-variants="generateMoreVariants">
         </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"
