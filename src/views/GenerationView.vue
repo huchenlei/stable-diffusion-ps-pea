@@ -367,12 +367,11 @@ async function generateMore() {
 async function generateMoreVariants(image: IGeneratedImage) {
   const varState = new ApplicationState();
   varState.commonPayload.seed = image.seed;
-  // TODO: Move this hardcoded value to config.
   varState.commonPayload.seed_enable_extras = true;
-  varState.commonPayload.subseed_strength = 0.2;
   varState.commonPayload.subseed = -1;
+  varState.commonPayload.subseed_strength = appState.subseedStrength;
   const stateDiff = appStateToStateDiff(varState);
-  
+
   await _generateWithStateDiff(_getConfigStateDiff(generationConfig.value).concat(stateDiff));
 }
 
