@@ -226,11 +226,6 @@ async function preparePayload() {
     // Handling extension
     fillExtensionsArgs();
 
-    if (appState.autoGenerationMode) {
-      const isImg2Img = !(image.isSolidColor && mask.isSolidColor);
-      appState.generationMode = isImg2Img ? GenerationMode.Img2Img : GenerationMode.Txt2Img;
-    }
-
     appState.commonPayload.width = image.width * appState.imageScale;
     appState.commonPayload.height = image.height * appState.imageScale;
 
@@ -418,8 +413,6 @@ const stepProgress = computed(() => {
         <PayloadRadio :value="appState.generationMode" @update:value="mode => appState.generationMode = mode"
           :enum-type="GenerationMode">
         </PayloadRadio>
-        <a-checkbox v-model:checked="appState.autoGenerationMode"
-          :label="$t('gen.autoGenerationModeHint')">Auto</a-checkbox>
       </a-space>
 
       <a-form :model="appState.commonPayload" class="payload" :labelWrap="true" layout="vertical" size="small">

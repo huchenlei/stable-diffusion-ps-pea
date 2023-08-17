@@ -23,7 +23,6 @@ interface IApplicationState {
     img2imgPayload: IImg2ImgPayload;
     txt2imgPayload: ITxt2ImgPayload;
     generationMode: GenerationMode;
-    autoGenerationMode: boolean;
     // Custom generation mechanism added outside A1111.
     // The scale ratio to upscale generated image.
     imageScale: number;
@@ -51,7 +50,6 @@ class ApplicationState implements IApplicationState {
     img2imgPayload: IImg2ImgPayload = new Img2ImgPayload();
     txt2imgPayload: ITxt2ImgPayload = new Txt2ImgPayload();
     generationMode: GenerationMode = GenerationMode.Img2Img;
-    autoGenerationMode: boolean = true;
     imageScale: number = 1.0;
     referenceRange: [number, number] = [64, 10];
     referenceRangeMode: ReferenceRangeMode = ReferenceRangeMode.kPixel;

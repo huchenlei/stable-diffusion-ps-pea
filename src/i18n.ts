@@ -10,7 +10,6 @@ const messages = {
             config: 'Config',
         },
         gen: {
-            autoGenerationModeHint: 'Automatically select generation mode based on selected area.',
             skip: 'Skip',
             interrupt: 'Interrupt',
             addLoRA: 'Add LoRA',
@@ -109,7 +108,6 @@ const messages = {
             config: '配置',
         },
         gen: {
-            autoGenerationModeHint: '根据所选区域自动选择生成模式。',
             skip: '跳过',
             interrupt: '中断',
             addLoRA: '添加 LoRA',
