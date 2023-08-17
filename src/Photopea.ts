@@ -182,7 +182,7 @@ class PhotopeaContext {
     }
 
     // Thread unsafe. Need be called within a task.
-    public async pasteImageOnPhotopea(imageURL: string, bound: PhotopeaBound,layerName: string = 'image') {
+    public async pasteImageOnPhotopea(imageURL: string, bound: PhotopeaBound, layerName: string = 'image') {
         const layerCount = Number(await this.invoke('pasteImageAsNewLayer', imageURL));
         console.debug(`sdp: Adding new layer. Num of top layers: ${layerCount}`);
 

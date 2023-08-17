@@ -464,8 +464,8 @@ const stepProgress = computed(() => {
           </a-space>
         </a-form-item>
         <GenerationResultPicker :images="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
-          @result-finalized="onResultImagePicked" @generate-more="generateMore"
-          @generate-more-variants="generateMoreVariants">
+          :result-destination="appState.imageResultDestination" @result-finalized="onResultImagePicked"
+          @generate-more="generateMore" @generate-more-variants="generateMoreVariants">
         </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"

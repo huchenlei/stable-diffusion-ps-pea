@@ -105,6 +105,15 @@ function pasteImageAsNewLayer(base64image) {
     app.echoToOE(layerNumBeforePaste.toString());
 }
 
+/**
+ * Paste given image to Photopea as a new document.
+ * @param {string} base64image base64 string representing an image.
+ */
+function pasteImageAsNewDocument(base64image) {
+    app.open(base64image, null, /* asSmart */ false);
+    app.echoToOE('success');
+}
+
 // Translate the newly added layer if the new layer has been added.
 // Note: we cannot get layer bounds when a selection is active. So the resize and
 // translation are all based on payload calculations.

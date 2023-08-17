@@ -14,6 +14,11 @@ enum ReferenceRangeMode {
     kPercent,
 };
 
+enum ImageResultDestination {
+    kCurrentCanvas,
+    kNewCanvas,
+};
+
 /**
  * The application state that can be saved and load to UI later.
  */
@@ -35,6 +40,9 @@ interface IApplicationState {
     // Subseed strength. The subseed strength used when clicking `generate with more variants`
     subseedStrength: number;
 
+    // Image result destination.
+    imageResultDestination: ImageResultDestination;
+
     // Extensions
     // ControlNet
     controlnetUnits: IControlNetUnit[];
@@ -54,6 +62,7 @@ class ApplicationState implements IApplicationState {
     referenceRange: [number, number] = [64, 10];
     referenceRangeMode: ReferenceRangeMode = ReferenceRangeMode.kPixel;
     subseedStrength: number = 0.15;
+    imageResultDestination: ImageResultDestination = ImageResultDestination.kCurrentCanvas;
     controlnetUnits: IControlNetUnit[] = [];
 };
 
@@ -62,4 +71,5 @@ export {
     type IHistoryItem,
     ApplicationState,
     ReferenceRangeMode,
+    ImageResultDestination,
 };
