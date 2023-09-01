@@ -12,12 +12,13 @@ import Txt2ImgPayloadDisplay from '@/components/Txt2ImgPayloadDisplay.vue';
 import GenerationProgress from '@/components/GenerationProgress.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import ControlNet from '@/components/ControlNet.vue';
+import UltimateUpscale from '@/components/UltimateUpscale.vue';
 import { type IControlNetUnit } from '@/ControlNet';
 import SliderGroup from '@/components/SliderGroup.vue';
 import GenerationResultPicker from '@/components/GenerationResultPicker.vue';
 import { getCurrentInstance } from 'vue';
 import _ from 'lodash';
-import { ApplicationState, ReferenceRangeMode } from '@/Core';
+import { ApplicationState, ImageResultDestination, ReferenceRangeMode } from '@/Core';
 import { ReloadOutlined } from '@ant-design/icons-vue';
 import { useHistoryStore } from '@/stores/historyStore';
 import { useAppStateStore } from '@/stores/appStateStore';
@@ -25,6 +26,7 @@ import { cloneNoBlob } from '@/Utils';
 import { DEFAULT_CONFIG, applyStateDiff, appStateToStateDiff, type StateDiff } from '@/Config';
 import { useConfigStore } from '@/stores/configStore';
 import { CloseOutlined } from '@ant-design/icons-vue';
+import { UltimateUpscaleScript } from '@/UltimateUpscale';
 
 const context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -147,7 +149,17 @@ function fillExtensionsArgs() {
         })
     };
   }
+
+  if (ultimateUpscaleAvailable.value && appState.ultimateUpscale.enabled) {
+    appState.commonPayload.script_name = UltimateUpscaleScript.script_name;
+    appState.commonPayload.script_args = UltimateUpscaleScript.script_args(appState.ultimateUpscale);
+    appState.imageResultDestination = ImageResultDestination.kNewCanvas;
+  }
 }
+
+const ultimateUpscaleAvailable = computed(() => {
+  return context.scripts.img2img.includes(UltimateUpscaleScript.script_name);
+})
 
 const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
@@ -275,9 +287,11 @@ async function sendPayload() {
     });
     const result = await response.json() as IGenerationResult;
 
-    const controlNetCount = _.sum(appState.controlnetUnits.map(unit => unit.enabled ? 1 : 0));
-    // Remove controlnet maps from image results.
-    const imageURLs = (controlNetCount > 0 ? result.images.slice(0, -controlNetCount) : result.images)
+    // Expected number of images from generation.
+    // ControlNet maps appending at the end will be dropped.
+    const numImages = appState.ultimateUpscale.enabled ? 1 : 
+      appState.commonPayload.batch_size * appState.commonPayload.n_iter;
+    const imageURLs = result.images.slice(0, numImages)
       .map((image: string) => `data:image/png;base64,${image}`);
 
     const info = JSON.parse(result.info) as IGenerationInfo;
@@ -315,6 +329,10 @@ function resetPayload() {
   appState.commonPayload.height = DEFAULT_CONFIG.commonPayload.height;
   appState.commonPayload.width = DEFAULT_CONFIG.commonPayload.width;
   delete appState.commonPayload.alwayson_scripts['ControlNet'];
+
+  appState.commonPayload.script_name = null;
+  appState.commonPayload.script_args = [];
+  appState.imageResultDestination = ImageResultDestination.kCurrentCanvas;
 }
 
 // Reset generation state to kInitial. Abandon current intermediant values.
@@ -464,8 +482,8 @@ const stepProgress = computed(() => {
           </a-space>
         </a-form-item>
         <GenerationResultPicker :images="resultImages" :bound="resultImageBound" :maskBlur="resultImageMaskBlur"
-          @result-finalized="onResultImagePicked" @generate-more="generateMore"
-          @generate-more-variants="generateMoreVariants">
+          :result-destination="appState.imageResultDestination" @result-finalized="onResultImagePicked"
+          @generate-more="generateMore" @generate-more-variants="generateMoreVariants">
         </GenerationResultPicker>
         <a-form-item>
           <SliderGroup :label="$t('gen.scaleRatio')" v-model:value="appState.imageScale" :min="1" :max="16"
@@ -476,7 +494,7 @@ const stepProgress = computed(() => {
           <div v-if="appState.referenceRangeMode === ReferenceRangeMode.kPixel"
             style="display:flex; align-items: center; width: 100%">
             <a-button @click="appState.referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
-            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="1" :max="256"
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="0" :max="256"
               :log-scale="true">
             </SliderGroup>
           </div>
@@ -545,6 +563,8 @@ const stepProgress = computed(() => {
           </a-collapse-panel>
         </a-collapse>
         <ControlNet :units="appState.controlnetUnits"></ControlNet>
+        <UltimateUpscale v-if="ultimateUpscaleAvailable && appState.generationMode == GenerationMode.Img2Img"
+          :script="appState.ultimateUpscale"></UltimateUpscale>
       </div>
     </a-space>
   </div>

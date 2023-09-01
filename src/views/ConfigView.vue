@@ -35,7 +35,7 @@
             {{ $t('config.download') }}</a-button>
         </a-col>
         <a-col :span="12">
-          <a-upload accept="application/json" :beforeUpload="uploadConfig" :showUploadList="false"
+          <a-upload :beforeUpload="uploadConfig" :showUploadList="false"
             style="display: block;">
             <a-button :title="$t('config.uploadConfig')" style="width: 100%;"><upload-outlined></upload-outlined> {{
               $t('config.upload')

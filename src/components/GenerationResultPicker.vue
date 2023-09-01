@@ -3,8 +3,9 @@ import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
 import { CloseOutlined, CheckOutlined, RedoOutlined } from '@ant-design/icons-vue';
-import { resizeImage } from '@/ImageUtil';
-import type { IGeneratedImage } from '@/Automatic1111';
+import { getImageDimensions, resizeImage } from '@/ImageUtil';
+import { type IGeneratedImage } from '@/Automatic1111';
+import { ImageResultDestination } from '@/Core';
 
 interface ImageItem extends IGeneratedImage {
     imageURL: string;
@@ -25,6 +26,10 @@ export default {
         maskBlur: {
             type: Number,
             required: false,
+        },
+        resultDestination: {
+            type: Number, // ImageResultDestination
+            required: true,
         },
     },
     components: {
@@ -72,7 +77,15 @@ export default {
         }
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
-            const bound = props.bound! as PhotopeaBound;
+            async function newCanvasBound(): Promise<PhotopeaBound> {
+                const { width, height } = await getImageDimensions(imageItem.imageURL);
+                return [0, 0, width, height] as PhotopeaBound;
+            }
+
+            const bound = props.resultDestination === ImageResultDestination.kCurrentCanvas ?
+                props.bound! as PhotopeaBound :
+                await newCanvasBound();
+
             await photopeaContext.pasteImageOnPhotopea(
                 await resizeImage(imageItem.imageURL, boundWidth(bound), boundHeight(bound)),
                 bound, layerName
@@ -86,16 +99,24 @@ export default {
             if (photopeaInProgress.value) return;
             photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
-                await deselectResultImage();
-                console.log("sdp: Mask blur" + props.maskBlur);
-                if (props.maskBlur) {
-                    await photopeaContext.invoke('applyMaskBlur', props.maskBlur);
+                if (props.resultDestination === ImageResultDestination.kCurrentCanvas) {
+                    await deselectResultImage();
+                    if (props.maskBlur) {
+                        await photopeaContext.invoke('applyMaskBlur', props.maskBlur);
+                    }
+                    for (const image of selectedResultImages) {
+                        await selectResultImage(image, /* layerName= */'ResultLayer');
+                        await photopeaContext.invoke('cropSelectedRegion');
+                    }
+                    await photopeaContext.invoke('deselect');
+                } else { // kNewCanvas
+                    // No selection on new canvas, so avoid any operations involving
+                    // selection.
+                    await deselectResultImage();
+                    for (const image of selectedResultImages) {
+                        await selectResultImage(image, /* layerName= */'ResultLayer');
+                    }
                 }
-                for (const image of selectedResultImages) {
-                    await selectResultImage(image, /* layerName= */'ResultLayer');
-                    await photopeaContext.invoke('cropSelectedRegion');
-                }
-                await photopeaContext.invoke('deselect');
             });
             photopeaInProgress.value = false;
             finalizeSelection();
@@ -141,11 +162,17 @@ export default {
             if (newValue.length > 0) {
                 const imageItem = resultImageItems.value[resultImageItems.value.length - 1];
                 if (selectedResultImages.length === 0) {
+                    // First generation.
                     await photopeaContext.executeTask(async () => {
-                        await selectResultImage(imageItem);
+                        if (props.resultDestination == ImageResultDestination.kCurrentCanvas) {
+                            await selectResultImage(imageItem);
+                        } else { // ImageResultDestination.kNewCanvas
+                            await photopeaContext.invoke('pasteImageAsNewDocument', imageItem.imageURL);
+                        }
                         selectedResultImages.push(imageItem);
                     });
                 } else {
+                    // Generate more.
                     await switchResultImage(imageItem);
                 }
             }

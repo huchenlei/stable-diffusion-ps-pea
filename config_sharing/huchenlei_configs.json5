@@ -172,4 +172,66 @@
             }
         }
     ],
+    "UltimateUpscaleAnime2x": [
+        {
+            "kind": "E",
+            "path": ["img2imgPayload", "denoising_strength"],
+            "lhs": 0.75,
+            "rhs": 0.45,
+        },
+        {
+            "kind": "E",
+            "path": ["ultimateUpscale", "enabled"],
+            "lhs": false,
+            "rhs": true,
+        },
+        {
+            "kind": "E",
+            "path": ["ultimateUpscale", "upscaler_index"],
+            "lhs": 0,
+            "rhs": 6, // Anime6B
+        },
+        {
+            "kind": "E",
+            "path": ["ultimateUpscale", "custom_scale"],
+            "lhs": 1,
+            "rhs": 2,
+        },
+        // No inpaint reference.
+        {
+            "kind": "E",
+            "path": ["referenceRange"],
+            "lhs": [64, 10],
+            "rhs": [0, 0],
+        },
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 2,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11f1e_sd15_tile [a371b31b]",
+                    "module": "tile_colorfix",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 3,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        },
+    ],
 }

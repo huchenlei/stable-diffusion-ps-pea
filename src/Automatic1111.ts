@@ -280,6 +280,11 @@ interface IProgress {
     textinfo: string | null;
 };
 
+interface IScripts {
+    txt2img: string[];
+    img2img: string[];
+};
+
 async function fetchJSON(url: string): Promise<any> {
     const response = await fetch(url);
     return await response.json();
@@ -296,6 +301,7 @@ class A1111Context {
     sdVAEs: IStableDiffusionVAE[] = [];
     loras: ILoRA[] = [];
     options: IOptions = {} as IOptions;
+    scripts: IScripts = {} as IScripts;
 
     initialized: boolean = false;
 
@@ -310,6 +316,7 @@ class A1111Context {
             fetchJSON(`${this.apiURL}/embeddings`),
             fetchJSON(`${this.apiURL}/hypernetworks`),
             fetchJSON(`${this.apiURL}/options`),
+            fetchJSON(`${this.apiURL}/scripts`),
         ];
 
         const [
@@ -321,6 +328,7 @@ class A1111Context {
             embeddings,
             hypernetworks,
             options,
+            scripts,
         ] = await Promise.all(fetchPromises);
 
         this.samplers = samplers as ISampler[];
@@ -331,6 +339,7 @@ class A1111Context {
         this.embeddings = embeddings as IEmbeddings;
         this.hypernetworks = hypernetworks as IHypernetwork[];
         this.options = options as IOptions;
+        this.scripts = scripts as IScripts;
 
         this.initialized = true;
     }
@@ -398,7 +407,7 @@ interface ICommonPayload {
     s_noise: number;
     s_tmax: number | null;
     s_tmin: number;
-    script_args: string[];
+    script_args: any[];
     script_name: string | null;
     styles: string[];
     subseed_strength: number;
@@ -486,7 +495,7 @@ class CommonPayload implements ICommonPayload {
     s_noise: number = 1.0;
     s_tmax: number | null = null;
     s_tmin: number = 0.0;
-    script_args: string[] = [];
+    script_args: any[] = [];
     script_name: string | null = null;
     styles: string[] = [];
     alwayson_scripts: Record<string, IScriptDetail> = {};

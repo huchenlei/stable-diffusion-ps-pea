@@ -7,11 +7,17 @@ import {
     type ITxt2ImgPayload,
     Txt2ImgPayload,
 } from './Automatic1111';
-import { ControlNetUnit, type IControlNetUnit } from './ControlNet';
+import { type IControlNetUnit } from './ControlNet';
+import { UltimateUpscaleScript, type IUltimateUpscaleScript } from './UltimateUpscale';
 
 enum ReferenceRangeMode {
     kPixel,
     kPercent,
+};
+
+enum ImageResultDestination {
+    kCurrentCanvas,
+    kNewCanvas,
 };
 
 /**
@@ -35,9 +41,14 @@ interface IApplicationState {
     // Subseed strength. The subseed strength used when clicking `generate with more variants`
     subseedStrength: number;
 
+    // Image result destination.
+    imageResultDestination: ImageResultDestination;
+
     // Extensions
     // ControlNet
     controlnetUnits: IControlNetUnit[];
+    // UltimateUpscale
+    ultimateUpscale: IUltimateUpscaleScript;
 };
 
 interface IHistoryItem {
@@ -54,7 +65,9 @@ class ApplicationState implements IApplicationState {
     referenceRange: [number, number] = [64, 10];
     referenceRangeMode: ReferenceRangeMode = ReferenceRangeMode.kPixel;
     subseedStrength: number = 0.15;
+    imageResultDestination: ImageResultDestination = ImageResultDestination.kCurrentCanvas;
     controlnetUnits: IControlNetUnit[] = [];
+    ultimateUpscale: IUltimateUpscaleScript = new UltimateUpscaleScript();
 };
 
 export {
@@ -62,4 +75,5 @@ export {
     type IHistoryItem,
     ApplicationState,
     ReferenceRangeMode,
+    ImageResultDestination,
 };
