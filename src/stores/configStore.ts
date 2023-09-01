@@ -3,11 +3,16 @@ import JSON5 from 'json5';
 import type { StateDiff } from '@/Config';
 import { toRaw } from 'vue';
 
+async function fetchDefaultConfigs(): Promise<Record<string, StateDiff>> {
+    const response = await fetch(`config/huchenlei_configs.json5`);
+    return JSON5.parse(await response.text());
+}
+
 // Fetch configs from local storage.
-function fetchConfigs(): Record<string, StateDiff> {
+async function fetchConfigs(): Promise<Record<string, StateDiff>> {
     const localConfigString = localStorage.getItem('configEntries');
     if (!localConfigString || localConfigString === '{}') {
-        return { default: [] };
+        return await fetchDefaultConfigs();
     } else {
         return JSON5.parse(localConfigString);
     }
@@ -21,11 +26,15 @@ function fetchConfigs(): Record<string, StateDiff> {
 // Base and addon config should all be delta with reference to Default config.
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
-        configEntries: fetchConfigs(),
+        configEntries: { default: [] } as Record<string, StateDiff>,
         baseConfigName: localStorage.getItem('baseConfig') || 'default',
         toolboxConfigNames: (JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]')) as string[],
     }),
     actions: {
+        async initializeConfigEntries() {
+            this.configEntries = await fetchConfigs();
+            console.debug("Config entries initialized");
+        },
         createConfigEntry(entry: Record<string, StateDiff>) {
             this.configEntries = { ...this.configEntries, ...entry };
             this.persistConfigEntries();
