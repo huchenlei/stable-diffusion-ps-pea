@@ -172,7 +172,7 @@
             }
         }
     ],
-    "UltimateUpscale2x": {
+    "UltimateUpscale2x": [
         {
             "kind": "E",
             "path": ["img2imgPayload", "denoising_strength"],
@@ -181,23 +181,22 @@
         },
         {
             "kind": "E",
-            "path": ["commonPayload", "script_name"],
-            "lhs": null,
-            "rhs": "ultimate sd upscale",
+            "path": ["ultimateUpscale", "enabled"],
+            "lhs": false,
+            "rhs": true,
         },
         {
             "kind": "E",
-            "path": ["commonPayload", "script_args"],
-            "lhs": [],
-            // info, tile_width, tile_height, mask_blur, 
-            // padding, seams_fix_width, seams_fix_denoise, seams_fix_padding,
-            // upscaler_index, save_upscaled_image, redraw_mode, save_seams_fix_image, 
-            // seams_fix_mask_blur, seams_fix_type, target_size_type, custom_width,
-            // custom_height, custom_scale
-            "rhs": [
-                
-            ]
-        }
+            "path": ["ultimateUpscale", "upscaler_index"],
+            "lhs": 0,
+            "rhs": 6, // Anime6B
+        },
+        {
+            "kind": "E",
+            "path": ["ultimateUpscale", "custom_scale"],
+            "lhs": 1,
+            "rhs": 2,
+        },
         {
             "kind": "A",
             "path": [
@@ -226,6 +225,6 @@
                     "linkedLayerName": ""
                 }
             }
-        }
-    },
+        },
+    ],
 }

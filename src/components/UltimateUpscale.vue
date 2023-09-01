@@ -83,15 +83,15 @@ export default {
                 <PayloadRadio v-model:value="$props.script.seams_fix_type" :enum-type="SeamFixType"
                     :label="$t('upscale.seamFixType')">
                 </PayloadRadio>
-                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.None"
                     :label="$t('upscale.seamfix.denoise')" v-model:value="$props.script.seams_fix_denoise" :min="0" :max="1"
                     :step="0.05"></SliderGroup>
-                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone" :label="$t('upscale.seamfix.width')"
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.None" :label="$t('upscale.seamfix.width')"
                     v-model:value="$props.script.seams_fix_width" :min="0" :max="128" :log-scale="true"></SliderGroup>
-                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.None"
                     :label="$t('upscale.seamfix.padding')" v-model:value="$props.script.seams_fix_padding" :min="0"
                     :max="128" :log-scale="true"></SliderGroup>
-                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.None"
                     :label="$t('upscale.seamfix.mask_blur')" v-model:value="$props.script.seams_fix_mask_blur" :min="0"
                     :max="64" :log-scale="true"></SliderGroup>
             </a-space>

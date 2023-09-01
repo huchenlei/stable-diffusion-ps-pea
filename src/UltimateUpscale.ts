@@ -1,20 +1,20 @@
 enum RedrawMode {
-    kLinear = 0,
-    kChess = 1,
-    kNone = 2,
+    Linear = 0,
+    Chess = 1,
+    None = 2,
 };
 
 enum SeamFixType {
-    kNone = 0,
-    kBandPass = 1,
-    kHalfTile = 2,
-    kHalfTilePlusIntersections = 3,
+    None = 0,
+    BandPass = 1,
+    HalfTile = 2,
+    HalfTilePlusIntersections = 3,
 };
 
 enum TargetSizeType {
-    kFromImg2ImgSettings,
-    kCustomSize,
-    kScaleFromImageSize,
+    FromImg2ImgSettings,
+    CustomSize,
+    ScaleFromImageSize,
 };
 
 interface IUltimateUpscaleScript {
@@ -63,11 +63,11 @@ class UltimateUpscaleScript implements IUltimateUpscaleScript {
     seams_fix_padding: number = 32;
     upscaler_index: number = 0;
     save_upscaled_image: boolean = true;
-    redraw_mode: RedrawMode = RedrawMode.kLinear;
+    redraw_mode: RedrawMode = RedrawMode.Linear;
     save_seams_fix_image: boolean = false;
     seams_fix_mask_blur: number = 8;
-    seams_fix_type: SeamFixType = SeamFixType.kNone;
-    target_size_type: TargetSizeType = TargetSizeType.kScaleFromImageSize;
+    seams_fix_type: SeamFixType = SeamFixType.None;
+    target_size_type: TargetSizeType = TargetSizeType.ScaleFromImageSize;
     custom_width: number = 2048;
     custom_height: number = 2048;
     custom_scale: number = 2;
