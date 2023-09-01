@@ -60,7 +60,7 @@ export default {
                     :log-scale="true"></SliderGroup>
 
                 <a-row>
-                    <a-tag class="label">Upscaler:</a-tag>
+                    <a-tag class="label">{{ $t('upscale.upscaler') }}:</a-tag>
                     <a-radio-group v-model:value="$props.script.upscaler_index" size="small">
                         <a-radio-button v-for="(upscaler, i) in upscalers" :key="i" :value="i">
                             {{ upscaler }}
@@ -83,14 +83,17 @@ export default {
                 <PayloadRadio v-model:value="$props.script.seams_fix_type" :enum-type="SeamFixType"
                     :label="$t('upscale.seamFixType')">
                 </PayloadRadio>
-                <SliderGroup :label="$t('upscale.seamfix.denoise')" v-model:value="$props.script.seams_fix_denoise" :min="0"
-                    :max="1" :step="0.05"></SliderGroup>
-                <SliderGroup :label="$t('upscale.seamfix.width')" v-model:value="$props.script.seams_fix_width" :min="0"
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                    :label="$t('upscale.seamfix.denoise')" v-model:value="$props.script.seams_fix_denoise" :min="0" :max="1"
+                    :step="0.05"></SliderGroup>
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone" :label="$t('upscale.seamfix.width')"
+                    v-model:value="$props.script.seams_fix_width" :min="0" :max="128" :log-scale="true"></SliderGroup>
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                    :label="$t('upscale.seamfix.padding')" v-model:value="$props.script.seams_fix_padding" :min="0"
                     :max="128" :log-scale="true"></SliderGroup>
-                <SliderGroup :label="$t('upscale.seamfix.padding')" v-model:value="$props.script.seams_fix_padding" :min="0"
-                    :max="128" :log-scale="true"></SliderGroup>
-                <SliderGroup :label="$t('upscale.seamfix.mask_blur')" v-model:value="$props.script.seams_fix_mask_blur"
-                    :min="0" :max="64" :log-scale="true"></SliderGroup>
+                <SliderGroup v-if="$props.script.seams_fix_type !== SeamFixType.kNone"
+                    :label="$t('upscale.seamfix.mask_blur')" v-model:value="$props.script.seams_fix_mask_blur" :min="0"
+                    :max="64" :log-scale="true"></SliderGroup>
             </a-space>
         </a-collapse-panel>
     </a-collapse>

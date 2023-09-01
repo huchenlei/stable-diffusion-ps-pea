@@ -71,6 +71,21 @@ const messages = {
             overwritePrompt: 'Overwrite Prompt',
             appendPrompt: 'Append Prompt',
         },
+        upscale: {
+            upscaler: 'Upscaler',
+            redrawMode: 'Redraw Mode',
+            tileWidth: 'Tile Width',
+            tileHeight: 'Tile Height',
+            maskBlur: 'Mask Blur',
+            padding: 'Padding',
+            seamFixType: 'Seam Fix Type',
+            seamfix: {
+                denoise: 'Seam Fix Denoise Strength',
+                width: 'Seam Fix Width',
+                padding: 'Seam Fix Padding',
+                maskBlur: 'Seam Fix Mask Blur',
+            },
+        },
 
         weight: 'Weight',
         width: 'Width',
