@@ -7,7 +7,8 @@ import {
     type ITxt2ImgPayload,
     Txt2ImgPayload,
 } from './Automatic1111';
-import { ControlNetUnit, type IControlNetUnit } from './ControlNet';
+import { type IControlNetUnit } from './ControlNet';
+import { UltimateUpscaleScript, type IUltimateUpscaleScript } from './UltimateUpscale';
 
 enum ReferenceRangeMode {
     kPixel,
@@ -46,6 +47,8 @@ interface IApplicationState {
     // Extensions
     // ControlNet
     controlnetUnits: IControlNetUnit[];
+    // UltimateUpscale
+    ultimateUpscale: IUltimateUpscaleScript;
 };
 
 interface IHistoryItem {
@@ -64,6 +67,7 @@ class ApplicationState implements IApplicationState {
     subseedStrength: number = 0.15;
     imageResultDestination: ImageResultDestination = ImageResultDestination.kCurrentCanvas;
     controlnetUnits: IControlNetUnit[] = [];
+    ultimateUpscale: IUltimateUpscaleScript = new UltimateUpscaleScript();
 };
 
 export {

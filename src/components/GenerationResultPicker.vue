@@ -78,7 +78,7 @@ export default {
         // Thead unsafe. Need to be called within task.
         async function selectResultImage(imageItem: ImageItem, layerName: string = 'ResultTempLayer') {
             async function newCanvasBound(): Promise<PhotopeaBound> {
-                const {width, height} = await getImageDimensions(imageItem.imageURL);
+                const { width, height } = await getImageDimensions(imageItem.imageURL);
                 return [0, 0, width, height] as PhotopeaBound;
             }
 
@@ -99,16 +99,24 @@ export default {
             if (photopeaInProgress.value) return;
             photopeaInProgress.value = true;
             await photopeaContext.executeTask(async () => {
-                await deselectResultImage();
-                console.log("sdp: Mask blur" + props.maskBlur);
-                if (props.maskBlur) {
-                    await photopeaContext.invoke('applyMaskBlur', props.maskBlur);
+                if (props.resultDestination === ImageResultDestination.kCurrentCanvas) {
+                    await deselectResultImage();
+                    if (props.maskBlur) {
+                        await photopeaContext.invoke('applyMaskBlur', props.maskBlur);
+                    }
+                    for (const image of selectedResultImages) {
+                        await selectResultImage(image, /* layerName= */'ResultLayer');
+                        await photopeaContext.invoke('cropSelectedRegion');
+                    }
+                    await photopeaContext.invoke('deselect');
+                } else { // kNewCanvas
+                    // No selection on new canvas, so avoid any operations involving
+                    // selection.
+                    await deselectResultImage();
+                    for (const image of selectedResultImages) {
+                        await selectResultImage(image, /* layerName= */'ResultLayer');
+                    }
                 }
-                for (const image of selectedResultImages) {
-                    await selectResultImage(image, /* layerName= */'ResultLayer');
-                    await photopeaContext.invoke('cropSelectedRegion');
-                }
-                await photopeaContext.invoke('deselect');
             });
             photopeaInProgress.value = false;
             finalizeSelection();

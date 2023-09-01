@@ -172,4 +172,60 @@
             }
         }
     ],
+    "UltimateUpscale2x": {
+        {
+            "kind": "E",
+            "path": ["img2imgPayload", "denoising_strength"],
+            "lhs": 0.75,
+            "rhs": 0.45,
+        },
+        {
+            "kind": "E",
+            "path": ["commonPayload", "script_name"],
+            "lhs": null,
+            "rhs": "ultimate sd upscale",
+        },
+        {
+            "kind": "E",
+            "path": ["commonPayload", "script_args"],
+            "lhs": [],
+            // info, tile_width, tile_height, mask_blur, 
+            // padding, seams_fix_width, seams_fix_denoise, seams_fix_padding,
+            // upscaler_index, save_upscaled_image, redraw_mode, save_seams_fix_image, 
+            // seams_fix_mask_blur, seams_fix_type, target_size_type, custom_width,
+            // custom_height, custom_scale
+            "rhs": [
+                
+            ]
+        }
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "batch_images": "",
+                    "control_mode": 2,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "input_mode": 0,
+                    "low_vram": false,
+                    "model": "control_v11f1e_sd15_tile [a371b31b]",
+                    "module": "tile_colorfix",
+                    "output_dir": "",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 3,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    },
 }
