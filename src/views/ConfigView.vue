@@ -109,10 +109,14 @@ const flushContentBuffer = () => {
 }
 
 const deleteSelectedConfig = () => {
-  console.debug(`Delete config ${store.baseConfigName}`);
+  if (store.baseConfigName === editorConfigName.value) {
+    message.warn("Cannot delete active config.");
+    return;
+  }
 
-  store.deleteConfigEntry(store.baseConfigName);
-  store.baseConfigName = Object.keys(store.configEntries)[0];
+  message.info(`Delete config ${editorConfigName.value}`);
+  store.deleteConfigEntry(editorConfigName.value);
+  editorConfigName.value = Object.keys(store.configEntries)[0];
 }
 
 const saveConfig = () => {
