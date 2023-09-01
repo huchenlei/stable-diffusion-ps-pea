@@ -8,16 +8,6 @@ async function fetchDefaultConfigs(): Promise<Record<string, StateDiff>> {
     return JSON5.parse(await response.text());
 }
 
-// Fetch configs from local storage.
-async function fetchConfigs(): Promise<Record<string, StateDiff>> {
-    const localConfigString = localStorage.getItem('configEntries');
-    if (!localConfigString || localConfigString === '{}') {
-        return await fetchDefaultConfigs();
-    } else {
-        return JSON5.parse(localConfigString);
-    }
-}
-
 // There are 3 levels of configs:
 // - Default: The base config. All other configs are references of the base config.
 // - Base: The alwayson config in generation.
@@ -27,13 +17,25 @@ async function fetchConfigs(): Promise<Record<string, StateDiff>> {
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
         configEntries: { default: [] } as Record<string, StateDiff>,
-        baseConfigName: localStorage.getItem('baseConfig') || 'default',
-        toolboxConfigNames: (JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]')) as string[],
+        baseConfigName: 'default',
+        toolboxConfigNames: [] as string[],
     }),
     actions: {
         async initializeConfigEntries() {
-            this.configEntries = await fetchConfigs();
-            console.debug("Config entries initialized");
+            const localConfigString = localStorage.getItem('configEntries');
+
+            // First time user. Do extra setups.
+            if (!localConfigString || localConfigString === '{}') {
+                this.configEntries = await fetchDefaultConfigs();
+                this.baseConfigName = 'default';
+                this.toolboxConfigNames = Object.keys(this.configEntries).filter(name => name !== this.baseConfigName);
+                console.debug("New user config initialization");
+            } else {
+                this.configEntries = JSON5.parse(localConfigString);
+                this.baseConfigName = localStorage.getItem('baseConfig') as string;
+                this.toolboxConfigNames = JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]');
+                console.debug("Normal config initialization");
+            }
         },
         createConfigEntry(entry: Record<string, StateDiff>) {
             this.configEntries = { ...this.configEntries, ...entry };
