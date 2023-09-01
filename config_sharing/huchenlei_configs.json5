@@ -172,7 +172,7 @@
             }
         }
     ],
-    "UltimateUpscale2x": [
+    "UltimateUpscaleAnime2x": [
         {
             "kind": "E",
             "path": ["img2imgPayload", "denoising_strength"],
@@ -196,6 +196,13 @@
             "path": ["ultimateUpscale", "custom_scale"],
             "lhs": 1,
             "rhs": 2,
+        },
+        // No inpaint reference.
+        {
+            "kind": "E",
+            "path": ["referenceRange"],
+            "lhs": [64, 10],
+            "rhs": [0, 0],
         },
         {
             "kind": "A",

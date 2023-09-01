@@ -287,9 +287,11 @@ async function sendPayload() {
     });
     const result = await response.json() as IGenerationResult;
 
-    const controlNetCount = _.sum(appState.controlnetUnits.map(unit => unit.enabled ? 1 : 0));
-    // Remove controlnet maps from image results.
-    const imageURLs = (controlNetCount > 0 ? result.images.slice(0, -controlNetCount) : result.images)
+    // Expected number of images from generation.
+    // ControlNet maps appending at the end will be dropped.
+    const numImages = appState.ultimateUpscale.enabled ? 1 : 
+      appState.commonPayload.batch_size * appState.commonPayload.n_iter;
+    const imageURLs = result.images.slice(0, numImages)
       .map((image: string) => `data:image/png;base64,${image}`);
 
     const info = JSON.parse(result.info) as IGenerationInfo;
@@ -492,7 +494,7 @@ const stepProgress = computed(() => {
           <div v-if="appState.referenceRangeMode === ReferenceRangeMode.kPixel"
             style="display:flex; align-items: center; width: 100%">
             <a-button @click="appState.referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
-            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="1" :max="256"
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="0" :max="256"
               :log-scale="true">
             </SliderGroup>
           </div>
