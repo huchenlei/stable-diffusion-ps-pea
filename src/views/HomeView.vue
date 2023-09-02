@@ -3,6 +3,8 @@ import { ref, onMounted, getCurrentInstance } from 'vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { useRouter } from 'vue-router';
 import { DeleteOutlined } from '@ant-design/icons-vue';
+import { useConfigStore } from '@/stores/configStore';
+import { useAppStateStore } from '@/stores/appStateStore';
 const { $notify } = getCurrentInstance()!.appContext.config.globalProperties;
 
 interface ConnectionItem {
@@ -15,13 +17,18 @@ let connectionHistory = ref<ConnectionItem[]>([]);
 const store = useA1111ContextStore();
 const router = useRouter();
 
-// Load connection history from localStorage
-onMounted(() => {
+
+onMounted(async () => {
+  // Load connection history from localStorage
   const savedHistory = localStorage.getItem('connectionHistory');
   if (savedHistory) {
     connectionHistory.value = JSON.parse(savedHistory).sort(
       (a: ConnectionItem, b: ConnectionItem) => b.timestamp - a.timestamp);
   }
+
+  // Initialize configs.
+  await useConfigStore().initializeConfigEntries()
+  await useAppStateStore().resetToDefault();
 });
 
 async function initializeContext(url: string) {

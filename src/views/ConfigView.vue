@@ -65,7 +65,6 @@ import { type StateDiff, stateDiffToAppState, appStateToStateDiff } from '@/Conf
 import _ from 'lodash';
 
 const store = useConfigStore();
-store.initializeConfigEntries();
 
 const allConfigOptions = computed(() => Object.keys(store.configEntries).map(configName => {
   return {
