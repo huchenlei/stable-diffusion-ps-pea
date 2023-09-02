@@ -3,7 +3,7 @@ import { ResizeMode } from '@/Automatic1111';
 import { ControlMode, ControlNetUnit, modelNoPreview, type ModuleDetail } from '@/ControlNet';
 import PayloadRadio from '@/components/PayloadRadio.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined, UploadOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined, CheckOutlined, StopOutlined, CaretRightOutlined, UploadOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import { computed, getCurrentInstance, ref, nextTick } from 'vue';
 import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
 import { PayloadImage, cropImage, resizeImage } from '@/ImageUtil';
@@ -41,6 +41,7 @@ export default {
         StopOutlined,
         CaretRightOutlined,
         UploadOutlined,
+        LinkOutlined,
     },
     emits: ['remove:unit', 'enable:unit'],
     setup(props, { emit }) {
@@ -159,6 +160,14 @@ export default {
             });
         }
 
+        async function generateHash(value: string): Promise<string> {
+            const msgUint8 = new TextEncoder().encode(value); // encode as (utf-8) Uint8Array
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8); // hash the message    
+            const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+            return hashHex;
+        }
+
         const preprocessorInProgress = ref<boolean>(false);
         /**
          * Run preprocessor on current selection area or current active layer.
@@ -168,20 +177,9 @@ export default {
          * layer will be cropped out and send to A1111 as payload.
          */
         async function runPreprocessor() {
-            async function generateHash(value: string): Promise<string> {
-                const msgUint8 = new TextEncoder().encode(value); // encode as (utf-8) Uint8Array
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8); // hash the message    
-                const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
-                return hashHex;
-            }
-
             preprocessorInProgress.value = true;
             try {
                 const context = useA1111ContextStore().controlnetContext;
-                const timestamp = new Date().getTime().toString();
-                const hash = await generateHash(timestamp + props.unit.module);
-
                 const [imageBuffer, bounds] = await photopeaContext.executeTask(async () => {
                     const imageBuffer = await photopeaContext.invoke('exportControlNetInputImage', 'PNG') as ArrayBuffer;
                     const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
@@ -210,16 +208,11 @@ export default {
                 const detectedMap = `data:image/png;base64,${data['images'][0]}`;
                 await photopeaContext.executeTask(async () => {
                     await photopeaContext.pasteImageOnPhotopea(
-                        await resizeImage(detectedMap, boundWidth(bounds), boundHeight(bounds)), 
+                        await resizeImage(detectedMap, boundWidth(bounds), boundHeight(bounds)),
                         bounds
                     );
-                    const previousLayerName = props.unit.linkedLayerName;
-                    props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
-                    await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);
                 });
-
-                if (!props.unit.enabled)
-                    props.unit.enabled = true;
+                await linkActiveLayer();
             } catch (e) {
                 console.error(e);
                 $notify(`ControlNet: ${e}`);
@@ -248,6 +241,19 @@ export default {
             return false;
         }
 
+        function linkActiveLayer() {
+            if (!props.unit.enabled)
+                props.unit.enabled = true;
+
+            return photopeaContext.executeTask(async () => {
+                const timestamp = new Date().getTime().toString();
+                const hash = await generateHash(timestamp + props.unit.module);
+                const previousLayerName = props.unit.linkedLayerName;
+                props.unit.linkedLayerName = `CN:${props.unit.module}:${hash}`;
+                await photopeaContext.invoke('controlNetDetectedMapPostProcess', props.unit.linkedLayerName, previousLayerName);
+            });
+        }
+
         return {
             preprocessorInput,
             controlType,
@@ -266,6 +272,7 @@ export default {
             runPreprocessor,
             isReferenceModel,
             beforeUploadImage,
+            linkActiveLayer,
             ControlMode,
             ResizeMode,
         };
@@ -316,6 +323,9 @@ export default {
                 <a-button @click="runPreprocessor" size="small" :disabled="!previewRunnable"
                     :loading="preprocessorInProgress">
                     <CaretRightOutlined></CaretRightOutlined>
+                </a-button>
+                <a-button @click="linkActiveLayer" size="small" :title="$t('cnet.linkActiveLayer')">
+                    <LinkOutlined></LinkOutlined>
                 </a-button>
                 <a-checkbox v-model:checked="unit.low_vram">{{ $t('cnet.lowvram') }}</a-checkbox>
             </a-space>
