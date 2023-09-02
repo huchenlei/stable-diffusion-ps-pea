@@ -289,7 +289,7 @@ async function sendPayload() {
 
     // Expected number of images from generation.
     // ControlNet maps appending at the end will be dropped.
-    const numImages = appState.ultimateUpscale.enabled ? 1 : 
+    const numImages = appState.ultimateUpscale.enabled ? 1 :
       appState.commonPayload.batch_size * appState.commonPayload.n_iter;
     const imageURLs = result.images.slice(0, numImages)
       .map((image: string) => `data:image/png;base64,${image}`);
@@ -494,8 +494,7 @@ const stepProgress = computed(() => {
           <div v-if="appState.referenceRangeMode === ReferenceRangeMode.kPixel"
             style="display:flex; align-items: center; width: 100%">
             <a-button @click="appState.referenceRangeMode = ReferenceRangeMode.kPercent">px</a-button>
-            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="0" :max="256"
-              :log-scale="true">
+            <SliderGroup :label="$t('gen.referenceRange')" v-model:value="appState.referenceRange[0]" :min="0" :max="256">
             </SliderGroup>
           </div>
           <div v-else style="display:flex; align-items: center; width:100%">
