@@ -63,6 +63,7 @@ import { DeleteOutlined, DownloadOutlined, PlusOutlined, SaveOutlined, UploadOut
 import { type IApplicationState } from '@/Core';
 import { message } from 'ant-design-vue';
 import { type StateDiff, stateDiffToAppState, appStateToStateDiff } from '@/Config';
+import _ from 'lodash';
 
 const store = useConfigStore();
 const allConfigOptions = computed(() => Object.keys(store.configEntries).map(configName => {
@@ -87,12 +88,14 @@ const editorValue = computed(() => {
 const isLastConfig = computed(() => Object.keys(store.configEntries).length === 1);
 
 const createNewEntry = () => {
-  if (newEntryName.value.trim() !== "") {
-    console.debug(`Create new config: ${newEntryName.value}`);
-    store.createConfigEntry({ [newEntryName.value]: [] });
-    store.baseConfigName = newEntryName.value;
-    newEntryName.value = "";
+  if (newEntryName.value.trim() === "") {
+    message.warn("Config name cannot be empty.");
   }
+
+  message.info(`Create new config: ${newEntryName.value} based on ${editorConfigName.value}`);
+  store.createConfigEntry({ [newEntryName.value]: _.cloneDeep(currentStateDiffContent.value) });
+  editorConfigName.value = newEntryName.value;
+  newEntryName.value = "";
 }
 
 const updateEntry = (newValue: IApplicationState | StateDiff) => {
