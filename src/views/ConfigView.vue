@@ -35,8 +35,7 @@
             {{ $t('config.download') }}</a-button>
         </a-col>
         <a-col :span="12">
-          <a-upload :beforeUpload="uploadConfig" :showUploadList="false"
-            style="display: block;">
+          <a-upload :beforeUpload="uploadConfig" :showUploadList="false" style="display: block;">
             <a-button :title="$t('config.uploadConfig')" style="width: 100%;"><upload-outlined></upload-outlined> {{
               $t('config.upload')
             }}</a-button>
@@ -118,7 +117,10 @@ const deleteSelectedConfig = () => {
     message.warn("Cannot delete active config.");
     return;
   }
-
+  if (store.toolboxConfigNames.includes(editorConfigName.value)) {
+    message.warn("Cannot delete active toolbox config.");
+    return;
+  }
   message.info(`Delete config ${editorConfigName.value}`);
   store.deleteConfigEntry(editorConfigName.value);
   editorConfigName.value = Object.keys(store.configEntries)[0];

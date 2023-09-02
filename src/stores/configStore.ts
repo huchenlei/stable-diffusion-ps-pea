@@ -29,10 +29,16 @@ export const useConfigStore = defineStore('configStore', {
                 this.configEntries = await fetchDefaultConfigs();
                 this.baseConfigName = 'default';
                 this.toolboxConfigNames = Object.keys(this.configEntries).filter(name => name !== this.baseConfigName);
+
+                // Persists all initialized configs.
+                this.updateCurrentConfig(this.baseConfigName);
+                this.persistConfigEntries();
+                this.persistToolbox();
+
                 console.debug("New user config initialization");
             } else {
                 this.configEntries = JSON5.parse(localConfigString);
-                this.baseConfigName = localStorage.getItem('baseConfig') as string;
+                this.baseConfigName = localStorage.getItem('baseConfig') || 'default';
                 this.toolboxConfigNames = JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]');
                 console.debug("Normal config initialization");
             }
@@ -50,6 +56,9 @@ export const useConfigStore = defineStore('configStore', {
             this.persistConfigEntries();
         },
         getCurrentConfig(): StateDiff {
+            if (this.configEntries[this.baseConfigName] === undefined) {
+                throw `Config ${this.baseConfigName} not found! All configs:\n${Object.keys(this.configEntries)}`;
+            }
             return this.configEntries[this.baseConfigName];
         },
         updateCurrentConfig(configName: string) {
