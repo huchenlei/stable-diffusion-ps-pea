@@ -66,6 +66,7 @@ const messages = {
             uploadImage: 'Upload Image',
             preprocessorInput: 'Preprocessor Input',
             preprocessorResult: 'Preprocessor Result',
+            linkActiveLayer: 'Link active layer as control map',
         },
         tagger: {
             overwritePrompt: 'Overwrite Prompt',
