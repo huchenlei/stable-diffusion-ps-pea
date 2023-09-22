@@ -142,8 +142,12 @@ function fillExtensionsArgs() {
               .filter(([key]) => key !== 'linkedLayerName')
           ) as any as IControlNetUnit;
 
-          if (linkedWithLayer)
+          if (linkedWithLayer) {
             payloadUnit.module = 'none';
+          } else {
+            // Use pixel perfect when using img2img input as ControlNet input.
+            payloadUnit.pixel_perfect = true;
+          }
 
           return payloadUnit;
         })
