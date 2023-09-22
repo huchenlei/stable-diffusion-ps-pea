@@ -90,7 +90,7 @@ export default {
         } as ModuleDetail);
 
         const attrNames = ['processor_res', 'threshold_a', 'threshold_b'];
-        const sliders = [0, 1, 2].map(index => computed(() => {
+        const sliders = [1, 2].map(index => computed(() => {
             if (moduleDetail.value.sliders.length < index + 1 || moduleDetail.value.sliders[index] === null) {
                 return null;
             }
@@ -188,6 +188,7 @@ export default {
                 const image = await cropImage(imageBuffer, bounds);
 
                 preprocessorInput.value = image;
+                const processorResolution = Math.min(image.width, image.height);
 
                 const response = await fetch(context.detectURL, {
                     method: 'POST',
@@ -195,7 +196,7 @@ export default {
                     body: JSON.stringify({
                         controlnet_module: props.unit.module,
                         controlnet_input_images: [image.dataURL],
-                        controlnet_processor_res: props.unit.processor_res,
+                        controlnet_processor_res: processorResolution,
                         controlnet_threshold_a: props.unit.threshold_a,
                         controlnet_threshold_b: props.unit.threshold_b,
                     }),
