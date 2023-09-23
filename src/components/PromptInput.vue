@@ -7,6 +7,7 @@ import ExtraNetworks from './ExtraNetworks.vue';
 import type { Tag } from '@/TagComplete';
 import { useTagStore } from '@/stores/tagStore';
 import Tagger from './Tagger.vue';
+import SegColorPicker from './SegColorPicker.vue';
 
 export default {
     name: 'PromptInput',
@@ -20,6 +21,7 @@ export default {
         ExtraNetworks,
         Tagger,
         DeleteOutlined,
+        SegColorPicker,
     },
     emits: ['update:promptValue'],
     setup(props, { emit, }) {
@@ -174,6 +176,8 @@ export default {
             <a-button @click="clearPrompt" :danger="true" type="primary" :title="$t('gen.clearPrompt')">
                 <DeleteOutlined></DeleteOutlined>
             </a-button>
+
+            <SegColorPicker></SegColorPicker>
         </a-space>
     </a-space>
 </template>

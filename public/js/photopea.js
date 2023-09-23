@@ -395,3 +395,20 @@ function removeTopLevelLayer(layerName) {
     }
     app.echoToOE(layerRemoved ? 'success' : 'fail');
 }
+
+function pickSegColor(rgb) {
+    const color = new SolidColor();
+    color.rgb.red = rgb[0];
+    color.rgb.green = rgb[1];
+    color.rgb.blue = rgb[2];
+
+    app.foregroundColor = color;
+
+    // Fill selection if there is a selection.
+    if (hasSelection()) {
+        app.activeDocument.selection.fill(color);
+        app.activeDocument.selection.deselect();
+    }
+    
+    app.echoToOE('success');
+}
