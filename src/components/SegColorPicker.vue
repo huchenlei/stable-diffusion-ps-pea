@@ -3,6 +3,7 @@ import { BgColorsOutlined } from '@ant-design/icons-vue';
 import Papa from 'papaparse';
 import { computed, ref } from 'vue';
 import { photopeaContext } from '@/Photopea';
+import { findActiveColors } from '@/ImageUtil';
 
 interface ColorMap {
     rgb: [number, number, number];
@@ -61,8 +62,13 @@ export default {
         });
 
         const searchKeyword = ref<string>('');
+        const colorsOnCavnas = ref<Set<string>>(new Set());
         const activeColorMaps = computed(() => {
-            return colorMaps.value.filter(colorMap => {
+            const reorderedColorMaps = [
+                ...colorMaps.value.filter(cm => colorsOnCavnas.value.has(cm.rgb.toString())),
+                ...colorMaps.value.filter(cm => !colorsOnCavnas.value.has(cm.rgb.toString())),
+            ];
+            return reorderedColorMaps.filter(colorMap => {
                 return colorMap.name.toLowerCase().includes(searchKeyword.value.toLowerCase());
             });
         });
@@ -71,12 +77,19 @@ export default {
             photopeaContext.invokeAsTask("pickSegColor", rgb);
         }
 
+        async function findColorsOnCanvas() {
+            const imageBuffer = await photopeaContext.invokeAsTask('exportSelectedLayerOnly', 'PNG');
+            colorsOnCavnas.value = await findActiveColors(imageBuffer, new Set(colorMaps.value.map(cm => cm.rgb.toString())));
+        }
+
         return {
             visible,
             showDrawer,
             activeColorMaps,
+            colorsOnCavnas,
             searchKeyword,
             pickColor,
+            findColorsOnCanvas,
         };
     },
 };
@@ -89,7 +102,7 @@ export default {
     <a-drawer v-model:visible="visible" title="Segmentation Color Picker" placement="right">
         <a-list size="small" :data-source="activeColorMaps">
             <template #renderItem="{ item }">
-                <a-list-item>
+                <a-list-item :class="{ onCanvas: colorsOnCavnas.has(item.rgb.toString()) }">
                     <a-space style="flex-wrap: wrap;">
                         <a-button :style="{ backgroundColor: `rgb(${item.rgb.join(',')})` }" @click="pickColor(item.rgb)">
                             <BgColorsOutlined></BgColorsOutlined>
@@ -99,8 +112,20 @@ export default {
                 </a-list-item>
             </template>
             <template #header>
-                <a-input v-model:value="searchKeyword" style="width: 100%" :placeholder="$t('gen.search') + '...'" />
+                <a-space direction="vertical">
+                    <a-button @click="findColorsOnCanvas">{{ $t('gen.findColorsOnCanvas') }}</a-button>
+                    <a-input v-model:value="searchKeyword" style="width: 100%" :placeholder="$t('gen.search') + '...'" />
+                </a-space>
             </template>
         </a-list>
     </a-drawer>
 </template>
+
+<style scoped>
+.onCanvas {
+    color: #ffdddd;
+    /* A light red for the text */
+    background-color: #5e0303;
+    /* A darker red for the background */
+}
+</style>

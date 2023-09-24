@@ -32,6 +32,8 @@ const messages = {
             tagger: 'Tagger',
             generateMore: 'Generate more images with same settings',
             generateMoreVariants: 'Generate more with variation seed',
+            segColorPicker: 'Segmentation Color Picker',
+            findColorsOnCanvas: 'Find colors on canvas',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
