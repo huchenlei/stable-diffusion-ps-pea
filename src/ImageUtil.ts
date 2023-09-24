@@ -180,6 +180,42 @@ function areColorsEqual(color1: Uint8ClampedArray, color2: Uint8ClampedArray): b
     return true;
 }
 
+/**
+ * Find colors on canvas that appears in the input colors array.
+ * @param imageBuffer input image
+ * @param colors candidate colors to find on canvas
+ */
+async function findActiveColors(imageBuffer: ArrayBuffer, colors: Set<string>): Promise<Set<string>> {
+    const imageObj = await loadImage(imageBuffer);
+    // Create a new fabric canvas
+    const canvas = new fabric.StaticCanvas(null, {
+        width: imageObj.width,
+        height: imageObj.height,
+    });
+
+    // Add the image to the canvas
+    canvas.add(imageObj);
+    // Render the canvas
+    canvas.renderAll();
+
+    // Get the context of the canvas
+    const ctx = canvas.getContext();
+
+    // Get the image data from the canvas
+    const imageData = ctx.getImageData(0, 0, canvas.getWidth(), canvas.getHeight());
+
+    // Check each pixel
+    const result: Set<string> = new Set();
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        const pixelColor: Uint8ClampedArray = imageData.data.slice(i, i + 3);
+        const targetColor: [number, number, number] = [pixelColor[0], pixelColor[1], pixelColor[2]];
+        if (colors.has(targetColor.toString())) {
+            result.add(targetColor.toString());
+        }
+    }
+    return result;
+}
+
 /*
 MIT LICENSE
 Copyright 2011 Jon Leighton
@@ -301,4 +337,5 @@ export {
     getImageDimensions,
     resizeImage,
     base64ArrayBuffer,
+    findActiveColors,
 }
