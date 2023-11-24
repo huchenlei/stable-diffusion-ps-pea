@@ -2,6 +2,7 @@
 import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
 import { computed, reactive, onMounted, ref, watch } from 'vue';
 import ImagePicker from './ImagePicker.vue';
+import DiceOutlined from './svg/DiceOutlined.vue';
 import { CloseOutlined, CheckOutlined, RedoOutlined } from '@ant-design/icons-vue';
 import { getImageDimensions, resizeImage } from '@/ImageUtil';
 import { type IGeneratedImage } from '@/Automatic1111';
@@ -37,6 +38,7 @@ export default {
         CloseOutlined,
         CheckOutlined,
         RedoOutlined,
+        DiceOutlined,
     },
     emits: ['result-finalized', 'generate-more', 'generate-more-variants'],
     setup(props, { emit }) {
@@ -200,7 +202,7 @@ export default {
     </a-spin>
     <a-row v-if="resultImageItems.length > 0">
         <a-button class="button" @click="generateMoreVariants" :title="$t('gen.generateMoreVariants')">
-            <img src="/icons/dice.svg" alt="dice" style="width: 1em; height: 1em; margin-bottom: 4px;">
+            <DiceOutlined></DiceOutlined>
         </a-button>
         <a-button class="button" @click="generateMoreImages" :title="$t('gen.generateMore')">
             <RedoOutlined></RedoOutlined>
