@@ -34,6 +34,7 @@ const messages = {
             generateMoreVariants: 'Generate more with variation seed',
             segColorPicker: 'Segmentation Color Picker',
             findColorsOnCanvas: 'Find colors on canvas',
+            seed: 'Seed',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
