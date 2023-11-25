@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, } from 'vue';
 import { CommonPayload } from '../Automatic1111';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { DeleteOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, MinusOutlined } from '@ant-design/icons-vue';
 import ExtraNetworks from './ExtraNetworks.vue';
 import type { Tag } from '@/TagComplete';
 import { useTagStore } from '@/stores/tagStore';
@@ -21,6 +21,7 @@ export default {
         ExtraNetworks,
         Tagger,
         DeleteOutlined,
+        MinusOutlined,
         SegColorPicker,
     },
     emits: ['update:promptValue'],
@@ -132,6 +133,8 @@ export default {
             return num.toString();
         }
 
+        const negativePromptVisible = ref<boolean>(false);
+
         return {
             loras,
             embeddings,
@@ -144,6 +147,7 @@ export default {
             autoCompleteInputElement,
             tagStore,
             formatNumber,
+            negativePromptVisible,
         };
     },
 };
@@ -153,7 +157,7 @@ export default {
     <a-space direction="vertical" class="input-container">
         <a-spin :spinning="tagStore.loading">
             <a-auto-complete v-model:value="payload.prompt" :options="autoCompleteOptions" @search="handleSearch"
-                @select="handleSelect">
+                @select="handleSelect" class="prompt-container">
                 <template #option="{ value, tag }">
                     <div style="display: flex; justify-content: space-between;">
                         <span>{{ value === tag.name ? value : `${value} → ${tag.name}` }}</span>
@@ -165,25 +169,29 @@ export default {
                     @keydown.tab.stop="handleTabPress" :autoSize="{ minRows: 1, maxRows: 6 }" />
             </a-auto-complete>
         </a-spin>
-        <a-textarea v-model:value="payload.negative_prompt" :placeholder="$t('gen.enterNegativePrompt') + '...'"
-            :autoSize="{ minRows: 1, maxRows: 6 }" />
-
         <a-space>
             <ExtraNetworks :loras="loras" :embeddings="embeddings" @add:prompt="addPrompt"></ExtraNetworks>
             <Tagger @update:prompt="newPrompt => $props.payload.prompt = newPrompt"
                 @append:prompt="newPrompt => $props.payload.prompt += newPrompt"></Tagger>
+            <SegColorPicker></SegColorPicker>
 
+            <a-button :danger="true" type="primary" @click="negativePromptVisible = true" :title="$t('gen.negativePrompt')">
+                <MinusOutlined />
+            </a-button>
+            <a-drawer v-model:visible="negativePromptVisible" :title="$t('gen.negativePrompt')" placement="right">
+                <a-textarea v-model:value="payload.negative_prompt" :placeholder="$t('gen.enterNegativePrompt') + '...'"
+                    :autoSize="{ minRows: 1 }" />
+            </a-drawer>
             <a-button @click="clearPrompt" :danger="true" type="primary" :title="$t('gen.clearPrompt')">
                 <DeleteOutlined></DeleteOutlined>
             </a-button>
-
-            <SegColorPicker></SegColorPicker>
         </a-space>
     </a-space>
 </template>
 
 <style scoped>
-.input-container {
+.input-container,
+.prompt-container {
     width: 100%;
 }
 </style>
