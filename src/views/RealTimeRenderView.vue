@@ -13,8 +13,10 @@ function rerollSeed() {
   appState.commonPayload.seed = Math.floor(Math.random() * Math.pow(2, 32));
 }
 
-// Send to canvas button
 // Send the rendered image to the canvas (selection)
+function sendToCanvas() {
+  
+}
 </script>
 
 <template>
@@ -27,6 +29,9 @@ function rerollSeed() {
       <a-input-number :addonBefore="$t('gen.seed')" v-model:value="appState.commonPayload.seed"></a-input-number>
       <a-button @click="rerollSeed">
         <DiceOutlined></DiceOutlined>
+      </a-button>
+      <a-button @click="sendToCanvas">
+        {{ $t('realtime.sendToCanvas') }}
       </a-button>
     </a-row>
 

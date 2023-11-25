@@ -117,6 +117,10 @@ const messages = {
             selectConfig: 'Select configs',
             toggleViewDiff: 'Toggle Diff/All',
         },
+
+        realtime: {
+            sendToCanvas: 'Send to canvas',
+        },
     },
     zh: {
         nav: {
