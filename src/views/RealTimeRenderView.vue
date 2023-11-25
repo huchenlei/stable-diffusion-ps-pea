@@ -4,6 +4,7 @@ import { useAppStateStore } from '@/stores/appStateStore';
 import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import { useConfigStore } from '@/stores/configStore';
+import SliderGroup from '@/components/SliderGroup.vue';
 
 const appStateStore = useAppStateStore();
 const appState = appStateStore.appState;
@@ -38,10 +39,12 @@ function sendToCanvas() {
   <a-space direction="vertical" style="width: 100%;">
     <a-row style="display: flex; align-items: center;">
       <a-tag style="border: none; flex: 0 0 auto;">{{ $t('realtime.realtimeConfig') }}</a-tag>
-      <a-select :value="configStore.lcmConfigName" @update:value="onSelectLCMConfig" :options="allConfigOptions" show-search
-          :filter-option="filterConfig" style="flex: 1 1 auto;"></a-select>  
+      <a-select :value="configStore.lcmConfigName" @update:value="onSelectLCMConfig" :options="allConfigOptions"
+        show-search :filter-option="filterConfig" style="flex: 1 1 auto;"></a-select>
     </a-row>
-     <!-- Seed control.
+    <SliderGroup :label="$t('gen.denoisingStrength')" v-model:value="appState.img2imgPayload.denoising_strength" :min="0"
+      :max="1" :step="0.05"></SliderGroup>
+    <!-- Seed control.
      - Display the current active seed
      - A button that reroll the seed
      - A list of previously used seeds -->
