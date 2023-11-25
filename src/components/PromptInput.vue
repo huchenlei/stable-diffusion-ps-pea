@@ -62,7 +62,7 @@ export default {
                 const inputElement = (autoCompleteInputElement.value.resizableTextArea.textArea as HTMLTextAreaElement);
                 const cursorPosition = inputElement.selectionStart;
                 const inputValue = inputElement.value;
-                const words = inputValue.slice(0, cursorPosition).split(/[\s,\)\]\}]+/);
+                const words = inputValue.slice(0, cursorPosition).split(/[\s,)\]}]+/);
                 const wordBeforeCursor = words[words.length - 1];
                 const tagCandidate = wordBeforeCursor
                     .replace(" ", "_")
