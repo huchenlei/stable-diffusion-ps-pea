@@ -93,8 +93,9 @@ export default {
     <a-drawer v-model:visible="visible" title="Extra Networks" placement="right">
         <a-space direction="vertical">
             <a-radio-group v-model:value="currentNetworkType" button-style="solid">
-                <a-radio-button v-for="network in [NetworkType.LoRA, NetworkType.Embedding]" :value="network">{{ network
-                }}</a-radio-button>
+                <a-radio-button v-for="network in [NetworkType.LoRA, NetworkType.Embedding]" :value="network"
+                    :key="network">{{ network
+                    }}</a-radio-button>
             </a-radio-group>
             <a-input v-model:value="searchKeyword" style="width: 100%" :placeholder="$t('gen.search') + '...'" />
 
