@@ -3,10 +3,25 @@ import { ref, computed } from 'vue';
 import { useAppStateStore } from '@/stores/appStateStore';
 import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
+import { useConfigStore } from '@/stores/configStore';
 
 const appStateStore = useAppStateStore();
 const appState = appStateStore.appState;
+const configStore = useConfigStore();
+const allConfigOptions = computed(() => Object.keys(configStore.configEntries).map(configName => {
+  return {
+    label: configName,
+    value: configName,
+  };
+}));
+const filterConfig = (input: string, option: any) => {
+  return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
 
+function onSelectLCMConfig(configName: string) {
+  configStore.lcmConfigName = configName;
+  configStore.persistLCM();
+}
 
 function rerollSeed() {
   // Generate a 32-bit integer
@@ -15,12 +30,17 @@ function rerollSeed() {
 
 // Send the rendered image to the canvas (selection)
 function sendToCanvas() {
-  
+
 }
 </script>
 
 <template>
   <a-space direction="vertical" style="width: 100%;">
+    <a-row style="display: flex; align-items: center;">
+      <a-tag style="border: none; flex: 0 0 auto;">{{ $t('realtime.realtimeConfig') }}</a-tag>
+      <a-select :value="configStore.lcmConfigName" @update:value="onSelectLCMConfig" :options="allConfigOptions" show-search
+          :filter-option="filterConfig" style="flex: 1 1 auto;"></a-select>  
+    </a-row>
      <!-- Seed control.
      - Display the current active seed
      - A button that reroll the seed

@@ -8,6 +8,7 @@ const messages = {
             generation: 'Generation',
             history: 'History',
             config: 'Config',
+            realtime: 'Realtime Render',
         },
         gen: {
             skip: 'Skip',
@@ -120,6 +121,7 @@ const messages = {
 
         realtime: {
             sendToCanvas: 'Send to canvas',
+            realtimeConfig: 'Realtime Config',
         },
     },
     zh: {

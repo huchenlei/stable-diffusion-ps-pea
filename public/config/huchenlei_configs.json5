@@ -46,6 +46,35 @@
             "rhs": 4,
         }
     ],
+    "lcm": [
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "sampler_name",
+            ],
+            "lhs": "",
+            "rhs": "LCM", // 'Euler a' if LCM sampler is not available
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "steps",
+            ],
+            "lhs": 20,
+            "rhs": 8,
+        },
+        {
+            "kind": "E",
+            "path": [
+                "commonPayload",
+                "cfg_scale",
+            ],
+            "lhs": 7,
+            "rhs": 1.5,
+        },
+    ],
     "LamaGenFill": [
         {
             "kind": "E",
