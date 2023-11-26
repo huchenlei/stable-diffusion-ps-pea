@@ -14,6 +14,7 @@ import { applyStateDiff, type StateDiff } from '@/Config';
 import type { ApplicationState } from '@/Core';
 import _ from "lodash";
 import type { IControlNetUnit } from '@/ControlNet';
+import { LinkOutlined } from '@ant-design/icons-vue';
 
 const a1111Context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -45,16 +46,18 @@ function sendToCanvas() {
 
 }
 
+async function getActiveDocName(): Promise<string> {
+  return await photopeaContext.invokeAsTask('getActiveDocName');
+}
+
+async function linkCurrentDocument() {
+  documentName.value = await getActiveDocName();
+}
+
 const renderResult = ref<string | null>(null);
-const documentId = ref<number>(0);
 const documentName = ref<string>('');
 let viewActive = true;
 onMounted(async () => {
-  async function getActiveDoc(): Promise<[number, string]> {
-    return JSON.parse(
-      await photopeaContext.invokeAsTask('getActiveDoc'));
-  }
-
   async function getInputImage(): Promise<PayloadImage> {
     const [imageBuffer, bounds] = await photopeaContext.executeTask(async () => {
       const imageBuffer = await photopeaContext.invoke('exportAllLayers', 'PNG') as ArrayBuffer;
@@ -105,8 +108,8 @@ onMounted(async () => {
 
   let previousPayload: ApplicationState | null = null;
   async function renderCanvas() {
-    const activeDocumentId = (await getActiveDoc())[0];
-    if (documentId.value !== activeDocumentId) {
+    const activeDocumentName = await getActiveDocName();
+    if (documentName.value !== activeDocumentName) {
       return;
     }
     const stateToSend: ApplicationState = _.cloneDeep(appState);
@@ -173,7 +176,7 @@ onMounted(async () => {
   }
 
   scheduleNextRender(2000);
-  [documentId.value, documentName.value] = await getActiveDoc();
+  documentName.value = await getActiveDocName();
   rerollSeed();
 });
 
@@ -183,6 +186,12 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <a-divider orientation="left" orientation-margin="0px" size="small">
+    {{ documentName }}
+    <a-button @click="linkCurrentDocument" size="small" :title="$t('realtime.linkCurrentDocument')">
+      <LinkOutlined></LinkOutlined>
+    </a-button>
+  </a-divider>
   <a-space direction="vertical" style="width: 100%;">
     <a-row style="display: flex; align-items: center;">
       <a-tag style="border: none; flex: 0 0 auto;">{{ $t('realtime.realtimeConfig') }}</a-tag>

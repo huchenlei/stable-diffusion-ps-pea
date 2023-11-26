@@ -412,7 +412,7 @@ function pickSegColor(rgb) {
     app.echoToOE('success');
 }
 
-function getActiveDoc() {
+function getActiveDocName() {
     const doc = app.activeDocument;
-    app.echoToOE(JSON.stringify([doc.id, doc.name]));
+    app.echoToOE(doc.name);
 }

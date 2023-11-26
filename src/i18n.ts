@@ -123,6 +123,7 @@ const messages = {
         realtime: {
             sendToCanvas: 'Send to canvas',
             realtimeConfig: 'Realtime Config',
+            linkCurrentDocument: 'Link current document',
         },
     },
     zh: {
