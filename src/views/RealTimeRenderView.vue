@@ -13,7 +13,7 @@ import { message } from 'ant-design-vue';
 import { applyStateDiff, type StateDiff } from '@/Config';
 import type { ApplicationState } from '@/Core';
 import _ from "lodash";
-import { exec } from 'child_process';
+
 
 const a1111Context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
