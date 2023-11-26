@@ -54,6 +54,7 @@ Other features:
 
 ![Screen Capture 034 - Photopea - Online Photo Editor - www photopea com](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/0d53c264-6f74-42e2-9581-ba98a6b021ba)
 ![scribble](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/fd0a0139-c61f-449d-8e1a-e00575acdda9)
+![apples](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/6a2fed43-1630-4b11-b3f2-548216571b73)
 
 ...More documentation work in progress...
 
