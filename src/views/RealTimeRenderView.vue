@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, render } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useAppStateStore } from '@/stores/appStateStore';
 import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
