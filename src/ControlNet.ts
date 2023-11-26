@@ -7,28 +7,20 @@ enum ControlMode {
     ControlNet,
 };
 
-enum InputMode {
-    Simple,
-    Batch,
-};
-
 interface ControlNetImage {
     image: string;
     mask: string | null;
 };
 
 interface IControlNetUnit {
-    batch_images: string;
     control_mode: ControlMode;
     enabled: boolean;
     guidance_end: number;
     guidance_start: number;
     image: ControlNetImage | undefined;
-    input_mode: InputMode;
     low_vram: boolean;
     model: string;
     module: string;
-    output_dir: string;
     pixel_perfect: boolean;
     processor_res: number;
     resize_mode: ResizeMode;
@@ -39,17 +31,14 @@ interface IControlNetUnit {
 }
 
 class ControlNetUnit implements IControlNetUnit {
-    batch_images: string = '';
     control_mode: ControlMode = ControlMode.Balanced;
     enabled: boolean = false;
     guidance_end: number = 1.0;
     guidance_start: number = 0.0;
     image: ControlNetImage | undefined = undefined;
-    input_mode: InputMode = InputMode.Simple;
     low_vram: boolean = false;
     model: string = '';
     module: string = '';
-    output_dir: string = '';
     pixel_perfect: boolean = false;
     processor_res: number = 512;
     resize_mode: ResizeMode = ResizeMode.InnerFit;
@@ -217,7 +206,6 @@ export {
     type IControlNetUnit,
     type ModuleDetail,
     type ControlType,
-    type InputMode,
     ControlNetUnit,
     ControlMode,
     ControlNetContext,

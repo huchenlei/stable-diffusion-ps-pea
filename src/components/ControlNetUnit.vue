@@ -182,7 +182,7 @@ export default {
                 const context = useA1111ContextStore().controlnetContext;
                 const [imageBuffer, bounds] = await photopeaContext.executeTask(async () => {
                     const imageBuffer = await photopeaContext.invoke('exportControlNetInputImage', 'PNG') as ArrayBuffer;
-                    const bounds = JSON.parse(await photopeaContext.invoke('getControlNetSelectionBound')) as PhotopeaBound;
+                    const bounds = JSON.parse(await photopeaContext.invoke('getActiveBound')) as PhotopeaBound;
                     return [imageBuffer, bounds];
                 });
                 const image = await cropImage(imageBuffer, bounds);

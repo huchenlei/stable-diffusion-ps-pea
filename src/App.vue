@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import { GithubOutlined, LoginOutlined, PlayCircleOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons-vue';
+import {
+  GithubOutlined,
+  LoginOutlined,
+  PlayCircleOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons-vue';
 import { reactive } from 'vue';
 
 const context = useA1111ContextStore().a1111Context;
@@ -10,6 +17,7 @@ const route = useRoute();
 const menuItems = reactive([
   { key: '/', path: '/', icon: LoginOutlined, textKey: 'nav.connection', requiresInit: false },
   { key: '/generation', path: '/generation', icon: PlayCircleOutlined, textKey: 'nav.generation', requiresInit: true },
+  { key: '/realtime', path: '/realtime', icon: VideoCameraOutlined, textKey: 'nav.realtime', requiresInit: true },
   { key: '/history', path: '/history', icon: HistoryOutlined, textKey: 'nav.history', requiresInit: true },
   { key: '/config', path: '/config', icon: SettingOutlined, textKey: 'nav.config', requiresInit: false },
 ]);

@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import GenerationView from '../views/GenerationView.vue';
 import HistoryView from '../views/HistoryView.vue';
 import ConfigView from '../views/ConfigView.vue';
+import RealTimeRenderView from '../views/RealTimeRenderView.vue';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 
 const router = createRouter({
@@ -17,6 +18,11 @@ const router = createRouter({
       path: '/generation',
       name: 'generation',
       component: GenerationView
+    },
+    {
+      path: '/realtime',
+      name: 'realtime',
+      component: RealTimeRenderView,
     },
     {
       path: '/history',

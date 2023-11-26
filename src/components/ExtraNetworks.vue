@@ -66,10 +66,6 @@ export default {
             emit('add:prompt', `(${item.name}:1.0)`);
         }
 
-        const afterVisibleChange = (bool: boolean) => {
-            console.log('visible', bool);
-        };
-
         const showDrawer = () => {
             visible.value = true;
         };
@@ -79,7 +75,6 @@ export default {
             NetworkType,
             currentNetworkType,
             searchKeyword,
-            afterVisibleChange,
             showDrawer,
             loraImages,
             embeddingImages,
@@ -95,11 +90,12 @@ export default {
         <DeploymentUnitOutlined />
     </a-button>
 
-    <a-drawer v-model:visible="visible" title="Extra Networks" placement="right" @after-visible-change="afterVisibleChange">
+    <a-drawer v-model:visible="visible" title="Extra Networks" placement="right">
         <a-space direction="vertical">
             <a-radio-group v-model:value="currentNetworkType" button-style="solid">
-                <a-radio-button v-for="network in [NetworkType.LoRA, NetworkType.Embedding]" :value="network">{{ network
-                }}</a-radio-button>
+                <a-radio-button v-for="network in [NetworkType.LoRA, NetworkType.Embedding]" :value="network"
+                    :key="network">{{ network
+                    }}</a-radio-button>
             </a-radio-group>
             <a-input v-model:value="searchKeyword" style="width: 100%" :placeholder="$t('gen.search') + '...'" />
 

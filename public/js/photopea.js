@@ -252,17 +252,16 @@ function exportControlNetInputImage(format) {
     }
 }
 
-function getControlNetSelectionBound() {
+function getActiveBound() {
     if (hasSelection()) {
         app.echoToOE(boundsToString(
             app.activeDocument.selection.bounds
         ));
-    } else if (hasActiveLayer()) {
-        app.echoToOE(boundsToString(
-            app.activeDocument.activeLayer.bounds
-        ));
     } else {
-        app.echoToOE("error");
+        // Get whole document if no selection is available.
+        app.echoToOE(JSON.stringify(
+            [0, 0, app.activeDocument.width, app.activeDocument.height]
+        ));
     }
 }
 
@@ -409,6 +408,11 @@ function pickSegColor(rgb) {
         app.activeDocument.selection.fill(color);
         app.activeDocument.selection.deselect();
     }
-    
+
     app.echoToOE('success');
+}
+
+function getActiveDocName() {
+    const doc = app.activeDocument;
+    app.echoToOE(doc.name);
 }

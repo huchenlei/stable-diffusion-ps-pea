@@ -8,6 +8,7 @@ const messages = {
             generation: 'Generation',
             history: 'History',
             config: 'Config',
+            realtime: 'Realtime Render',
         },
         gen: {
             skip: 'Skip',
@@ -15,6 +16,7 @@ const messages = {
             addLoRA: 'Add LoRA',
             enterPrompt: 'Enter prompt',
             enterNegativePrompt: 'Enter negative prompt',
+            negativePrompt: 'Negative Prompt',
             extraNetworks: 'Extra networks',
             clearPrompt: 'Clear current prompt',
             samplingSteps: 'Sampling Steps',
@@ -34,6 +36,7 @@ const messages = {
             generateMoreVariants: 'Generate more with variation seed',
             segColorPicker: 'Segmentation Color Picker',
             findColorsOnCanvas: 'Find colors on canvas',
+            seed: 'Seed',
 
             inpaintArea: 'Inpaint Area',
             resizeMode: 'Resize Mode',
@@ -115,6 +118,12 @@ const messages = {
             toolbox: 'Toolbox',
             selectConfig: 'Select configs',
             toggleViewDiff: 'Toggle Diff/All',
+        },
+
+        realtime: {
+            sendToCanvas: 'Send to canvas',
+            realtimeConfig: 'Realtime Config',
+            linkCurrentDocument: 'Link current document',
         },
     },
     zh: {

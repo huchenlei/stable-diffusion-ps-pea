@@ -33,6 +33,29 @@ set COMMANDLINE_ARGS=--cors-origins https://huchenlei.github.io [Rest of ARGS...
 **Step3: Search for stable-diffusion-ps-pea**
 ![Install](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/35c2b802-4f31-45c2-8a24-e55f621adfae)
 ## Features
+
+##### :fire:[New Feature][2023-11-26] Realtime rendering powered by [LCM](https://github.com/luosiallen/latent-consistency-model)
+Recent advancement in LCM(Latent Consistency Model) has significantly increased the speed of
+inference of stable diffusion. The inference time now can be so fast that we can do real-time
+rendering of the canvas.
+
+Some preparations before you start exploring the real-time rendering tab:
+- Make sure to download the latest version of [`config_sharing/huchenlei_configs.json5`](https://github.com/huchenlei/stable-diffusion-ps-pea/blob/main/public/config/huchenlei_configs.json5) and upload it in the config tab. The new config file provides `lcm_base`, `lcm_lora_sd15`, `lcm_sd15_scribble` configs that are necessary.
+- Make sure you have LCM LoRA named `lcm_lora_sd15.safetensor` in A1111. Or you can change the name of LoRA in config `lcm_lora_sd15`. You can download LCM LoRAs [here](https://huggingface.co/collections/latent-consistency/latent-consistency-models-loras-654cdd24e111e16f0865fba6).
+
+After these preparations, you can now navigate to the real-time render tab (📹).
+- Select `lcm_base`, `lcm_lora_sd15` in RealtimeConfig.
+- Start drawing on canvas and enjoy!
+
+Other features:
+- If you have any selections on canvas, LCM will only render the selected area.
+- You can add `lcm_sd15_scribble` to RealtimeConfig, which will invoke ControlNet scribble model on canvas content. Make sure you have solid black brush color active when scribbling.
+- You can click `Send to canvas` to send the rendered view to canvas.
+
+![Screen Capture 034 - Photopea - Online Photo Editor - www photopea com](https://github.com/huchenlei/stable-diffusion-ps-pea/assets/20929282/0d53c264-6f74-42e2-9581-ba98a6b021ba)
+
+...More documentation work in progress...
+
 **Reference range selection**
 In A1111 img2img inpaint, one painpoint is that the inpaint area selection is either `WholeImage` or `OnlyMasked`. This
 might not be an issue when the image is within reasonable size (512x512). Once the image becomes big (1024x1024+), the
