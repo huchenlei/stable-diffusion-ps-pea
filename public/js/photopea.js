@@ -257,12 +257,11 @@ function getActiveBound() {
         app.echoToOE(boundsToString(
             app.activeDocument.selection.bounds
         ));
-    } else if (hasActiveLayer()) {
-        app.echoToOE(boundsToString(
-            app.activeDocument.activeLayer.bounds
-        ));
     } else {
-        app.echoToOE("error");
+        // Get whole document if no selection is available.
+        app.echoToOE(JSON.stringify(
+            [0, 0, app.activeDocument.width, app.activeDocument.height]
+        ));
     }
 }
 
