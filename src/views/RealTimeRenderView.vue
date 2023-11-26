@@ -92,8 +92,11 @@ onMounted(async () => {
     // Apply LCM config.
     const lcmConfig: StateDiff = configStore.configEntries[configStore.lcmConfigName];
     applyStateDiff(stateToSend, lcmConfig);
-    stateToSend.img2imgPayload.init_images = [(await getInputImage()).dataURL];
+    const inputImage = await getInputImage();
+    stateToSend.img2imgPayload.init_images = [inputImage.dataURL];
     stateToSend.img2imgPayload.mask = undefined;
+    stateToSend.commonPayload.height = inputImage.height;
+    stateToSend.commonPayload.width = inputImage.width;
     stateToSend.commonPayload.prompt += ',' + appState.commonPayload.prompt;
     stateToSend.commonPayload.seed = seed.value;
     renderResult.value = await sendPayload(stateToSend);
