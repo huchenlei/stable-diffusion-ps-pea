@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, toRaw } from 'vue';
 import { useAppStateStore } from '@/stores/appStateStore';
 import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
@@ -8,11 +8,12 @@ import SliderGroup from '@/components/SliderGroup.vue';
 import { photopeaContext, type PhotopeaBound } from '@/Photopea';
 import { PayloadImage, cropImage } from '@/ImageUtil';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
-import type { IGenerationResult } from '@/Automatic1111';
+import { GenerationMode, type IGenerationResult } from '@/Automatic1111';
 import { message } from 'ant-design-vue';
 import { applyStateDiff, type StateDiff } from '@/Config';
 import type { ApplicationState } from '@/Core';
 import _ from "lodash";
+import type { IControlNetUnit } from '@/ControlNet';
 
 const a1111Context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -64,14 +65,17 @@ onMounted(async () => {
   }
 
   async function sendPayload(appState: ApplicationState): Promise<string> {
-    const response = await fetch(a1111Context.img2imgURL, {
+    const isImg2Img = appState.generationMode === GenerationMode.Img2Img;
+    const url = isImg2Img ? a1111Context.img2imgURL : a1111Context.txt2imgURL;
+    const extraPayload = isImg2Img ? appState.img2imgPayload : appState.txt2imgPayload;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         ...appState.commonPayload,
-        ...appState.img2imgPayload,
+        ...extraPayload,
       }),
     });
     const result = await response.json() as IGenerationResult;
@@ -80,6 +84,23 @@ onMounted(async () => {
       return '';
     }
     return `data:image/png;base64,${result.images[0]}`;
+  }
+
+  function fillControlNetArgs(appState: ApplicationState) {
+    if (!useA1111ContextStore().controlnetContext.initialized)
+      return;
+
+    appState.commonPayload.alwayson_scripts['ControlNet'] = {
+      args: toRaw(appState.controlnetUnits)
+        .filter(unit => unit.enabled)
+        .map(unit => {
+          const payloadUnit = Object.fromEntries(
+            Object.entries(unit)
+              .filter(([key]) => key !== 'linkedLayerName')
+          ) as any as IControlNetUnit;
+          return payloadUnit;
+        })
+    };
   }
 
   let previousPayload: ApplicationState | null = null;
@@ -101,8 +122,20 @@ onMounted(async () => {
       // Failed to get input image.
       return;
     }
-    stateToSend.img2imgPayload.init_images = [inputImage.dataURL];
-    stateToSend.img2imgPayload.mask = undefined;
+    if (stateToSend.generationMode === GenerationMode.Img2Img) {
+      // lcm_base should have generation mode set to img2img by default.
+      stateToSend.img2imgPayload.init_images = [inputImage.dataURL];
+      stateToSend.img2imgPayload.mask = undefined;
+    } else {
+      // Txt2img should have canvas input wired to all ControlNet units.
+      stateToSend.controlnetUnits.forEach(unit => {
+        unit.image = {
+          image: inputImage.dataURL,
+          mask: null,
+        };
+      });
+      fillControlNetArgs(stateToSend);
+    }
     stateToSend.commonPayload.height = inputImage.height;
     stateToSend.commonPayload.width = inputImage.width;
     stateToSend.commonPayload.prompt += ',' + appState.commonPayload.prompt;

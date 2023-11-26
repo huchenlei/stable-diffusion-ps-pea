@@ -51,6 +51,14 @@
         {
             "kind": "E",
             "path": [
+                "generationMode",
+            ],
+            "lhs": 0,
+            "rhs": 1, // Set to img2img
+        },
+        {
+            "kind": "E",
+            "path": [
                 "commonPayload",
                 "sampler_name",
             ],
@@ -105,6 +113,42 @@
             "rhs": "<lora:lcm_lora_sd15:1>",
         },
     ],
+    "lcm_sd15_scribble": [
+        {
+            "kind": "E",
+            "path": [
+                "generationMode",
+            ],
+            "lhs": 0,
+            "rhs": 0, // Set to txt2img
+        },
+        {
+            "kind": "A",
+            "path": [
+                "controlnetUnits"
+            ],
+            "index": 0,
+            "item": {
+                "kind": "N",
+                "rhs": {
+                    "control_mode": 0,
+                    "enabled": true,
+                    "guidance_end": 1,
+                    "guidance_start": 0,
+                    "low_vram": false,
+                    "model": "control_v11p_sd15_scribble [d4ba51ff]",
+                    "module": "none",
+                    "pixel_perfect": false,
+                    "processor_res": 512,
+                    "resize_mode": 1,
+                    "threshold_a": 64,
+                    "threshold_b": 64,
+                    "weight": 1,
+                    "linkedLayerName": ""
+                }
+            }
+        }
+    ],
     "LamaGenFill": [
         {
             "kind": "E",
@@ -142,16 +186,13 @@
             "item": {
                 "kind": "N",
                 "rhs": {
-                    "batch_images": "",
                     "control_mode": 2,
                     "enabled": true,
                     "guidance_end": 1,
                     "guidance_start": 0,
-                    "input_mode": 0,
                     "low_vram": false,
                     "model": "control_v11p_sd15_inpaint [ebff9138]",
                     "module": "inpaint_only+lama",
-                    "output_dir": "",
                     "pixel_perfect": false,
                     "processor_res": 512,
                     "resize_mode": 1,
@@ -173,16 +214,13 @@
             "item": {
                 "kind": "N",
                 "rhs": {
-                    "batch_images": "",
                     "control_mode": 0,
                     "enabled": true,
                     "guidance_end": 1,
                     "guidance_start": 0,
-                    "input_mode": 0,
                     "low_vram": false,
                     "model": "control_v11p_sd15_inpaint [ebff9138]",
                     "module": "inpaint_only",
-                    "output_dir": "",
                     "pixel_perfect": false,
                     "processor_res": 512,
                     "resize_mode": 1,
@@ -210,16 +248,13 @@
             "item": {
                 "kind": "N",
                 "rhs": {
-                    "batch_images": "",
                     "control_mode": 0,
                     "enabled": true,
                     "guidance_end": 1,
                     "guidance_start": 0,
-                    "input_mode": 0,
                     "low_vram": false,
                     "model": "control_v11f1e_sd15_tile [a371b31b]",
                     "module": "tile_colorfix",
-                    "output_dir": "",
                     "pixel_perfect": false,
                     "processor_res": 512,
                     "resize_mode": 1,
@@ -272,16 +307,13 @@
             "item": {
                 "kind": "N",
                 "rhs": {
-                    "batch_images": "",
                     "control_mode": 2,
                     "enabled": true,
                     "guidance_end": 1,
                     "guidance_start": 0,
-                    "input_mode": 0,
                     "low_vram": false,
                     "model": "control_v11f1e_sd15_tile [a371b31b]",
                     "module": "tile_colorfix",
-                    "output_dir": "",
                     "pixel_perfect": false,
                     "processor_res": 512,
                     "resize_mode": 1,
