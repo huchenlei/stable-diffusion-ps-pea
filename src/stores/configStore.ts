@@ -16,11 +16,11 @@ async function fetchDefaultConfigs(): Promise<Record<string, StateDiff>> {
 // Base and addon config should all be delta with reference to Default config.
 export const useConfigStore = defineStore('configStore', {
     state: () => ({
-        configEntries: { default: [], lcm: [] } as Record<string, StateDiff>,
+        configEntries: { default: [] } as Record<string, StateDiff>,
         baseConfigName: 'default',
         toolboxConfigNames: [] as string[],
         // Config for realtime rendering.
-        lcmConfigName: 'lcm',
+        lcmConfigNames: [] as string[],
     }),
     actions: {
         async initializeConfigEntries() {
@@ -31,19 +31,20 @@ export const useConfigStore = defineStore('configStore', {
                 this.configEntries = await fetchDefaultConfigs();
                 this.baseConfigName = 'default';
                 this.toolboxConfigNames = Object.keys(this.configEntries).filter(name => name !== this.baseConfigName);
-                this.lcmConfigName = 'lcm';
+                this.lcmConfigNames = ['lcm_base', 'lcm_sd15_lora'];
 
                 // Persists all initialized configs.
                 this.updateCurrentConfig(this.baseConfigName);
                 this.persistConfigEntries();
                 this.persistToolbox();
+                this.persistLCM();
 
                 console.debug("New user config initialization");
             } else {
                 this.configEntries = JSON5.parse(localConfigString);
                 this.baseConfigName = localStorage.getItem('baseConfig') || 'default';
                 this.toolboxConfigNames = JSON5.parse(localStorage.getItem('toolboxConfigs') || '[]');
-                this.lcmConfigName = localStorage.getItem('lcmConfig') || 'lcm';
+                this.lcmConfigNames = JSON5.parse(localStorage.getItem('lcmConfigs') || '[]');
                 console.debug("Normal config initialization");
             }
         },
@@ -73,7 +74,7 @@ export const useConfigStore = defineStore('configStore', {
             localStorage.setItem('toolboxConfigs', JSON5.stringify(toRaw(this.toolboxConfigNames)));
         },
         persistLCM() {
-            localStorage.setItem('lcmConfig', this.lcmConfigName);
+            localStorage.setItem('lcmConfigs', JSON5.stringify(toRaw(this.lcmConfigNames)));
         },
     },
 });

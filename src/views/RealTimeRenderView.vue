@@ -14,7 +14,6 @@ import { applyStateDiff, type StateDiff } from '@/Config';
 import type { ApplicationState } from '@/Core';
 import _ from "lodash";
 
-
 const a1111Context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
 const appState = appStateStore.appState;
@@ -29,8 +28,8 @@ const filterConfig = (input: string, option: any) => {
   return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 
-function onSelectLCMConfig(configName: string) {
-  configStore.lcmConfigName = configName;
+function onLCMConfigChange(configNames: string[]) {
+  configStore.lcmConfigNames = configNames;
   configStore.persistLCM();
 }
 
@@ -90,10 +89,11 @@ onMounted(async () => {
       return;
     }
     const stateToSend: ApplicationState = _.cloneDeep(appState);
-
     // Apply LCM config.
-    const lcmConfig: StateDiff = configStore.configEntries[configStore.lcmConfigName];
-    applyStateDiff(stateToSend, lcmConfig);
+    configStore.lcmConfigNames.forEach(lcmConfigName => {
+      const lcmConfig: StateDiff = configStore.configEntries[lcmConfigName];
+      applyStateDiff(stateToSend, lcmConfig);
+    });
     let inputImage: PayloadImage;
     try {
       inputImage = await getInputImage();
@@ -153,8 +153,8 @@ onUnmounted(() => {
   <a-space direction="vertical" style="width: 100%;">
     <a-row style="display: flex; align-items: center;">
       <a-tag style="border: none; flex: 0 0 auto;">{{ $t('realtime.realtimeConfig') }}</a-tag>
-      <a-select :value="configStore.lcmConfigName" @update:value="onSelectLCMConfig" :options="allConfigOptions"
-        show-search :filter-option="filterConfig" style="flex: 1 1 auto;"></a-select>
+      <a-select :value="configStore.lcmConfigNames" @update:value="onLCMConfigChange" :options="allConfigOptions"
+        show-search :filter-option="filterConfig" mode="multiple" style="flex: 1 1 auto;"></a-select>
     </a-row>
     <SliderGroup :label="$t('gen.denoisingStrength')" v-model:value="appState.img2imgPayload.denoising_strength" :min="0"
       :max="1" :step="0.05"></SliderGroup>

@@ -46,7 +46,8 @@
             "rhs": 4,
         }
     ],
-    "lcm": [
+    // General configs for LCM usage.
+    "lcm_base": [
         {
             "kind": "E",
             "path": [
@@ -92,6 +93,8 @@
             "lhs": 1,
             "rhs": 1,
         },
+    ],
+    "lcm_sd15_lora": [
         {
             "kind": "E",
             "path": [
