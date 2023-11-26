@@ -13,6 +13,7 @@ import { message } from 'ant-design-vue';
 import { applyStateDiff, type StateDiff } from '@/Config';
 import type { ApplicationState } from '@/Core';
 import _ from "lodash";
+import { exec } from 'child_process';
 
 const a1111Context = useA1111ContextStore().a1111Context;
 const appStateStore = useAppStateStore();
@@ -93,7 +94,13 @@ onMounted(async () => {
     // Apply LCM config.
     const lcmConfig: StateDiff = configStore.configEntries[configStore.lcmConfigName];
     applyStateDiff(stateToSend, lcmConfig);
-    const inputImage = await getInputImage();
+    let inputImage: PayloadImage;
+    try {
+      inputImage = await getInputImage();
+    } catch (e) {
+      // Failed to get input image.
+      return;
+    }
     stateToSend.img2imgPayload.init_images = [inputImage.dataURL];
     stateToSend.img2imgPayload.mask = undefined;
     stateToSend.commonPayload.height = inputImage.height;
