@@ -252,7 +252,7 @@ function exportControlNetInputImage(format) {
     }
 }
 
-function getControlNetSelectionBound() {
+function getActiveBound() {
     if (hasSelection()) {
         app.echoToOE(boundsToString(
             app.activeDocument.selection.bounds
@@ -409,6 +409,11 @@ function pickSegColor(rgb) {
         app.activeDocument.selection.fill(color);
         app.activeDocument.selection.deselect();
     }
-    
+
     app.echoToOE('success');
+}
+
+function getActiveDoc() {
+    const doc = app.activeDocument;
+    app.echoToOE(JSON.stringify([doc.id, doc.name]));
 }
