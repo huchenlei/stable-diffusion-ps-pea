@@ -33,9 +33,10 @@ function onSelectLCMConfig(configName: string) {
   configStore.persistLCM();
 }
 
+const seed = ref<number>(0);
 function rerollSeed() {
   // Generate a 32-bit integer
-  appState.commonPayload.seed = Math.floor(Math.random() * Math.pow(2, 32));
+  seed.value = Math.floor(Math.random() * Math.pow(2, 32));
 }
 
 // Send the rendered image to the canvas (selection)
@@ -94,10 +95,12 @@ onMounted(async () => {
     stateToSend.img2imgPayload.init_images = [(await getInputImage()).dataURL];
     stateToSend.img2imgPayload.mask = undefined;
     stateToSend.commonPayload.prompt += ',' + appState.commonPayload.prompt;
+    stateToSend.commonPayload.seed = seed.value;
     renderResult.value = await sendPayload(stateToSend);
   }
   intervalId = window.setInterval(renderCanvas, 5000); // Polling every 1s.
   [documentId.value, documentName.value] = await getActiveDoc();
+  rerollSeed();
 });
 
 onUnmounted(() => {
@@ -119,7 +122,7 @@ onUnmounted(() => {
      - A button that reroll the seed
      - A list of previously used seeds -->
     <a-row>
-      <a-input-number :addonBefore="$t('gen.seed')" v-model:value="appState.commonPayload.seed"></a-input-number>
+      <a-input-number :addonBefore="$t('gen.seed')" v-model:value="seed"></a-input-number>
       <a-button @click="rerollSeed">
         <DiceOutlined></DiceOutlined>
       </a-button>
