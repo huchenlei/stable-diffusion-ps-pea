@@ -63,7 +63,7 @@ onMounted(async () => {
     return await cropImage(imageBuffer, bounds);
   }
 
-  async function sendPayload(appState: ApplicationState): Promise<string> {    
+  async function sendPayload(appState: ApplicationState): Promise<string> {
     const response = await fetch(a1111Context.img2imgURL, {
       method: 'POST',
       headers: {
@@ -82,12 +82,13 @@ onMounted(async () => {
     return `data:image/png;base64,${result.images[0]}`;
   }
 
+  let previousPayload: ApplicationState | null = null;
   async function renderCanvas() {
     const activeDocumentId = (await getActiveDoc())[0];
     if (documentId.value !== activeDocumentId) {
       return;
     }
-    const stateToSend = _.cloneDeep(appState);
+    const stateToSend: ApplicationState = _.cloneDeep(appState);
 
     // Apply LCM config.
     const lcmConfig: StateDiff = configStore.configEntries[configStore.lcmConfigName];
@@ -99,7 +100,12 @@ onMounted(async () => {
     stateToSend.commonPayload.width = inputImage.width;
     stateToSend.commonPayload.prompt += ',' + appState.commonPayload.prompt;
     stateToSend.commonPayload.seed = seed.value;
+
+    if (_.isEqual(previousPayload, stateToSend))
+      return;
+
     renderResult.value = await sendPayload(stateToSend);
+    previousPayload = stateToSend;
   }
   intervalId = window.setInterval(renderCanvas, 5000); // Polling every 1s.
   [documentId.value, documentName.value] = await getActiveDoc();
@@ -108,7 +114,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   clearInterval(intervalId);
-})
+});
 </script>
 
 <template>
@@ -120,10 +126,6 @@ onUnmounted(() => {
     </a-row>
     <SliderGroup :label="$t('gen.denoisingStrength')" v-model:value="appState.img2imgPayload.denoising_strength" :min="0"
       :max="1" :step="0.05"></SliderGroup>
-    <!-- Seed control.
-     - Display the current active seed
-     - A button that reroll the seed
-     - A list of previously used seeds -->
     <a-row>
       <a-input-number :addonBefore="$t('gen.seed')" v-model:value="seed"></a-input-number>
       <a-button @click="rerollSeed">
