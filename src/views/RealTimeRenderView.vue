@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, render } from 'vue';
 import { useAppStateStore } from '@/stores/appStateStore';
 import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
@@ -47,7 +47,7 @@ function sendToCanvas() {
 const renderResult = ref<string | null>(null);
 const documentId = ref<number>(0);
 const documentName = ref<string>('');
-let intervalId: number;
+let viewActive = true;
 onMounted(async () => {
   async function getActiveDoc(): Promise<[number, string]> {
     return JSON.parse(
@@ -101,19 +101,44 @@ onMounted(async () => {
     stateToSend.commonPayload.prompt += ',' + appState.commonPayload.prompt;
     stateToSend.commonPayload.seed = seed.value;
 
+    // Prevent rendering if payload unchanged.
     if (_.isEqual(previousPayload, stateToSend))
       return;
 
     renderResult.value = await sendPayload(stateToSend);
     previousPayload = stateToSend;
   }
-  intervalId = window.setInterval(renderCanvas, 5000); // Polling every 1s.
+
+  function scheduleNextRender(fixedInterval: number) {
+    if (!viewActive) return;
+
+    console.debug("RealtimeRender: Schedule next render");
+    let renderCompleted = false;
+    let fixedTimerElapsed = false;
+    function checkAndScheduleNextRender() {
+      if (renderCompleted && fixedTimerElapsed) {
+        scheduleNextRender(fixedInterval);
+      }
+    }
+
+    renderCanvas().then(() => {
+      renderCompleted = true;
+      checkAndScheduleNextRender();
+    });
+
+    window.setTimeout(() => {
+      fixedTimerElapsed = true;
+      checkAndScheduleNextRender();
+    }, fixedInterval);
+  }
+
+  scheduleNextRender(2000);
   [documentId.value, documentName.value] = await getActiveDoc();
   rerollSeed();
 });
 
 onUnmounted(() => {
-  clearInterval(intervalId);
+  viewActive = false;
 });
 </script>
 
