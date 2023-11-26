@@ -63,7 +63,7 @@
                 "sampler_name",
             ],
             "lhs": "",
-            "rhs": "LCM", // 'Euler a' if LCM sampler is not available
+            "rhs": "Euler a", // 'Euler a' if LCM sampler is not available
         },
         {
             "kind": "E",
