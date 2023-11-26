@@ -5,8 +5,8 @@ import DiceOutlined from '@/components/svg/DiceOutlined.vue';
 import PromptInput from '@/components/PromptInput.vue';
 import { useConfigStore } from '@/stores/configStore';
 import SliderGroup from '@/components/SliderGroup.vue';
-import { photopeaContext, type PhotopeaBound } from '@/Photopea';
-import { PayloadImage, cropImage } from '@/ImageUtil';
+import { photopeaContext, type PhotopeaBound, boundWidth, boundHeight } from '@/Photopea';
+import { PayloadImage, cropImage, resizeImage } from '@/ImageUtil';
 import { useA1111ContextStore } from '@/stores/a1111ContextStore';
 import { GenerationMode, type IGenerationResult } from '@/Automatic1111';
 import { message } from 'ant-design-vue';
@@ -42,8 +42,14 @@ function rerollSeed() {
 }
 
 // Send the rendered image to the canvas (selection)
-function sendToCanvas() {
+async function sendToCanvas() {
+  if (!renderResult.value) return;
 
+  const bound = renderBound.value!;
+  await photopeaContext.pasteImageOnPhotopea(
+    await resizeImage(renderResult.value, boundWidth(bound), boundHeight(bound)),
+    bound, 'result'
+  );
 }
 
 async function getActiveDocName(): Promise<string> {
@@ -54,6 +60,7 @@ async function linkCurrentDocument() {
   documentName.value = await getActiveDocName();
 }
 
+const renderBound = ref<PhotopeaBound | null>(null);
 const renderResult = ref<string | null>(null);
 const documentName = ref<string>('');
 let viewActive = true;
@@ -125,6 +132,7 @@ onMounted(async () => {
       // Failed to get input image.
       return;
     }
+    renderBound.value = inputImage.bound;
     if (stateToSend.generationMode === GenerationMode.Img2Img) {
       // lcm_base should have generation mode set to img2img by default.
       stateToSend.img2imgPayload.init_images = [inputImage.dataURL];
@@ -188,9 +196,14 @@ onUnmounted(() => {
 <template>
   <a-divider orientation="left" orientation-margin="0px" size="small">
     {{ documentName }}
-    <a-button @click="linkCurrentDocument" size="small" :title="$t('realtime.linkCurrentDocument')">
-      <LinkOutlined></LinkOutlined>
-    </a-button>
+    <a-space>
+      <a-button @click="linkCurrentDocument" size="small" :title="$t('realtime.linkCurrentDocument')">
+        <LinkOutlined></LinkOutlined>
+      </a-button>
+      <a-button @click="sendToCanvas" type="primary" size="small">
+        {{ $t('realtime.sendToCanvas') }}
+      </a-button>
+    </a-space>
   </a-divider>
   <a-space direction="vertical" style="width: 100%;">
     <a-row style="display: flex; align-items: center;">
@@ -204,9 +217,6 @@ onUnmounted(() => {
       <a-input-number :addonBefore="$t('gen.seed')" v-model:value="seed"></a-input-number>
       <a-button @click="rerollSeed">
         <DiceOutlined></DiceOutlined>
-      </a-button>
-      <a-button @click="sendToCanvas">
-        {{ $t('realtime.sendToCanvas') }}
       </a-button>
     </a-row>
 
